@@ -21,8 +21,11 @@ class ProductGroupTest {
     @Test
     void possibleToAddProducts() {
         Product milk = new Product("Milk", 10);
+        Product egg = new Product("Egg", 5);
         ProductGroup p = new ProductGroup(PRODUCT_GROUP_NAME, milk);
+        p.addProduct(egg);
         assertEquals(milk, p.getProductGroup().get(0));
+        assertEquals(egg, p.getProductGroup().get(1));
     }
 
     @Test
