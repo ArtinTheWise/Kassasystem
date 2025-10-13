@@ -1,20 +1,23 @@
-package org.example;
-
-import org.example.Product.Product;
+package org.example.Product;
 
 import java.util.*;
 
 public class ProductGroup {
     private final String name;
     private final List<Product> products = new ArrayList<>();
+    private VatGroup vatGroup;
 
-    public ProductGroup(String name){
+    public ProductGroup(String name, VatGroup vatGroup){
         this.name = name;
     }
 
     public ProductGroup(String name, Product... product){
-        this(name);
-        this.products.addAll(Arrays.asList(product));
+        this.name = name;
+        products.addAll(Arrays.asList(product));
+    }
+
+    public VatGroup getVatGroup() {
+        return vatGroup;
     }
 
     public void addProduct(Product p) {

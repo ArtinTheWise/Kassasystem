@@ -1,22 +1,32 @@
 package org.example.Product;
-
 import org.example.Money;
 
 public abstract class Product {
     private final String name;
-    private final Money price;
+    private final PriceModel priceModel;
+    private final ProductGroup productGroup;
 
-    public Product(String name, Money price){
+    public Product(String name, PriceModel priceModel, ProductGroup productGroup){
         this.name = name;
-        this.price = price;
+        this.priceModel = priceModel;
+        this.productGroup = productGroup;
+        if(productGroup != null){
+            productGroup.addProduct(this);
+        }
     }
     public String getName(){
         return name;
     }
 
-    protected double getPrice(){
-        return price.getAmount();
+    public ProductGroup getProductGroup(){
+        return productGroup;
     }
 
-    public abstract double getFinalPrice();
+    public PriceModel getPriceModel(){
+        return priceModel;
+    }
+
+    public Money calculatePrice(Quantity quantity){
+        return priceModel.calculatePrice(quantity);
+    }
 }
