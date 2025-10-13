@@ -18,12 +18,8 @@ public abstract class Product {
         return name;
     }
 
-    public ProductGroup getProductGroup(){
-        return productGroup;
-    }
-
-    public PriceModel getPriceModel(){
-        return priceModel;
+    protected double getPrice(){
+        return 0.0; // VAD VAR HÄR
     }
 
     public Money calculatePrice(Quantity quantity){
