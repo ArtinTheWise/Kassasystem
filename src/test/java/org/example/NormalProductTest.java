@@ -20,7 +20,7 @@ class NormalProductTest {
     @Test
     void getFinalPriceReturnsCorrectPrice() {
         Money mockMoney = mock(Money.class);
-        when(mockMoney.getAmount()).thenReturn(10.0);
+        when(mockMoney.getAmountInMinorUnits()).thenReturn(10L);
 
         Product p = new NormalProduct("Milk", mockMoney);
         assertEquals(10, p.getFinalPrice());

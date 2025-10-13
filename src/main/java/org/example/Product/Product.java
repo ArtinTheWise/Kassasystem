@@ -15,7 +15,7 @@ public abstract class Product {
     }
 
     protected double getPrice(){
-        return price.getAmount();
+        return price.getAmountInMinorUnits();
     }
 
     public abstract double getFinalPrice();

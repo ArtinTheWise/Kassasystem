@@ -21,7 +21,7 @@ public class WeightedProductTest {
     @Test
     void getFinalPriceReturnsCorrectPrice() {
         Money mockMoney = mock(Money.class);
-        when(mockMoney.getAmount()).thenReturn(10.0);
+        when(mockMoney.getAmountInMinorUnits()).thenReturn(10L);
 
         Product p = new WeightedProduct("Lemon", mockMoney, 10);
         assertEquals(100, p.getFinalPrice());
