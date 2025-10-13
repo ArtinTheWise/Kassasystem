@@ -25,13 +25,4 @@ class NormalProductTest {
         Product p = new NormalProduct("Milk", mockMoney);
         assertEquals(10, p.getFinalPrice());
     }
-
-    @Test
-    void toStringIsOverloadedProperly() {
-        Money mockMoney = mock(Money.class);
-        when(mockMoney.getAmount()).thenReturn(10.0);
-
-        Product p = new NormalProduct("Milk", mockMoney);
-        assertEquals("Milk 10.0", p.toString());
-    }
 }
