@@ -20,7 +20,7 @@ public class Money implements Comparable<Money> {
 
     public Money add(long amountInMinorUnits){
         if(amountInMinorUnits < 0) throw new IllegalArgumentException();
-        return new Money(amountInMinorUnits + amountInMinorUnits);
+        return new Money(this.amountInMinorUnits + amountInMinorUnits);
     }
 
     public Money add(Money m){
