@@ -3,13 +3,13 @@ package org.example;
 import java.util.Objects;
 
 public class Money {
-    private final int amount;
+    private double amount;
 
-    public Money(int amount) {
+    public Money(double amount) {
         this.amount = amount;
     }
 
-    public int getAmount() {
+    public double getAmount() {
         return amount;
     }
 
@@ -33,6 +33,6 @@ public class Money {
 
     @Override
     public String toString() {
-        return Integer.toString(amount);
+        return Double.toString(amount);
     }
 }

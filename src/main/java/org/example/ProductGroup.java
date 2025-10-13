@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.Product.Product;
+
 import java.util.*;
 
 public class ProductGroup {
