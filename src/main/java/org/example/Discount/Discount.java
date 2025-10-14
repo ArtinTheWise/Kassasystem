@@ -8,3 +8,4 @@ public interface Discount {
     boolean isActive();
     Money calculatePrice(Quantity quantity);
 }
+//behövs inte

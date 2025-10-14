@@ -18,7 +18,7 @@ public class RecyclePrice implements PriceModel{
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
 
-        return pantPerPiece;
+        return new Money(Math.round(basePrice.calculatePrice(quantity).getAmountInMinorUnits() + (pantPerPiece.getAmountInMinorUnits() * quantity.getAmount())));
     }
     
 }

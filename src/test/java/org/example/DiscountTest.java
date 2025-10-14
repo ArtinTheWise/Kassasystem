@@ -3,9 +3,11 @@ package org.example;
 import org.example.Discount.NormalDiscount;
 import org.example.Discount.PercentageDiscount;
 import org.example.Discount.ProductDecorator;
+import org.example.Discount.ThreeForTwoDiscount;
 import org.example.Product.*;
 import org.junit.jupiter.api.Test;
 
+import static org.example.Product.Unit.KG;
 import static org.example.Product.Unit.PIECE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -114,6 +116,25 @@ public class DiscountTest {
         assertEquals(190, discountedProductGroup.getProductGroup().get(1).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
         assertEquals(290, discountedProductGroup.getProductGroup().get(2).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
+    }
+
+    @Test
+    void ThreeForTwoDiscountCalculatesDiscountCorrectly(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(100));
+        Product product = new Product("Milk", mockPriceModel);
+
+        Product discountedProduct = new ThreeForTwoDiscount(product, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
+        assertEquals(100, discountedProduct.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        assertEquals(200, discountedProduct.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
+        assertEquals(300, discountedProduct.calculatePrice(new Quantity(4, PIECE)).getAmountInMinorUnits());
+    }
+
+    @Test
+    void ThreeForTwoDiscountDoesNotAllowWeightPrice(){
+        PriceModel mockPriceModel = new WeightPrice(new Money(100), KG);
+        Product product = new Product("Milk", mockPriceModel);
+
+        assertThrows(IllegalArgumentException.class, () -> new ThreeForTwoDiscount(product, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1)));
     }
 
     private void assertInvalidDate(Product product, int percent, LocalDateTime start, LocalDateTime end) {

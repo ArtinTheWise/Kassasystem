@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ProductDecorator extends Product implements Discount{
+public abstract class ProductDecorator extends Product {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final Product product;
