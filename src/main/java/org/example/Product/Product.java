@@ -1,7 +1,7 @@
 package org.example.Product;
 import org.example.Money;
 
-public abstract class Product {
+public class Product {
     private final String name;
     private final PriceModel priceModel;
     private final ProductGroup productGroup;
@@ -14,13 +14,26 @@ public abstract class Product {
             productGroup.addProduct(this);
         }
     }
+
+    public Product(String name, PriceModel priceModel){
+        this(name, priceModel, null); //ändring från artin, antar man behöver inte vara i en grupp.
+    }
+
     public String getName(){
         return name;
     }
 
-    protected double getPrice(){
-        return 0.0; // VAD VAR HÄR
+    public PriceModel getPriceModel(){
+        return priceModel;
     }
+
+    public ProductGroup getProductGroup(){
+        return productGroup;
+    }
+
+    //protected double getPrice(){
+        //return 0.0; // VAD VAR HÄR
+    //}
 
     public Money calculatePrice(Quantity quantity){
         return priceModel.calculatePrice(quantity);

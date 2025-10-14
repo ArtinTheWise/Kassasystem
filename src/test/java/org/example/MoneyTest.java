@@ -88,13 +88,11 @@ public class MoneyTest {
         assertNotEquals(m1.hashCode(), new Money(50).hashCode());
     }
 
-    @Test
-    void compareToIsImplemented() {
+    @ParameterizedTest
+    @CsvSource({"0, 100", "1, 99", "-1, 101"})
+    void compareToIsImplemented(int i1, int i2) {
         Money m1 = new Money(100);
-
-        assertEquals(0, m1.compareTo(new Money(100)));
-        assertEquals(1, m1.compareTo(new Money(99)));
-        assertEquals(-1, m1.compareTo(new Money(101)));
+        assertEquals(i1, m1.compareTo(new Money(i2)));
     }
 
     @ParameterizedTest

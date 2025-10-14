@@ -18,8 +18,7 @@ public class WeightPrice implements PriceModel {
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
         
-        return null; // implementera pris uträkning i money klassen
+        return pricePerUnit; // implementera pris uträkning i money klassen
         
     }
-        
 }

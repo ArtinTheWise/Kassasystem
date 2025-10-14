@@ -9,10 +9,12 @@ public class ProductGroup {
 
     public ProductGroup(String name, VatGroup vatGroup){
         this.name = name;
+        this.vatGroup = vatGroup;
     }
 
-    public ProductGroup(String name, Product... product){
+    public ProductGroup(String name, VatGroup vatGroup, Product... product){
         this.name = name;
+        this.vatGroup = vatGroup;
         products.addAll(Arrays.asList(product));
     }
 

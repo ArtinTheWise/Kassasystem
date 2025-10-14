@@ -15,7 +15,7 @@ public class Money implements Comparable<Money> {
     }
 
     public long getAmountInMajorUnits(){
-        return amountInMinorUnits/100;
+        return amountInMinorUnits / 100;
     }
 
     public Money add(long amountInMinorUnits){
