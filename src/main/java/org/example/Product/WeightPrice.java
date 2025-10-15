@@ -13,13 +13,13 @@ public class WeightPrice implements PriceModel {
         if (pricePerUnit == null) {
             throw new IllegalArgumentException("Price per unit can't be null.");
         }
-        else if (pricePerUnit.getAmountInMinorUnits() <= 0) {
+        if (pricePerUnit.getAmountInMinorUnits() <= 0) {
             throw new IllegalArgumentException("Price per unit must be greater than zero.");
         }
-        else if (unit == null) {
+        if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
-        else if (unit == PIECE) {
+        if (unit == PIECE) {
             throw new IllegalArgumentException("Unit cannot be PIECE for WeightPrice.");
         }
 

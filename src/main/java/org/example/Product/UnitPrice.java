@@ -11,7 +11,7 @@ public class UnitPrice implements PriceModel {
             throw new IllegalArgumentException("Price per piece can't be null.");
         }
 
-        else if (pricePerPiece.getAmountInMinorUnits() <= 0) {
+        if (pricePerPiece.getAmountInMinorUnits() <= 0) {
             throw new IllegalArgumentException("Price per piece must be greater than zero.");
         }
 

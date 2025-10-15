@@ -11,10 +11,10 @@ public class UnitPriceWithPant implements PriceModel{
         if (basePrice == null){
             throw new IllegalArgumentException("Base price cannot be null.");
         }
-        else if (pantPerPiece == null){
+        if (pantPerPiece == null){
             throw new IllegalArgumentException("Pant per piece cannot be null.");
         }
-        else if (pantPerPiece.getAmountInMinorUnits() < 0){
+        if (pantPerPiece.getAmountInMinorUnits() < 0){
             throw new IllegalArgumentException("Pant per piece cannot be negative.");
         }
 
