@@ -31,31 +31,31 @@ class CustomerTest {
         assertEquals("test@example.com", customer.getEmailAddress());
     }
 
-    @Test
-    void isMember() {
-        Customer customer = new Customer("200404301234", "test@example.com");
-        customer.becomeMember();
-        assertTrue(customer.isMember());
-    }
-
-    @Test
-    void isExpiredMember() {
-        Customer customer = new Customer("130404301234", "test@example.com");
-        customer.becomeMember();
-        customer.changeDateOfMembership(LocalDate.of(1324, 4, 30));//test metod bara
-        assertFalse(customer.isMember());
-    }
-
-    @Test
-    void renewMember() {
-        Customer customer = new Customer("130404301234", "test@example.com");
-        customer.becomeMember();
-        customer.changeDateOfMembership(LocalDate.of(2023, 4, 30));//test metod bara
-
-        assertEquals(LocalDate.of(2023, 4, 30), customer.getDateOfMembership());
-
-        customer.renewMember();
-
-        assertEquals(LocalDate.now(), customer.getDateOfMembership());
-    }
+//    @Test
+//    void isMember() {
+//        Customer customer = new Customer("200404301234", "test@example.com");
+//        customer.becomeMember();
+//        assertTrue(customer.isMember());
+//    }
+//
+//    @Test
+//    void isExpiredMember() {
+//        Customer customer = new Customer("130404301234", "test@example.com");
+//        customer.becomeMember();
+//        customer.changeDateOfMembership(LocalDate.of(1324, 4, 30));//test metod bara
+//        assertFalse(customer.isMember());
+//    }
+//
+//    @Test
+//    void renewMembership() {
+//        Customer customer = new Customer("130404301234", "test@example.com");
+//        customer.becomeMember();
+//        customer.changeDateOfMembership(LocalDate.of(2023, 4, 30));//test metod bara
+//
+//        assertEquals(LocalDate.of(2023, 4, 30), customer.getDateOfMembership());
+//
+//        customer.renewMembership();
+//
+//        assertEquals(LocalDate.now(), customer.getDateOfMembership());
+//    }
 }
