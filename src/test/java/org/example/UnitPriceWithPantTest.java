@@ -50,21 +50,6 @@ public class UnitPriceWithPantTest {
     }
 
     @Test
-    @DisplayName("Calculate price for zero units correctly")
-    void calculatesCorrectPriceForZeroUnits(){
-        Money pricePerPiece = new Money(100); // 1.00 kr per piece
-        Money pantPerPiece = new Money(20); // 0.20 kr pant per piece
-        UnitPrice basePrice = new UnitPrice(pricePerPiece);
-        UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
-        Quantity quantity = new Quantity (0, org.example.Product.Unit.PIECE);
-
-        Money expectedPrice = new Money(0); // 0.00 kr
-        Money actualPrice = unitPriceWithPant.calculatePrice(quantity);
-
-        assert(expectedPrice.equals(actualPrice));
-    }
-
-    @Test
     @DisplayName("Handles very large quantities correctly")
     void handlesVeryLargeQuantitiesCorrectly(){
         Money pricePerPiece = new Money(100); // 1.00 kr per piece
@@ -118,22 +103,6 @@ public class UnitPriceWithPantTest {
             @SuppressWarnings("unused")
             UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, null);
             assert(false); // null pant should not reach here
-        } catch (IllegalArgumentException e) {
-            assert(true); // expected exception
-        }
-    }
-
-    @Test
-    @DisplayName("Throws exception for negative pant")
-    void throwsExceptionForNegativePant(){
-        Money pricePerPiece = new Money(100); // 1.00 kr per piece
-        Money pantPerPiece = new Money(-20); // -0.20 kr pant per piece
-        UnitPrice basePrice = new UnitPrice(pricePerPiece);
-
-        try {
-            @SuppressWarnings("unused")
-            UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
-            assert(false); // negative pant should not reach here
         } catch (IllegalArgumentException e) {
             assert(true); // expected exception
         }

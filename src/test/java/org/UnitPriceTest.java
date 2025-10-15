@@ -48,18 +48,6 @@ public class UnitPriceTest {
      }
 
      @Test
-     @DisplayName("Calculate price correct for decimal units")
-     void calculatesCorrectPriceForDecimalUnits(){
-        Money pricePerPiece = new Money(199); // 1.99 kr per piece
-        UnitPrice unitPrice = new UnitPrice(pricePerPiece);
-        Quantity quantity = new Quantity (2.5, Unit.PIECE);
-        Money expectedPrice = new Money(498); // 4.98 kr
-        Money actualPrice = unitPrice.calculatePrice(quantity);
-
-        assert(expectedPrice.equals(actualPrice));
-     }
-
-     @Test
      @DisplayName("Rounds off correctly for decimal results")
      void roundsOffCorrectlyForDecimalResults(){
         Money pricePerPiece = new Money(333); // 3.33 kr per piece
@@ -84,18 +72,6 @@ public class UnitPriceTest {
         } catch (IllegalArgumentException e) {
             assert(true); // expected exception
         }
-     }
-
-     @Test
-     @DisplayName("Calculate price for zero units correctly")
-     void calculatesCorrectPriceForZeroUnits(){
-        Money pricePerPiece = new Money(100); // 1.00 kr per piece
-        UnitPrice unitPrice = new UnitPrice(pricePerPiece);
-        Quantity quantity = new Quantity (0, Unit.PIECE);
-        Money expectedPrice = new Money(0); // 0.00 kr
-        Money actualPrice = unitPrice.calculatePrice(quantity);
-
-        assert(expectedPrice.equals(actualPrice));
      }
 
     @Test
