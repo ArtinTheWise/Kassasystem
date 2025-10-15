@@ -2,12 +2,12 @@ package org.example.Product;
 
 import org.example.Money;
 
-public class RecyclePrice implements PriceModel{
+public class UnitPriceWithPant implements PriceModel{
 
     private final UnitPrice basePrice; // Locked to UnitPrice - model
     private final Money pantPerPiece;
 
-    public RecyclePrice(UnitPrice basePrice, Money pantPerPiece){
+    public UnitPriceWithPant(UnitPrice basePrice, Money pantPerPiece){
         this.basePrice = basePrice;
         this.pantPerPiece = pantPerPiece;
     }
@@ -18,7 +18,9 @@ public class RecyclePrice implements PriceModel{
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
 
-        return new Money(Math.round(basePrice.calculatePrice(quantity).getAmountInMinorUnits() + (pantPerPiece.getAmountInMinorUnits() * quantity.getAmount())));
+        return new Money(Math.round(basePrice.calculatePrice(quantity).getAmountInMinorUnits() 
+        + (pantPerPiece.getAmountInMinorUnits() 
+        * quantity.getAmount())));
     }
     
 }

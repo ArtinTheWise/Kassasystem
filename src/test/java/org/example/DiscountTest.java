@@ -6,9 +6,12 @@ import org.example.Discount.ProductDecorator;
 import org.example.Discount.ThreeForTwoDiscount;
 import org.example.Product.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.example.Product.Unit.KG;
 import static org.example.Product.Unit.PIECE;
+import static org.example.Product.VatRate.OTHER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -19,125 +22,106 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DiscountTest {
+    private static final int DISCOUNT_AMOUNT = 20;
+    private static final LocalDateTime DATE_IN_FUTURE = LocalDateTime.now().plusDays(1);
+    private static final LocalDateTime DATE_IN_PAST = LocalDateTime.now().minusDays(1);
 
     @Test
     void isActiveWorksForValidDates(){
-        Product mockProduct = mock(Product.class);
-        PercentageDiscount activeDiscount = new PercentageDiscount(mockProduct, 20, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-
+        PercentageDiscount activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
         assertTrue(activeDiscount.isActive());
 
-        PercentageDiscount inactiveDiscount = new PercentageDiscount(mockProduct, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
+        PercentageDiscount inactiveDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
         assertFalse(inactiveDiscount.isActive());
     }
 
     @Test
     void constructorDoesNotAllowImpossibleDate(){
-        Product mockProduct = mock(Product.class);
-        assertInvalidDate(mockProduct, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().minusDays(1));
-        assertInvalidDate(mockProduct, 20, null, null);
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_PAST));
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, null, null));
     }
 
     @Test
     void percentDiscountGivesCorrectDiscount(){
-        PriceModel mockPriceModel = mock(PriceModel.class);
-        when(mockPriceModel.calculatePrice(any())).thenReturn(new Money(100));
-        Product product = new Product("Milk", mockPriceModel);
 
-        Product activeDiscount = new PercentageDiscount(product, 20, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-        assertEquals(80, activeDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        Product activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertEquals(96, activeDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
-        Product inactiveDiscount = new PercentageDiscount(product, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
-        assertEquals(100, inactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        Product inactiveDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
+        assertEquals(120, inactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
     }
 
     @Test
     void percentDiscountIsValid(){
-        Product mockProduct = mock(Product.class);
-        assertDoesNotThrow(() -> new PercentageDiscount(mockProduct, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
-        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(mockProduct, 101, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
-        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(mockProduct, -1, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
+        assertDoesNotThrow(() -> new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE));
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(getMockProduct(), 101, DATE_IN_PAST, DATE_IN_FUTURE));
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(getMockProduct(), -1, DATE_IN_PAST, DATE_IN_FUTURE));
     }
 
     @Test
     void getNameSaysIfThereIsADiscount(){
-        PriceModel mockPriceModel = mock(PriceModel.class);
-        Product product = new Product("Milk", mockPriceModel);
-        Product activeDiscount = new PercentageDiscount(product, 20, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
+        Product activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
         assertEquals("Milk got a discount.", activeDiscount.getName());
 
-        Product inactiveDiscount = new PercentageDiscount(product, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
+        Product inactiveDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
         assertEquals("Milk", inactiveDiscount.getName());
     }
 
     @Test
     void normalDiscountGivesCorrectDiscount(){
-        PriceModel mockPriceModel = mock(PriceModel.class);
-        when(mockPriceModel.calculatePrice(any())).thenReturn(new Money(100));
-        Product product = new Product("Milk", mockPriceModel);
+        Product activeDiscount = new NormalDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertEquals(100, activeDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
-        Product activeDiscount = new NormalDiscount(product, 10, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-        assertEquals(90, activeDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
-
-        Product inactiveDiscount = new NormalDiscount(product, 10, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
-        assertEquals(100, inactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        Product inactiveDiscount = new NormalDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
+        assertEquals(120, inactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
     }
 
     @Test
     void normalDiscountIsValid(){
-        PriceModel mockPriceModel = mock(PriceModel.class);
-        when(mockPriceModel.calculatePrice(any())).thenReturn(new Money(100));
-        Product product = new Product("Milk", mockPriceModel);
-        assertDoesNotThrow(() -> new NormalDiscount(product, 20, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
-        assertThrows(IllegalArgumentException.class, () -> new NormalDiscount(product, -1, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
+        assertDoesNotThrow(() -> new NormalDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE));
+        assertThrows(IllegalArgumentException.class, () -> new NormalDiscount(getMockProduct(), -1, DATE_IN_FUTURE, DATE_IN_FUTURE));
         //assertThrows(IllegalArgumentException.class, () -> new NormalDiscount(product, 101, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2))); problem med att få money från en produkt.
     }
 
-    @Test
-    void discountProductGroupDiscountsEveryProductInGroup(){
-        PriceModel mockPriceModel1 = mock(PriceModel.class);
-        when(mockPriceModel1.calculatePrice(any())).thenReturn(new Money(100));
-        Product product1 = new Product("Green Apple", mockPriceModel1);
+    @ParameterizedTest
+    @CsvSource({"100, 0", "200, 1", "300, 2"})
+    void discountProductGroupDiscountsEveryProductInGroup(int i1, int i2){
+        Product productOne = getMockProduct();
+        Product productTwo = getMockProduct();
+        Product productThree = getMockProduct();
+        when(productTwo.calculatePrice(any())).thenReturn(new Money(220));
+        when(productThree.calculatePrice(any())).thenReturn(new Money(320));
 
-        PriceModel mockPriceModel2 = mock(PriceModel.class);
-        when(mockPriceModel2.calculatePrice(any())).thenReturn(new Money(200));
-        Product product2 = new Product("Red Apple", mockPriceModel2);
-
-        PriceModel mockPriceModel3 = mock(PriceModel.class);
-        when(mockPriceModel3.calculatePrice(any())).thenReturn(new Money(300));
-        Product product3 = new Product("Yellow Apple", mockPriceModel3);
-
-        VatGroup vatMock = mock(VatGroup.class);
-
-        ProductGroup productGroup = new ProductGroup("Apples", vatMock, product1, product2, product3);
-
-        ProductGroup discountedProductGroup = NormalDiscount.discountGroup(productGroup, 10, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-        assertEquals(90, discountedProductGroup.getProductGroup().get(0).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
-        assertEquals(190, discountedProductGroup.getProductGroup().get(1).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
-        assertEquals(290, discountedProductGroup.getProductGroup().get(2).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        ProductGroup productGroup = new ProductGroup("Milk", productOne, productTwo, productThree);
+        ProductGroup discountedProductGroup = NormalDiscount.discountGroup(productGroup, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertEquals(i1, discountedProductGroup.getProductGroup().get(i2).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
     }
 
-    @Test
-    void ThreeForTwoDiscountCalculatesDiscountCorrectly(){
-        PriceModel mockPriceModel = new UnitPrice(new Money(100));
-        Product product = new Product("Milk", mockPriceModel);
+    @ParameterizedTest
+    @CsvSource({"120, 1", "240, 3", "360, 4"})
+    void ThreeForTwoDiscountCalculatesDiscountCorrectly(int i1, int i2){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
 
-        Product discountedProduct = new ThreeForTwoDiscount(product, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1));
-        assertEquals(100, discountedProduct.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
-        assertEquals(200, discountedProduct.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
-        assertEquals(300, discountedProduct.calculatePrice(new Quantity(4, PIECE)).getAmountInMinorUnits());
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product discountedProduct = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertEquals(i1, discountedProduct.calculatePrice(new Quantity(i2, PIECE)).getAmountInMinorUnits());
     }
 
     @Test
     void ThreeForTwoDiscountDoesNotAllowWeightPrice(){
-        PriceModel mockPriceModel = new WeightPrice(new Money(100), KG);
-        Product product = new Product("Milk", mockPriceModel);
+        PriceModel mockPriceModel = new WeightPrice(new Money(120), KG);
+        Product product = new Product("Milk", mockPriceModel, OTHER);
 
-        assertThrows(IllegalArgumentException.class, () -> new ThreeForTwoDiscount(product, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1)));
+        assertThrows(IllegalArgumentException.class, () -> new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE));
     }
 
-    private void assertInvalidDate(Product product, int percent, LocalDateTime start, LocalDateTime end) {
-        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(product, percent, start, end));
+    private Product getMockProduct(){
+        Product mockProduct = mock(Product.class);
+        when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
+        when(mockProduct.getName()).thenReturn("Milk");
+        return mockProduct;
     }
+
 }

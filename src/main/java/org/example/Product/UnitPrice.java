@@ -2,7 +2,7 @@ package org.example.Product;
 
 import org.example.Money;
 
-public class UnitPrice implements PriceModel{
+public class UnitPrice implements PriceModel {
 
     private final Money pricePerPiece;
 
@@ -17,9 +17,8 @@ public class UnitPrice implements PriceModel{
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
 
-        return new Money(Math.round(pricePerPiece.getAmountInMinorUnits() * quantity.getAmount())); // implementera pris uträkning i money klassen
+        return new Money(Math.round(pricePerPiece.getAmountInMinorUnits() 
+        * quantity.getAmount())); 
     }
-
-
     
 }
