@@ -1,9 +1,6 @@
 package org.example;
 
-import org.example.Discount.NormalDiscount;
-import org.example.Discount.PercentageDiscount;
-import org.example.Discount.ProductDecorator;
-import org.example.Discount.ThreeForTwoDiscount;
+import org.example.Discount.*;
 import org.example.Product.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +30,9 @@ public class DiscountTest {
 
         PercentageDiscount inactiveDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
         assertFalse(inactiveDiscount.isActive());
+
+        PercentageDiscount oldDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_PAST);
+        assertFalse(oldDiscount.isActive());
     }
 
     @Test
@@ -117,11 +117,83 @@ public class DiscountTest {
         assertThrows(IllegalArgumentException.class, () -> new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE));
     }
 
+    @Test
+    void discountManagerDoesNotAllowNullInConstructor(){
+        Product product = null;
+        assertThrows(IllegalArgumentException.class, () -> new DiscountManager(product));
+    }
+
+    @Test
+    void discountManagerOnlyAllowsDiscountedProducts(){
+        Product product = getMockProduct();
+        assertThrows(IllegalArgumentException.class, () -> new DiscountManager(product));
+
+        Product discountedProduct = mock(PercentageDiscount.class);
+        assertDoesNotThrow(() -> new DiscountManager(discountedProduct));
+    }
+
+    @Test
+    void discountManagerSaysIfProductGotDiscount(){
+        PriceModel mockPriceModel = mock(PriceModel.class);
+        Product productOne = new Product("Milk", mockPriceModel, OTHER);
+        Product productTwo = new Product("Egg", mockPriceModel, OTHER);
+        Product productThree = new Product("Apple", mockPriceModel, OTHER);
+        Product productFour = new Product("Egg", mockPriceModel, OTHER);
+
+        Product activeDiscount = new PercentageDiscount(productTwo, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        Product inactiveDiscount = new PercentageDiscount(productThree, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
+        DiscountManager manager = new DiscountManager(activeDiscount, inactiveDiscount);
+
+        assertFalse(manager.discountCheck(productOne));
+        assertTrue(manager.discountCheck(productTwo));
+        assertFalse(manager.discountCheck(productThree));
+        assertTrue(manager.discountCheck(productFour));
+    }
+
+    @Test
+    void discountManagerWithOldAndNewDiscount(){
+        PriceModel mockPriceModel = mock(PriceModel.class);
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product oldDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_PAST);
+        Product activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        DiscountManager manager = new DiscountManager(oldDiscount, activeDiscount);
+
+        assertTrue(manager.discountCheck(product));
+    }
+
+    @Test
+    void discountManagerWithInactiveAndActiveDiscount(){
+        PriceModel mockPriceModel = mock(PriceModel.class);
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product futureDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
+        Product activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        DiscountManager manager = new DiscountManager(futureDiscount, activeDiscount);
+
+        assertTrue(manager.discountCheck(product));
+    }
+
+    @Test
+    void discountManagerReturnsCheapestDiscount(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product goodDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        Product badDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        DiscountManager manager = new DiscountManager(badDiscount, goodDiscount);
+
+        assertEquals(96, manager.getBestDiscount(product, new Quantity(1, PIECE)).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+    }
+
+    //TEST MED 3 FÖR 2 FÖR CHEAPEST DISCOUNT, INDATA KONTROLLER FÖR DISCOUNT MANAGER
+    //DISCOUNT GROUP METOD I DISCOUNT MANAGER
+    //ADD AND REMOVE DISCOUNT I DISCOUNT MANAGER
+
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
         when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
         when(mockProduct.getName()).thenReturn("Milk");
         return mockProduct;
     }
-
 }

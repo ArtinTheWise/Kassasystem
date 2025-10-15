@@ -39,42 +39,6 @@ public class ProductTest {
     }
 
     @Test
-    void calculatePriceWithVatForWeightKG() {
-        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(8900), KG), new ProductGroup("Godis"), FOOD, false);
-        Quantity quantity = new Quantity(0.1, Unit.KG);
-
-        double expectedWithVat = 890 * (1 + FOOD.getRate() / 100.0);
-        Money expected = new Money(Math.round(expectedWithVat));
-        Money actual = product.calculatePriceWithVat(quantity);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void calculatePriceWithVatForWeightHG() {
-        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(700), HG), new ProductGroup("Godis"), FOOD, false);
-        Quantity quantity = new Quantity(3, Unit.HG);
-
-        double expectedWithVat = 2100 * (1 + FOOD.getRate() / 100.0);
-        Money expected = new Money(Math.round(expectedWithVat));
-        Money actual = product.calculatePriceWithVat(quantity);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void calculatePriceWithVatForWeightG() {
-        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(5), G), new ProductGroup("Godis"), FOOD, false);
-        Quantity quantity = new Quantity(300, Unit.G);
-
-        double expectedWithVat = 1500 * (1 + FOOD.getRate() / 100.0);
-        Money expected = new Money(Math.round(expectedWithVat));
-        Money actual = product.calculatePriceWithVat(quantity);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
     void calculatePriceWithVatReturnsCorrectPriceForFOOD() {
         Product product = new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false);
         Quantity quantity = new Quantity(3, Unit.PIECE);
@@ -104,6 +68,42 @@ public class ProductTest {
         Quantity quantity = new Quantity(2, Unit.PIECE);
 
         double expectedWithVat = 300000 * (1 + BOOKSANDPAPERS.getRate() / 100.0);
+        Money expected = new Money(Math.round(expectedWithVat));
+        Money actual = product.calculatePriceWithVat(quantity);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void calculatePriceWithVatReturnsCorrectPriceForWeightKG() {
+        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(8900), KG), new ProductGroup("Godis"), FOOD, false);
+        Quantity quantity = new Quantity(0.1, Unit.KG);
+
+        double expectedWithVat = 890 * (1 + FOOD.getRate() / 100.0);
+        Money expected = new Money(Math.round(expectedWithVat));
+        Money actual = product.calculatePriceWithVat(quantity);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void calculatePriceWithVatReturnsCorrectPriceForWeightHG() {
+        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(700), HG), new ProductGroup("Godis"), FOOD, false);
+        Quantity quantity = new Quantity(3, Unit.HG);
+
+        double expectedWithVat = 2100 * (1 + FOOD.getRate() / 100.0);
+        Money expected = new Money(Math.round(expectedWithVat));
+        Money actual = product.calculatePriceWithVat(quantity);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void calculatePriceWithVatReturnsCorrectPriceForWeightG() {
+        Product product = new Product("Godis Lösvikt", new WeightPrice(new Money(5), G), new ProductGroup("Godis"), FOOD, false);
+        Quantity quantity = new Quantity(300, Unit.G);
+
+        double expectedWithVat = 1500 * (1 + FOOD.getRate() / 100.0);
         Money expected = new Money(Math.round(expectedWithVat));
         Money actual = product.calculatePriceWithVat(quantity);
 

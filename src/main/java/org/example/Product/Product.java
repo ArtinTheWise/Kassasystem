@@ -1,6 +1,8 @@
 package org.example.Product;
 import org.example.Money;
 
+import java.util.Objects;
+
 public class Product {
     private final String name;
     private final PriceModel priceModel;
@@ -65,7 +67,12 @@ public class Product {
         return new Money(Math.round(price.getAmountInMinorUnits() * (1 + vatRate.getRate()/100.0)));
     }
 
-    public String toString() {
-        return "Name: " + name + " Price Model: " + priceModel + " Product Group: " + productGroup + " VAT Rate: " + vatRate;
+    @Override
+    public boolean equals(Object o){
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
+
+        Product other = (Product) o;
+        return name.equals(other.name);
     }
 }
