@@ -232,7 +232,7 @@ public class WeightPriceTest {
             WeightPrice weightPrice = new WeightPrice(pricePerG, Unit.G);
             org.example.Product.Quantity quantity = new org.example.Product.Quantity (2, Unit.G);
 
-            Money expectedPrice = new Money(1); // 0.02 kr
+            Money expectedPrice = new Money(2); // 0.02 kr
             Money actualPrice = weightPrice.calculatePrice(quantity);
 
             assert(expectedPrice.equals(actualPrice));
