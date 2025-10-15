@@ -1,6 +1,8 @@
 package org.example.Product;
 import org.example.Money;
 
+import java.util.Objects;
+
 public class Product {
     private final String name;
     private final PriceModel priceModel;
@@ -63,5 +65,14 @@ public class Product {
     public Money calculatePriceWithVat(Quantity quantity){
         Money price = calculatePrice(quantity);
         return new Money(Math.round(price.getAmountInMinorUnits() * (1 + vatRate.getRate()/100.0)));
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (this == o) return true;
+        if (!(o instanceof Product)) return false;
+
+        Product other = (Product) o;
+        return name.equals(other.name);
     }
 }

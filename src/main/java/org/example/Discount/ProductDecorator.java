@@ -38,6 +38,14 @@ public abstract class ProductDecorator extends Product {
         return product.getName();
     }
 
+    public LocalDateTime getStartTime(){
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime(){
+        return endTime;
+    }
+
     protected Product getProduct(){
         return product;
     }
