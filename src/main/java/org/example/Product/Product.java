@@ -6,8 +6,9 @@ public class Product {
     private final PriceModel priceModel;
     private final ProductGroup productGroup;
     private final VatRate vatRate;
+    private final Boolean ageRestriction;
 
-    public Product(String name, PriceModel priceModel, ProductGroup productGroup, VatRate vatRate){
+    public Product(String name, PriceModel priceModel, ProductGroup productGroup, VatRate vatRate, Boolean ageRestriction){
         this.name = name;
         this.priceModel = priceModel;
         this.productGroup = productGroup;
@@ -15,14 +16,16 @@ public class Product {
             productGroup.addProduct(this);
         }
         this.vatRate = vatRate;
+        this.ageRestriction = ageRestriction;
     }
 
     // en produkt behöver inte ha en grupp.
-    public Product(String name, PriceModel priceModel, VatRate vatRate){
+    public Product(String name, PriceModel priceModel, VatRate vatRate, boolean ageRestriction){
         this.name = name;
         this.priceModel = priceModel;
         this.productGroup = null;
         this.vatRate = vatRate; 
+        this.ageRestriction = ageRestriction;
     }
 
     public String getName(){
@@ -39,6 +42,10 @@ public class Product {
 
     public VatRate getVatRate(){
         return vatRate;
+    }
+
+    public Boolean getAgeRestriction(){
+        return ageRestriction;
     }
 
     public Money calculatePrice(Quantity quantity){
