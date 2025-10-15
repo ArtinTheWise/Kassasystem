@@ -25,7 +25,7 @@ public class UnitPrice implements PriceModel {
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
 
-        if (quantity.getAmount() < 1) {
+        if (quantity.getAmount() < 1.0) {
             throw new IllegalArgumentException("Quantity must be at least 1 for PIECE unit.");
         }
 

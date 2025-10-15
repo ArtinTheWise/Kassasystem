@@ -33,6 +33,9 @@ public class WeightPriceTest {
      * kastar undantag för negativt pris per gram
      * Kastar undantag om enhet är null
      * Kastar undantag om pris per enhet är null
+     * minimum 1 gram
+     * minimum 0.1 hektogram
+     * minimum 0.001 kilogram
      * 
      * REDUCERA ANTALET TESTFALL?
      */
@@ -44,6 +47,7 @@ public class WeightPriceTest {
             WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
             assert(weightPrice != null);
         }
+
     @Test
     @DisplayName("Can create WeightPrice with hectogram as unit")
         void canCreateWeightPriceWithHectogramAsUnit(){
@@ -51,6 +55,7 @@ public class WeightPriceTest {
             WeightPrice weightPrice = new WeightPrice(pricePerHg, Unit.HG);
             assert(weightPrice != null);
         }
+
     @Test
     @DisplayName("Can create WeightPrice with gram as unit")
         void canCreateWeightPriceWithGramAsUnit(){
@@ -58,6 +63,7 @@ public class WeightPriceTest {
             WeightPrice weightPrice = new WeightPrice(pricePerG, Unit.G);
             assert(weightPrice != null);
         }
+
     @Test
     @DisplayName("Calculate price for one kilogram correctly")
         void calculatesCorrectPriceForOneKilogram(){
@@ -70,6 +76,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+        
     @Test
     @DisplayName("Calculate price for multiple kilograms correctly")
         void calculatesCorrectPriceForMultipleKilograms(){
@@ -82,6 +89,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price correct for decimal kilograms")
         void calculatesCorrectPriceForDecimalKilograms(){
@@ -94,6 +102,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price for one hectogram correctly")
         void calculatesCorrectPriceForOneHectogram(){
@@ -106,6 +115,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price for multiple hectograms correctly")
         void calculatesCorrectPriceForMultipleHectograms(){
@@ -118,6 +128,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price correct for decimal hectograms")
         void calculatesCorrectPriceForDecimalHectograms(){
@@ -130,6 +141,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price for one gram correctly")
         void calculatesCorrectPriceForOneGram(){
@@ -142,6 +154,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price for multiple grams correctly")
         void calculatesCorrectPriceForMultipleGrams(){
@@ -154,6 +167,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price correct for decimal grams")
         void calculatesCorrectPriceForDecimalGrams(){
@@ -166,6 +180,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Throws exception when quantity unit does not match price model unit")
         void throwsExceptionWhenQuantityUnitDoesNotMatchPriceModelUnit(){
@@ -180,6 +195,7 @@ public class WeightPriceTest {
                 assert(true); // Test passes if exception is thrown
             }
         }
+
     @Test
     @DisplayName("Throws exception for piece unit")
         void throwsExceptionForPieceUnit(){
@@ -194,18 +210,8 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
-    @Test
-    @DisplayName("Handles zero quantity correctly")
-        void handlesZeroQuantityCorrectly(){
-            Money pricePerKg = new Money(1000); // 10.00 kr per kg
-            WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
-            org.example.Product.Quantity quantity = new org.example.Product.Quantity (0, Unit.KG);
 
-            Money expectedPrice = new Money(0); // 0.00 kr
-            Money actualPrice = weightPrice.calculatePrice(quantity);
 
-            assert(expectedPrice.equals(actualPrice));
-        }
     @Test
     @DisplayName("Handles very large quantities correctly")
         void handlesVeryLargeQuantitiesCorrectly(){
@@ -218,6 +224,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Handles very small weights correctly")
         void handlesVerySmallWeightsCorrectly(){
@@ -230,6 +237,7 @@ public class WeightPriceTest {
 
             assert(expectedPrice.equals(actualPrice));
         }
+
     @Test
     @DisplayName("Calculate price for negative kilograms throws exception")
         void calculatesCorrectPriceForNegativeKilogramsThrowsException(){
@@ -243,6 +251,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception for zero price per kilogram")
         void throwsExceptionForZeroPricePerKilogram(){
@@ -255,6 +264,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception for negative price per kilogram")
         void throwsExceptionForNegativePricePerKilogram(){
@@ -267,6 +277,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+        
     @Test
     @DisplayName("Throws exception for zero price per hectogram")
         void throwsExceptionForZeroPricePerHectogram(){
@@ -279,6 +290,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception for negative price per hectogram")
         void throwsExceptionForNegativePricePerHectogram(){
@@ -291,6 +303,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception for zero price per gram")
         void throwsExceptionForZeroPricePerGram(){
@@ -303,6 +316,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception for negative price per gram")
         void throwsExceptionForNegativePricePerGram(){
@@ -315,6 +329,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception if unit is null")
         void throwsExceptionIfUnitIsNull(){
@@ -327,6 +342,7 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
     @Test
     @DisplayName("Throws exception if price per unit is null")
         void throwsExceptionIfPricePerUnitIsNull(){
@@ -338,4 +354,46 @@ public class WeightPriceTest {
                 assert(true); // expected exception
             }
         }
+
+    @Test
+    @DisplayName("Throws exception for weight below minimum for kilogram")
+        void throwsExceptionForWeightBelowMinimumForKilogram(){
+            Money pricePerKg = new Money(1000); // 10.00 kr per kg
+            WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
+            try {
+                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.0005, Unit.KG);
+                weightPrice.calculatePrice(quantity);
+                assert(false); // Weight below minimum should not reach here
+            } catch (IllegalArgumentException e) {
+                assert(true); // expected exception
+            }
+        }
+    @Test
+    @DisplayName("Throws exception for weight below minimum for hectogram")
+        void throwsExceptionForWeightBelowMinimumForHectogram(){
+            Money pricePerHg = new Money(100); // 1.00 kr per hg
+            WeightPrice weightPrice = new WeightPrice(pricePerHg, Unit.HG);
+            try {
+                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.05, Unit.HG);
+                weightPrice.calculatePrice(quantity);
+                assert(false); // Weight below minimum should not reach here
+            } catch (IllegalArgumentException e) {
+                assert(true); // expected exception
+            }
+        }
+    @Test
+    @DisplayName("Throws exception for weight below minimum for gram")
+        void throwsExceptionForWeightBelowMinimumForGram(){
+            Money pricePerG = new Money(10); // 0.10 kr per g
+            WeightPrice weightPrice = new WeightPrice(pricePerG, Unit.G);
+            try {
+                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.5, Unit.G);
+                weightPrice.calculatePrice(quantity);
+                assert(false); // Weight below minimum should not reach here
+            } catch (IllegalArgumentException e) {
+                assert(true); // expected exception
+            }
+        }
+
+    
 }

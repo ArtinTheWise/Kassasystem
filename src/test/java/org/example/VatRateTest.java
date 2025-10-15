@@ -35,7 +35,8 @@ public class VatRateTest {
         double netPrice = 100.0;
         double expectedPriceWithVat = 112.0;
         double actualPriceWithVat = vatRate.applyVAT(netPrice);
-        assert(expectedPriceWithVat == actualPriceWithVat);
+        double tolerance = 1e-9; // Define a small tolerance for floating-point comparison
+        assert(Math.abs(expectedPriceWithVat - actualPriceWithVat) < tolerance);
     }
 
     @Test
