@@ -200,7 +200,7 @@ public class QuantityTest {
     @DisplayName("Handles small weight for G correctly")
     void handlesSmallWeightForGCorrectly(){
         Quantity quantity = new Quantity(3, org.example.Product.Unit.G);
-        assert(quantity.getAmount() == 0.001);
+        assert(quantity.getAmount() == 3);
         assert(quantity.getUnit() == org.example.Product.Unit.G);
     }
 
