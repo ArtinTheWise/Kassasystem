@@ -19,7 +19,7 @@ public class Quantity {
         if (unit == Unit.HG && amount < 0.1) {
             throw new IllegalArgumentException("Weight must be at least 0.1 hg.");
         }
-        if (unit == Unit.G && amount < 1) {
+        if (unit == Unit.G && amount < 1.0) {
             throw new IllegalArgumentException("Weight must be at least 1 g.");
         }
         if (unit == null) {
