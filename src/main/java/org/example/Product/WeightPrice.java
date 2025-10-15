@@ -18,7 +18,8 @@ public class WeightPrice implements PriceModel {
             throw new IllegalArgumentException("Quantity unit does not match price model unit.");
         }
         
-        return new Money(Math.round(pricePerUnit.getAmountInMinorUnits() * quantity.getAmount())); // implementera pris uträkning i money klassen
+        return new Money(Math.round(pricePerUnit.getAmountInMinorUnits() 
+        * quantity.getAmount()));
         
     }
 }
