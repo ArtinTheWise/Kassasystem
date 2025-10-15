@@ -2,24 +2,19 @@ package org.example.Product;
 
 import java.util.*;
 
+
+ // REPRESENTS CATEGORIES - E.G. FRUIT, VEGETABLES, DAIRY, MEAT, BAKERY, BOOKS, ELECTRONICS
 public class ProductGroup {
     private final String name;
     private final List<Product> products = new ArrayList<>();
-    private VatGroup vatGroup;
 
-    public ProductGroup(String name, VatGroup vatGroup){
+    public ProductGroup(String name){
         this.name = name;
-        this.vatGroup = vatGroup;
     }
 
-    public ProductGroup(String name, VatGroup vatGroup, Product... product){
+    public ProductGroup(String name, Product... product){
         this.name = name;
-        this.vatGroup = vatGroup;
         products.addAll(Arrays.asList(product));
-    }
-
-    public VatGroup getVatGroup() {
-        return vatGroup;
     }
 
     public void addProduct(Product p) {
