@@ -1,5 +1,5 @@
 package org.example.Membership;
 
-public class BonusChecks {
+public class BonusCheck {
 
 }
