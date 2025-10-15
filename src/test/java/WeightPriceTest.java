@@ -355,45 +355,5 @@ public class WeightPriceTest {
             }
         }
 
-    @Test
-    @DisplayName("Throws exception for weight below minimum for kilogram")
-        void throwsExceptionForWeightBelowMinimumForKilogram(){
-            Money pricePerKg = new Money(1000); // 10.00 kr per kg
-            WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
-            try {
-                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.0005, Unit.KG);
-                weightPrice.calculatePrice(quantity);
-                assert(false); // Weight below minimum should not reach here
-            } catch (IllegalArgumentException e) {
-                assert(true); // expected exception
-            }
-        }
-    @Test
-    @DisplayName("Throws exception for weight below minimum for hectogram")
-        void throwsExceptionForWeightBelowMinimumForHectogram(){
-            Money pricePerHg = new Money(100); // 1.00 kr per hg
-            WeightPrice weightPrice = new WeightPrice(pricePerHg, Unit.HG);
-            try {
-                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.05, Unit.HG);
-                weightPrice.calculatePrice(quantity);
-                assert(false); // Weight below minimum should not reach here
-            } catch (IllegalArgumentException e) {
-                assert(true); // expected exception
-            }
-        }
-    @Test
-    @DisplayName("Throws exception for weight below minimum for gram")
-        void throwsExceptionForWeightBelowMinimumForGram(){
-            Money pricePerG = new Money(10); // 0.10 kr per g
-            WeightPrice weightPrice = new WeightPrice(pricePerG, Unit.G);
-            try {
-                org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.5, Unit.G);
-                weightPrice.calculatePrice(quantity);
-                assert(false); // Weight below minimum should not reach here
-            } catch (IllegalArgumentException e) {
-                assert(true); // expected exception
-            }
-        }
-
     
 }

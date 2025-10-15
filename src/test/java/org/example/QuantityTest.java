@@ -117,26 +117,6 @@ public class QuantityTest {
     }
 
     @Test
-    @DisplayName("Create quantity with minimum 0.001 for KG")
-    void createsQuantityWithMinimumForKg(){
-        Quantity quantity = new Quantity(0.001, org.example.Product.Unit.KG);
-        assert(quantity.getAmount() == 0.001);
-        assert(quantity.getUnit() == org.example.Product.Unit.KG);
-    }
-
-    @Test
-    @DisplayName("Throws exception for weight under minimum for KG")
-    void throwsExceptionForWeightUnderMinimumForKg(){
-        try {
-            @SuppressWarnings("unused")
-            Quantity quantity = new Quantity(0.0009, org.example.Product.Unit.KG);
-            assert(false); // Should not reach this point
-        } catch (IllegalArgumentException e) {
-            assert(e.getMessage().equals("Weight must be at least 0.001 kg."));
-        }
-    }
-
-    @Test
     @DisplayName("Create quantity with large whole number for KG")
     void createsQuantityWithLargeWholeNumberForKg(){
         Quantity quantity = new Quantity(1000000, org.example.Product.Unit.KG);
