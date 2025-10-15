@@ -28,6 +28,14 @@ public class Product {
         this.ageRestriction = ageRestriction;
     }
 
+    public Product(String name, PriceModel priceModel, VatRate vatRate){
+        this.name = name;
+        this.priceModel = priceModel;
+        this.productGroup = null;
+        this.vatRate = vatRate;
+        this.ageRestriction = false;
+    }
+
     public String getName(){
         return name;
     }

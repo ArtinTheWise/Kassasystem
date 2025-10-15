@@ -30,7 +30,7 @@ public class NormalDiscount extends ProductDecorator {
     }
 
     public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime startTime, LocalDateTime endTime) {
-        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName(), productGroup.getVatGroup());
+        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
 
         for(Product p : productGroup.getProductGroup()){
             discountedProductGroup.addProduct(new NormalDiscount(p, discount, startTime, endTime));

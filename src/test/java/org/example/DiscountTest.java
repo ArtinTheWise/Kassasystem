@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.example.Product.Unit.KG;
 import static org.example.Product.Unit.PIECE;
+import static org.example.Product.VatRate.OTHER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -91,8 +92,7 @@ public class DiscountTest {
         when(productTwo.calculatePrice(any())).thenReturn(new Money(220));
         when(productThree.calculatePrice(any())).thenReturn(new Money(320));
 
-        VatGroup vatMock = mock(VatGroup.class);
-        ProductGroup productGroup = new ProductGroup("Milk", vatMock, productOne, productTwo, productThree);
+        ProductGroup productGroup = new ProductGroup("Milk", productOne, productTwo, productThree);
         ProductGroup discountedProductGroup = NormalDiscount.discountGroup(productGroup, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
         assertEquals(i1, discountedProductGroup.getProductGroup().get(i2).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
@@ -102,7 +102,8 @@ public class DiscountTest {
     @CsvSource({"120, 1", "240, 3", "360, 4"})
     void ThreeForTwoDiscountCalculatesDiscountCorrectly(int i1, int i2){
         PriceModel mockPriceModel = new UnitPrice(new Money(120));
-        Product product = new Product("Milk", mockPriceModel);
+
+        Product product = new Product("Milk", mockPriceModel, OTHER);
 
         Product discountedProduct = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE);
         assertEquals(i1, discountedProduct.calculatePrice(new Quantity(i2, PIECE)).getAmountInMinorUnits());
@@ -111,7 +112,7 @@ public class DiscountTest {
     @Test
     void ThreeForTwoDiscountDoesNotAllowWeightPrice(){
         PriceModel mockPriceModel = new WeightPrice(new Money(120), KG);
-        Product product = new Product("Milk", mockPriceModel);
+        Product product = new Product("Milk", mockPriceModel, OTHER);
 
         assertThrows(IllegalArgumentException.class, () -> new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE));
     }
