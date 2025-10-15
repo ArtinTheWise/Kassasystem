@@ -56,4 +56,8 @@ public class Product {
         Money price = calculatePrice(quantity);
         return new Money(Math.round(price.getAmountInMinorUnits() * (1 + vatRate.getRate()/100.0)));
     }
+
+    public String toString() {
+        return "Name: " + name + " Price Model: " + priceModel + " Product Group: " + productGroup + " VAT Rate: " + vatRate;
+    }
 }
