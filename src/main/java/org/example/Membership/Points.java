@@ -8,6 +8,10 @@ public class Points {
         this.amountOfPoints = 0;
     }
 
+    public Points(long amountOfPoints) {
+        this.amountOfPoints = amountOfPoints;
+    }
+
     public void add(long points) {
         if(points < 0) throw new IllegalArgumentException("Points cannot be negative");
         this.amountOfPoints += points;

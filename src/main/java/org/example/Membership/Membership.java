@@ -4,14 +4,25 @@ import java.time.LocalDate;
 
 public class Membership {
 
-    private String socialSecurityNumber;
-    private String email;
+    private final Customer customer;
+    private final Points points;
     private LocalDate expirationDate;
 
-    public Membership(String socialSecurityNumber, String email) {
-        this.socialSecurityNumber = socialSecurityNumber;
-        this.email = email;
-        expirationDate = LocalDate.now().plusYears(5);
+
+    public Membership(Customer costumer) {
+        this.customer = costumer;
+        expirationDate = LocalDate.now().plusYears(5); //flyttal
+        points = new Points();
+    }
+
+    //nytt
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    //nytt
+    public Points getPoints() {
+        return points;
     }
 
     public LocalDate getExpirationDate() {
@@ -19,8 +30,21 @@ public class Membership {
     }
 
     public void extendExpirationDate() {
-        this.expirationDate = LocalDate.now().plusYears(5);
+        this.expirationDate = LocalDate.now().plusYears(5); //flyttal
     }
 
-    //cancel,
+    //nytt
+    public void cancelMembership() {
+        customer.cancelMembership();
+    }
+
+
+    // bara för tester
+    public void changeExpirationDate(LocalDate newExpirationDate) {
+        this.expirationDate = newExpirationDate;
+    }
+
+
+
+
 }

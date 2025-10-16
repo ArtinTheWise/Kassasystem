@@ -9,19 +9,13 @@ public class Customer {
 
     private final String socialSecurityNumber;
     private final String emailAddress;
+    // samling av checkar
+    private final List<BonusCheck> checks = new ArrayList<>(); // tas bort i kassan när de används eller tiden got ut
 
     // gör member till egen grej
-
     private Membership membership;
 
-    private Points points = null;
-
-    // samling av checkar
-    private List<BonusCheck> checks = new ArrayList<>(); // tas bort i kassan när de används eller tiden got ut
-
-    // antal points
-
-    // ev lista av köphistorik
+    // ev? lista av köphistorik
 
     public Customer(String socialSecurityNumber, String emailAddress) {
         if (emailAddress == null || socialSecurityNumber == null) {
@@ -33,8 +27,6 @@ public class Customer {
         membership = null;
     }
 
-
-
     public String getSocialSecurityNumber() {
         return socialSecurityNumber;
     }
@@ -44,37 +36,32 @@ public class Customer {
     }
 
     //membership
-    public void becomeMember() {
-        if (membership == null) {
-            LocalDate age = LocalDate.of(
-                    Integer.parseInt(socialSecurityNumber.substring(0,4))+18,
-                    Integer.parseInt(socialSecurityNumber.substring(4,6)),
-                    Integer.parseInt(socialSecurityNumber.substring(6,8))
-            );
-            if (age.isEqual(LocalDate.now())||age.isBefore(LocalDate.now())) {
-                membership = new Membership(socialSecurityNumber, emailAddress);
-                points = new Points();
-            }
-        }
-    }
-
     public Membership getMembership() {
         if (membership == null || membership.getExpirationDate().isBefore(LocalDate.now())) {
+            membership = null;                              // tas den bort om du glömt att renew:a den, tappar då alla poäng
             throw new IllegalStateException("Non-member");
         }
         return membership;
     }
 
-
-
-
-    //points
-    public Points getPoints() {
-        if (points == null) {
-            throw new IllegalStateException("Not a member, no points.");
+    public void becomeMember() {
+        if (membership == null) {
+            LocalDate age = LocalDate.of(
+                    Integer.parseInt(socialSecurityNumber.substring(0,4))+18, //flyttal
+                    Integer.parseInt(socialSecurityNumber.substring(4,6)),
+                    Integer.parseInt(socialSecurityNumber.substring(6,8))
+            );
+            if (age.isEqual(LocalDate.now())||age.isBefore(LocalDate.now())) {
+                membership = new Membership(this);
+            }
         }
-        return points;
     }
+
+    protected void cancelMembership() {
+        membership = null;
+    }
+
+
 
     //bonuscheckar
     public List<BonusCheck> getChecks() {

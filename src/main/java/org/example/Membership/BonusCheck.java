@@ -1,8 +1,7 @@
 package org.example.Membership;
 
-import org.example.Discount.Discount;
+
 import org.example.Discount.ProductDecorator;
-import org.example.Product.ProductGroup;
 
 public class BonusCheck {
 
