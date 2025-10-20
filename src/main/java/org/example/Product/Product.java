@@ -3,6 +3,8 @@ import org.example.Money;
 
 import java.util.Objects;
 
+import static org.example.Product.VatRate.FOOD;
+
 public class Product {
     private final String name;
     private final PriceModel priceModel;
@@ -74,5 +76,10 @@ public class Product {
 
         Product other = (Product) o;
         return name.equals(other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }
