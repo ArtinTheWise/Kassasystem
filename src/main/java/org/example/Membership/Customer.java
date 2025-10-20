@@ -10,7 +10,7 @@ public class Customer {
     private final String socialSecurityNumber;
     private final String emailAddress;
     // samling av checkar
-    private final List<BonusCheck> checks = new ArrayList<>(); // tas bort i kassan när de används eller tiden got ut
+
 
     // gör member till egen grej
     private Membership membership;
@@ -60,27 +60,4 @@ public class Customer {
     protected void cancelMembership() {
         membership = null;
     }
-
-
-
-    //bonuscheckar
-    public List<BonusCheck> getChecks() {
-        return Collections.unmodifiableList(checks);
-    }
-
-    public void addCheck(BonusCheck check) {
-        if (!check.getDiscount().isActive())
-            throw new IllegalArgumentException("Discount is not active.");
-        checks.add(check);
-    }
-
-    public void removeCheck(BonusCheck check) {
-        if (checks.contains(check)) {
-            checks.remove(check);
-        } else {
-            throw new IllegalArgumentException("Check does not exist.");
-        }
-    }
-
-
 }

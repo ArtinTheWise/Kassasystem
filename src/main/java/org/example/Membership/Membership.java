@@ -1,6 +1,9 @@
 package org.example.Membership;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Membership {
 
@@ -8,6 +11,7 @@ public class Membership {
     private final Points points;
     private LocalDate expirationDate;
 
+    private final List<BonusCheck> checks = new ArrayList<>(); // tas bort i kassan när de används eller tiden got ut
 
     public Membership(Customer costumer) {
         this.customer = costumer;
@@ -39,12 +43,30 @@ public class Membership {
     }
 
 
+    //bonuscheckar
+    public List<BonusCheck> getChecks() {
+        return Collections.unmodifiableList(checks);
+    }
+
+    public void addCheck(BonusCheck check) {
+        if (!check.getDiscount().isActive())
+            throw new IllegalArgumentException("Discount is not active.");
+        checks.add(check);
+    }
+
+    public void removeCheck(BonusCheck check) {
+        if (checks.contains(check)) {
+            checks.remove(check);
+        } else {
+            throw new IllegalArgumentException("Check does not exist.");
+        }
+    }
+
+
     // bara för tester
     public void changeExpirationDate(LocalDate newExpirationDate) {
         this.expirationDate = newExpirationDate;
     }
-
-
 
 
 }
