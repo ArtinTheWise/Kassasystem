@@ -77,24 +77,24 @@ class CustomerTest {
     }
 
     //bonusCheckar
-//    @Test
-//    void getAddedChecks() {
-//        Customer customer = new Customer("200404301234", "test@example.com");
-//        customer.addCheck(new BonusCheck("snackSale",
-//                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-//                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
-//                new Points(200)));
-//        customer.addCheck(new BonusCheck("snackSale",
-//                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-//                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
-//                new Points(200)));                                                                   //dubblett ???
-//        customer.addCheck(new BonusCheck("santaSale",
-//                new NormalDiscount(new Product("skumtomtar", new UnitPrice(new Money(50)),
-//                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(3)),
-//                new Points(150)));
-//
-//        assertEquals(3, customer.getChecks().size());
-//    }
+    @Test
+    void getAddedChecks() {
+        Customer customer = new Customer("200404301234", "test@example.com");
+        customer.addCheck(new BonusCheck("snackSale",
+                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
+                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
+                new Points(200)));
+        customer.addCheck(new BonusCheck("snackSale",
+                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
+                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
+                new Points(200)));                                                                   //dubblett ???
+        customer.addCheck(new BonusCheck("santaSale",
+                new NormalDiscount(new Product("skumtomtar", new UnitPrice(new Money(50)),
+                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(3)),
+                new Points(150)));
+
+        assertEquals(3, customer.getChecks().size());
+    }
 
 
 }

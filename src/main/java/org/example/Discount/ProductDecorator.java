@@ -27,7 +27,7 @@ public abstract class ProductDecorator extends Product {
 
     public boolean isActive(){
         LocalDateTime now = LocalDateTime.now();
-        return now.isBefore(endTime) && now.isAfter(startTime);
+        return now.isBefore(endTime) && (now.isAfter(startTime) || now.isEqual(startTime));
     }
 
     @Override
