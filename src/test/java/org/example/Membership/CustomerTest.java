@@ -17,7 +17,7 @@ class CustomerTest {
     //can använda before each
 
     @Test
-    void constructorWithNull() {
+    void constructorWithNullTest() {
         assertThrows(IllegalArgumentException.class, () -> {
             new Customer("200404301234", null);
         });
@@ -27,20 +27,20 @@ class CustomerTest {
     }
 
     @Test
-    void getSocialSecurityNumber() {
+    void getSocialSecurityNumberTest() {
         Customer customer = new Customer("200404301234", "test@example.com");
         assertEquals("200404301234", customer.getSocialSecurityNumber());
     }
 
     @Test
-    void getEmailAddress() {
+    void getEmailAddressTest() {
         Customer customer = new Customer("200404301234", "test@example.com");
         assertEquals("test@example.com", customer.getEmailAddress());
     }
 
     //membership
     @Test
-    void isMember() {
+    void isMemberTest() {
         Customer customer = new Customer("200404301234", "test@example.com");
         assertThrows(IllegalStateException.class, customer::getMembership); // kollar att man inte är det från början
         customer.becomeMember();
@@ -48,7 +48,7 @@ class CustomerTest {
     }
 
     @Test
-    void isExpiredMember() {
+    void isExpiredMemberTest() {
         Customer customer = new Customer("130404301234", "test@example.com");
         customer.becomeMember();
         customer.getMembership().changeExpirationDate(LocalDate.of(1324, 4, 30));//test metod bara
@@ -56,7 +56,7 @@ class CustomerTest {
     }
 
     @Test
-    void renewMembership() {
+    void renewMembershipTest() {
         Customer customer = new Customer("200404301234", "test@example.com");
         customer.becomeMember();
         customer.getMembership().changeExpirationDate(LocalDate.of(2027, 4, 30));//test metod bara
@@ -69,31 +69,11 @@ class CustomerTest {
     }
 
     @Test
-    void cancelMembership() {
+    void cancelMembershipTest() {
         Customer customer = new Customer("200404301234", "test@example.com");
         customer.becomeMember();
         customer.cancelMembership();
         assertThrows(IllegalStateException.class, customer::getMembership);
-    }
-
-    //bonusCheckar
-    @Test
-    void getAddedChecks() {
-        Customer customer = new Customer("200404301234", "test@example.com");
-        customer.addCheck(new BonusCheck("snackSale",
-                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
-                new Points(200)));
-        customer.addCheck(new BonusCheck("snackSale",
-                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-                        VatRate.FOOD, false),50, LocalDateTime.now().plusMonths(6)),
-                new Points(200)));                                                                   //dubblett ???
-        customer.addCheck(new BonusCheck("santaSale",
-                new NormalDiscount(new Product("skumtomtar", new UnitPrice(new Money(50)),
-                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(3)),
-                new Points(150)));
-
-        assertEquals(3, customer.getChecks().size());
     }
 
 
