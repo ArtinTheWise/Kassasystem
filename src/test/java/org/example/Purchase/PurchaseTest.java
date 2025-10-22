@@ -54,7 +54,6 @@ public class PurchaseTest {
         when(salesEmployee.getId()).thenReturn("44");
     }
 
-
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
         when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
