@@ -65,10 +65,8 @@ public class PurchaseTest {
     @Test
     @DisplayName("Create Purchase with null CashRegister Object throws exception")
     void createPurchaseWithNullCashRegisterThrowsException(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            Purchase purchase = new Purchase(null, salesEmployee);
-        });
-
+        assertThrows(IllegalArgumentException.class, 
+            () -> new Purchase(null, salesEmployee));
     }
 
     
