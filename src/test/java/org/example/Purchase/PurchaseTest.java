@@ -47,11 +47,6 @@ public class PurchaseTest {
     @Mock CashRegister cashRegister;
     @Mock SalesEmployee salesEmployee; 
 
-    @BeforeEach void setUp(){
-        when(cashRegister.getId()).thenReturn("31");
-        when(salesEmployee.getId()).thenReturn("44");
-    }
-
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
         when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
