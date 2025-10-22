@@ -1,19 +1,28 @@
 package org.example.Purchase;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.example.Money;
 import org.example.Product.Product;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
+import Sales.Purchase;
 
 public class PurchaseTest {
 
     /*
      * konstruktor 
-     * Seller - null / finns ej
-     * 
+     * kassa id - null / finns ej / fel instans
+     * Seller id - null / finns ej / fel instans
      * addItem - null / finns ej / fel instance
+     * 
+     * 
      * createReceipt - 
      * 
      * lägga till viktvara
@@ -30,26 +39,40 @@ public class PurchaseTest {
      * 
      * 
      * 
+     * 
+     * 
      */
 
-        private Product getMockProduct(){
-            Product mockProduct = mock(Product.class);
-            when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
-            when(mockProduct.getName()).thenReturn("Milk");
-            return mockProduct;
 
-        }
+    public interface SalesEmployee { String getId(); }
+    public interface CashRegister  { String getId(); }
+
+    private Product getMockProduct(){
+        Product mockProduct = mock(Product.class);
+        when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
+        when(mockProduct.getName()).thenReturn("Milk");
+        return mockProduct;
+    }
+
+    @Mock CashRegister cashRegister; @Mock SalesEmployee salesEmployee;
+
+    @BeforeEach void setUp(){
+        when(cashRegister.getId()).thenReturn("31");
+        when(salesEmployee.getId()).thenReturn("44");
+    }
 
 
-        
+    @Test
+    @DisplayName("Create Purchase with null CashRegister Object throws exception")
+    void createPurchaseWithNullCashRegisterThrowsException(){
+        SalesEmployee salesEmployee = mock(SalesEmployee.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            Purchase purchase = new Purchase(null, salesEmployee);
+        });
 
+    }
 
-
-
-
-
-
-
+    
 
     
 }

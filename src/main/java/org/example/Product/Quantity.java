@@ -3,6 +3,7 @@ package org.example.Product;
 
 public class Quantity {
 
+    
     private final double amount; // Amount of units for piece or kg for weight
     private final Unit unit;
     
