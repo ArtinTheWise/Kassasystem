@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-
 import Sales.Purchase;
 
 public class PurchaseTest {
@@ -47,14 +46,8 @@ public class PurchaseTest {
     public interface SalesEmployee { String getId(); }
     public interface CashRegister  { String getId(); }
 
-    private Product getMockProduct(){
-        Product mockProduct = mock(Product.class);
-        when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
-        when(mockProduct.getName()).thenReturn("Milk");
-        return mockProduct;
-    }
-
-    @Mock CashRegister cashRegister; @Mock SalesEmployee salesEmployee;
+    @Mock CashRegister cashRegister;
+    @Mock SalesEmployee salesEmployee; 
 
     @BeforeEach void setUp(){
         when(cashRegister.getId()).thenReturn("31");
@@ -62,10 +55,17 @@ public class PurchaseTest {
     }
 
 
+    private Product getMockProduct(){
+        Product mockProduct = mock(Product.class);
+        when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
+        when(mockProduct.getName()).thenReturn("Milk");
+        return mockProduct;
+    }
+
+
     @Test
     @DisplayName("Create Purchase with null CashRegister Object throws exception")
     void createPurchaseWithNullCashRegisterThrowsException(){
-        SalesEmployee salesEmployee = mock(SalesEmployee.class);
         assertThrows(IllegalArgumentException.class, () -> {
             Purchase purchase = new Purchase(null, salesEmployee);
         });
