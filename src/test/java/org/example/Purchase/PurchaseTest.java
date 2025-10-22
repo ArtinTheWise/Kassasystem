@@ -10,9 +10,13 @@ import org.example.Product.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import Sales.Purchase;
 
+@ExtendWith(MockitoExtension.class)
 public class PurchaseTest {
 
     /*
@@ -21,8 +25,7 @@ public class PurchaseTest {
      * Seller id - null / finns ej / fel instans
      * addItem - null / finns ej / fel instance
      * 
-     * 
-     * createReceipt - 
+     * createReceipt - toString metod
      * 
      * lägga till viktvara
      * lägga till styckvara
@@ -35,11 +38,6 @@ public class PurchaseTest {
      * räkna pant korrekt
      * kan ta bort en vara under ett köp
      * kan inte ta bort en vara under betalning
-     * 
-     * 
-     * 
-     * 
-     * 
      */
 
 
@@ -60,7 +58,6 @@ public class PurchaseTest {
         when(mockProduct.getName()).thenReturn("Milk");
         return mockProduct;
     }
-
 
     @Test
     @DisplayName("Create Purchase with null CashRegister Object throws exception")
