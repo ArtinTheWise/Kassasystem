@@ -81,14 +81,22 @@ public class Purchase {
         long total = 0;
         for (Map.Entry<Product, Quantity> e : items.entrySet()) {
             total+= e.getKey().calculatePrice(e.getValue()).getAmountInMinorUnits();
-
         }
         return new Money(total);
     }
 
     public Money getTotalVat(){
-        return null;
+        long vat = getTotalGross().getAmountInMinorUnits() - getTotalNet().getAmountInMinorUnits();
+        return new Money(vat);
 
+    }
+
+    public Money getTotalGross(){
+        long total = 0;
+        for (Map.Entry<Product, Quantity> e : items.entrySet()) {
+            total+= e.getKey().calculatePriceWithVat(e.getValue()).getAmountInMinorUnits();
+        }
+        return new Money(total);
     }
 
 
