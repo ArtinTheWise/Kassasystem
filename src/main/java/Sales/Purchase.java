@@ -40,9 +40,7 @@ public class Purchase {
         if (salesEmployee == null) {
             throw new IllegalArgumentException("SalesEmployee cannot be null.");
         }
-        if (discountManager == null){
-            throw new IllegalArgumentException("DiscountManager cannot be null");
-        }
+        
         this.discountManager = null;
 
     }
