@@ -21,12 +21,24 @@ public class PercentageDiscount extends ProductDecorator {
     }
 
     @Override
-    public Money calculatePrice(Quantity quantity){
-        if(isActive()){
-            long discounted = Math.round(getProduct().calculatePrice(quantity).getAmountInMinorUnits() * (1-(percent/100.0)));
-            return new Money(discounted);
-        }
-        return getProduct().calculatePrice(quantity);
+    public Money calculatePrice(Quantity q) {
+        Money net = getProduct().calculatePrice(q);
+
+        if (!isActive()) return net;
+        if (net == null) return null; // undvik null pointer excp.
+
+        long discounted = Math.round(net.getAmountInMinorUnits() * (1 - (percent / 100.0)));
+        return new Money(discounted);
+    }
+
+    @Override
+    public Money calculatePriceWithVat(Quantity q) {
+        if (!isActive()) return getProduct().calculatePriceWithVat(q);
+        Money gross = getProduct().calculatePriceWithVat(q);
+        if (gross == null) return null; 
+        long discounted = Math.round(gross.getAmountInMinorUnits() * (1 - (percent / 100.0)));
+
+        return new Money(discounted);
     }
 
     public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime startTime, LocalDateTime endTime) {

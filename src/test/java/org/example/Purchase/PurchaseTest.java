@@ -411,8 +411,8 @@ public class PurchaseTest {
     }
 
     @Test
-    @DisplayName("applyDiscounts - calculates discount correctly")
-    void applyDiscounts_NormalDiscount(){
+    @DisplayName("applyDiscounts - calculates PercentageDiscount correctly")
+    void applyDiscounts_PercentageDiscount(){
 
         Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
