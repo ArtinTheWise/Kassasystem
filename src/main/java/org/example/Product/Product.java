@@ -75,11 +75,11 @@ public class Product {
         if (!(o instanceof Product)) return false;
 
         Product other = (Product) o;
-        return name.equals(other.name);
+        return Objects.equals(this.name, other.name);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hashCode(this.name);
     }
 }
