@@ -79,10 +79,10 @@ public class PurchaseTest {
     void addNullItemToPurchaseThrowsException(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
-            () -> purchase.addItem(null, 1));
+            () -> purchase.addProduct(null, 1));
     }
 
-    
+
 
 
 
