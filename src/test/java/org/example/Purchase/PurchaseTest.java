@@ -135,8 +135,6 @@ public class PurchaseTest {
         return p;
     }
 
-
-
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
@@ -426,7 +424,7 @@ public class PurchaseTest {
         purchase.addPiece(banana);
         purchase.applyDiscounts();
 
-        long total = purchase.getTotalGross().getAmountInMinorUnits();
+        Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
         assertEquals(1200L, total);
     }
