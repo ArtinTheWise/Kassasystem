@@ -99,7 +99,10 @@ public class PurchaseTest {
         when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
-            return new Money(Math.round(netPerPiece.getAmountInMinorUnits() * vatRate.getRate() * qty));
+            long net = netPerPiece.getAmountInMinorUnits();
+            double rate = vatRate.getRate();
+            long grossPerPiece = Math.round(net * (1.0) + rate);
+            return new Money(grossPerPiece * qty);
         });
 
         return p;
@@ -344,8 +347,7 @@ public class PurchaseTest {
         purchase.addPiece(kanelbulle);
 
         Money vat = purchase.getTotalVat();
-
-        assertEquals(2500L, vat);
+        assertEquals(2500L, vat.getAmountInMinorUnits());
 
     }
 
