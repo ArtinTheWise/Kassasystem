@@ -1,7 +1,6 @@
 package org.example.Purchase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -35,8 +34,8 @@ public class PurchaseTest {
      * 
      * createReceipt - toString metod
      * 
-     * lägga till viktvara
-     * lägga till styckvara
+     * lägga till viktvara - klar
+     * lägga till styckvara - klar
      * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen
      * samma som ovan för styck
      * skapa flera mockrabatter och se att den applicerar rätt rabatt på en quantity
@@ -209,6 +208,25 @@ public class PurchaseTest {
         assertEquals(Unit.PIECE, q.getUnit());
     
     }
+
+    @Test
+    @DisplayName("addPiece + addWeight- add Piece then weight then piece correctly")
+    void addPiece_addsUnitsInDifferentOrder() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProduct("Karins lasagne");
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addPiece(karinsLasagne);
+        purchase.addWeight(potato, 0.350, Unit.G);
+        purchase.addPiece(karinsLasagne); //should be added to same quantity as first one
+
+        Quantity q = purchase.getItemsView().get(karinsLasagne);
+        assertEquals(2.0, q.getAmount(), 0.0001);
+        assertEquals(Unit.PIECE, q.getUnit());
+    
+    }
+
+
 
 
 
