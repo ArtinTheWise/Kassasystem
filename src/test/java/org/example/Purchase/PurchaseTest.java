@@ -71,7 +71,7 @@ public class PurchaseTest {
     }
     private Product mockUnitProductWithInfo(String name, Money price, VatRate vatRate){ // namn, pris i öre, moms i %. e.g banan, 500, OTHER - banan 500kr 25% moms
         Product p = mock(Product.class, name);
-        PriceModel pm = mock(WeightPrice.class);
+        PriceModel pm = mock(UnitPrice.class);
 
         when(p.getPriceModel()).thenReturn(pm);
         when(p.getVatRate()).thenReturn(vatRate);
