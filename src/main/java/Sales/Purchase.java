@@ -95,6 +95,9 @@ public class Purchase {
         long total = 0;
         for (Map.Entry<Product, Quantity> e : items.entrySet()) {
             total+= e.getKey().calculatePriceWithVat(e.getValue()).getAmountInMinorUnits();
+            if(e.getKey().getPriceModel() instanceof UnitPriceWithPant){
+                total += ((UnitPriceWithPant) e.getKey().getPriceModel()).getPantPerPiece().getAmountInMinorUnits();
+            }
         }
         return new Money(total);
     }
