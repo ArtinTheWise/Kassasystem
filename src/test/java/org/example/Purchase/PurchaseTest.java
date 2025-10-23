@@ -125,8 +125,8 @@ public class PurchaseTest {
         purchase.addWeight(potato, 0.350, Unit.KG);
 
         Quantity q = purchase.getItemsView().get(potato);
-        assertEquals(Unit.KG, q.getUnit());
         assertEquals(0.350, q.getAmount(), 0.0001);
+        assertEquals(Unit.KG, q.getUnit());
     }
 
 
