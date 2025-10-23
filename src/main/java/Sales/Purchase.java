@@ -78,7 +78,12 @@ public class Purchase {
     }
 
     public Money getTotalNet(){
-        return null;
+        long total = 0;
+        for (Map.Entry<Product, Quantity> e : items.entrySet()) {
+            total+= e.getKey().calculatePrice(e.getValue()).getAmountInMinorUnits();
+
+        }
+        return new Money(total);
     }
 
 
