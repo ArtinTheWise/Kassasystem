@@ -24,7 +24,10 @@ public class Purchase {
             throw new IllegalArgumentException("The product does not have piece pricemodel");
         }
     
+    }
 
+    public void addWeight(Product product){
+        
     }
 
 

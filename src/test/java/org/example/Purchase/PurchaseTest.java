@@ -1,7 +1,6 @@
 package org.example.Purchase;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +73,7 @@ public class PurchaseTest {
 
     @Test
     @DisplayName("Add null piece-product to Purchase throws exception")
-    void addNullItemToPurchaseThrowsException(){
+    void addNullPieceToAddPieceException(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
             () -> purchase.addPiece(null));
@@ -82,7 +81,7 @@ public class PurchaseTest {
 
     @Test
     @DisplayName("Add piece with weight pricemodel throws exception ")
-    void addPieceWithWeightPricemodelThrowsException() {
+    void addProductWithWeightPricemodelAsPieceThrowsException() {
         WeightPrice weightPrice = new WeightPrice(new Money(5000), Unit.KG);
         Product mockProduct = mock(Product.class);
 
@@ -93,8 +92,28 @@ public class PurchaseTest {
             () -> purchase.addPiece(mockProduct));
     }
 
+    @Test
+    @DisplayName("Add null weight-product to Purchase throws exception")
+    void addNullWeightToAddWeightThrowsException(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        assertThrows(IllegalArgumentException.class, 
+            () -> purchase.addWeight(null));
+    }
 
-    
+    @Test
+    @DisplayName("Add product with Unit priceModel throws exception ")
+    void addProductWithPiecePriceModelAsWeightThrowsException(){
+        WeightPrice weightPrice = new WeightPrice(new Money(5000), Unit.PIECE);
+        Product mockProduct = mock(Product.class);
 
+        when(mockProduct.getPriceModel()).thenReturn(weightPrice);
+
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        assertThrows(IllegalArgumentException.class,
+            () -> purchase.addWeight(mockProduct));
+    }
+
+
+ 
     
 }
