@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.example.Money;
+import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
 import org.example.Product.WeightPrice;
 import org.example.Product.UnitPrice;
-import org.example.Product.Unit;
+import org.example.Product.UnitPriceWithPant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,69 +49,72 @@ public class PurchaseTest {
     @Mock CashRegister cashRegister;
     @Mock SalesEmployee salesEmployee; 
     @Mock Quantity quantity;
-    @Mock Product product;
 
+    @Mock Product product;
+        private Product mockUnitProduct(String name) {
+        Product p = mock(Product.class, name);
+        when(p.getName()).thenReturn(name);
+        PriceModel pm = mock(UnitPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+        return p;
+    }
+
+    private Product mockWeightProduct(String name) {
+        Product p = mock(Product.class, name);
+        when(p.getName()).thenReturn(name);
+        PriceModel pm = mock(WeightPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+        return p;
+    }
 
     @Test
-    @DisplayName("Create Purchase with null salesEmployee Object throws exception")
+    @DisplayName("constructor: null salesEmployee throws exception")
     void createPurchaseWithNullCashRegisterThrowsException(){
         assertThrows(IllegalArgumentException.class, 
             () -> new Purchase(null, salesEmployee));
     }
 
     @Test
-    @DisplayName("Create Purchase with null cashRegister Object throws exception")
+    @DisplayName("constructor: null cashRegister throws exception")
     void createPurchaseWithNullSalesEmployeeThrowsException(){
         assertThrows(IllegalArgumentException.class, 
             () -> new Purchase(cashRegister, null));
     }
 
     @Test
-    @DisplayName("Create Purchase with valid parameters does not throw exception")
-    void createPurchaseWithValidParametersDoesNotThrowException(){
-        new Purchase(cashRegister, salesEmployee);
-    }
-
-    @Test
-    @DisplayName("Add null piece-product to Purchase throws exception")
-    void addNullPieceToAddPieceException(){
+    @DisplayName("addPiece: throws exception for null Product")
+    void addPiece_onNullProduct_throws(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
             () -> purchase.addPiece(null));
     }
 
     @Test
-    @DisplayName("Add piece with weight pricemodel throws exception ")
-    void addProductWithWeightPricemodelAsPieceThrowsException() {
-        WeightPrice weightPrice = new WeightPrice(new Money(5000), Unit.KG);
-        Product mockProduct = mock(Product.class);
-
-        when(mockProduct.getPriceModel()).thenReturn(weightPrice);
-
+    @DisplayName("addPiece: throws exception for weightPice")
+    void addPiece_onWeightProduct_throws(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product cheese = mockWeightProduct("Cheese");
+        
         assertThrows(IllegalArgumentException.class,
-            () -> purchase.addPiece(mockProduct));
+            () -> purchase.addPiece(cheese));
     }
 
     @Test
-    @DisplayName("Add null weight-product to Purchase throws exception")
-    void addNullWeightToAddWeightThrowsException(){
+    @DisplayName("addWeight: throws exception for null Product")
+    void addWeight_onNullProduct_throws(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
             () -> purchase.addWeight(null));
     }
 
     @Test
-    @DisplayName("Add product with Unit priceModel throws exception ")
-    void addProductWithUnitPriceModelAsWeightThrowsException() {
-        UnitPrice unitPrice = new UnitPrice(new Money(5000));
-        Product mockProduct = mock(Product.class);
-
-        when(mockProduct.getPriceModel()).thenReturn(unitPrice);
+    @DisplayName("addWeight: throws exception for Piece Product")
+    void addWeight_onPieceProduct_throws() {
+        Product beef = mockUnitProduct("beef");
 
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class,
-            () -> purchase.addWeight(mockProduct));
+            () -> purchase.addWeight(beef));
     }
 
 
