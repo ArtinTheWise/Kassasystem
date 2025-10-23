@@ -19,30 +19,34 @@ public class DiscountManager {
         products.addAll(Arrays.asList(product));
     }
 
+    // Scanna alla 
     public boolean discountCheck(Product product){
         removeOldDiscounts();
-        for(Product p : getActiveDiscounts()){
-            ProductDecorator discountProduct = (ProductDecorator) p;
-            return discountProduct.getProduct().equals(product) && discountProduct.isActive();
+        for (Product p : getActiveDiscounts()) {
+            ProductDecorator d = (ProductDecorator) p;
+            if (d.getProduct() == product && d.isActive()) {
+                return true;
+            }
         }
         return false;
-    }
+}
 
     public Product getBestDiscount(Product product, Quantity quantity){
         if(!discountCheck(product)) return product;
         Product cheapest = null;
-        for(Product p : products){
+        for (Product p : products) {
             ProductDecorator discountProduct = (ProductDecorator) p;
-            if(discountProduct.equals(product) && discountProduct.isActive()){
-                if(cheapest == null){
-                    cheapest = p;
-                } else if (cheapest.calculatePrice(quantity).getAmountInMinorUnits() > p.calculatePrice(quantity).getAmountInMinorUnits()) {
+        // Jämför wrappad bas product -  inte decorator
+            if (discountProduct.getProduct() == product && discountProduct.isActive()) {
+                if (cheapest == null ||
+                    cheapest.calculatePrice(quantity).getAmountInMinorUnits() >
+                    p.calculatePrice(quantity).getAmountInMinorUnits()) {
                     cheapest = p;
                 }
             }
         }
         return cheapest;
-    }
+}
 
     private void removeOldDiscounts(){
         for(Product p : products){
