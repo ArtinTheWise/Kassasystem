@@ -388,7 +388,7 @@ public class PurchaseTest {
         purchase.addPiece(kanelbulle);
 
         Money totalPrice = purchase.getTotalGross();
-        assertEquals(12500L, vat.getAmountInMinorUnits());
+        assertEquals(12500L, totalPrice.getAmountInMinorUnits());
     }
 
     @Test
