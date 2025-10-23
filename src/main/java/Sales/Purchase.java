@@ -1,6 +1,8 @@
 package Sales;
 
 import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.example.Product.Product;
@@ -11,8 +13,12 @@ import org.example.Product.UnitPriceWithPant;
 import org.example.Product.WeightPrice;
 
 
-
 public class Purchase {
+
+    private Map<Product, Quantity> items = new LinkedHashMap<>();// Hashmap + LinkedList - sorterad ordning men med konstant get
+
+
+
     public Purchase(Object cashRegister, Object salesEmployee){
         if (cashRegister == null) {
             throw new IllegalArgumentException("CashRegister cannot be null.");
@@ -49,7 +55,7 @@ public class Purchase {
     }
 
     public Map<Product, Quantity> getItemsView() {
-        return null;
+        return Collections.unmodifiableMap(items);
         
     }
 
