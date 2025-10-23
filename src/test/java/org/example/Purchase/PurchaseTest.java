@@ -347,4 +347,23 @@ public class PurchaseTest {
 
     }
 
+    @Test
+    @DisplayName("GetTotalGross - calculates gross price correctly")
+    void getTotalGross_calculateTotalGross(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), new Money(6250));
+        Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), new Money(5000));
+        Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), new Money(1250));
+
+        purchase.addPiece(karinsLasagne);
+        purchase.addPiece(billys);
+        purchase.addPiece(kanelbulle);
+
+        Money vat = purchase.getTotalGross();
+        assertEquals(12500L, vat.getAmountInMinorUnits());
+
+
+
+    }
+
 }
