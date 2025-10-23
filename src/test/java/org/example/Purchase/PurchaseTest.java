@@ -310,7 +310,7 @@ public class PurchaseTest {
     }
 
     @Test
-    @DisplayName("GetTotalVat - calculates vat correctyl")
+    @DisplayName("GetTotalVat - calculates vat correctly")
     void getTotalVat_calculateTotalVat() {
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(5000), OTHER);
@@ -323,7 +323,7 @@ public class PurchaseTest {
 
         Money vat = purchase.getTotalVat();
 
-        assertEquals(25L, vat.getAmountInMinorUnits());
+        assertEquals(25L, vat);
 
     }
 
