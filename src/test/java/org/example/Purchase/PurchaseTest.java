@@ -129,8 +129,8 @@ public class PurchaseTest {
     }
 
     @Test
-    @DisplayName("addWeight: add weight for weight product")
-    void addWeight_addsAmount_forWeightProduct() {
+    @DisplayName("addWeight: add weight for KG product")
+    void addWeight_addsAmount_forKGProduct() {
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         Product potato = mockWeightProduct("Potato");
 
@@ -143,6 +143,40 @@ public class PurchaseTest {
         assertEquals(0.350, q.getAmount(), 0.0001);
         assertEquals(Unit.KG, q.getUnit());
     }
+
+    @Test
+    @DisplayName("addWeight: add weight for HG product")
+    void addWeight_addsAmount_forHGProduct() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addWeight(potato, 0.350, Unit.HG);
+
+        Map<Product,Quantity> items = purchase.getItemsView();
+        assertEquals(1, items.size());
+        Quantity q = items.get(potato);
+        assertNotNull(q);
+        assertEquals(0.350, q.getAmount(), 0.0001);
+        assertEquals(Unit.HG, q.getUnit());
+    }
+
+    @Test
+    @DisplayName("addWeight: add weight for G product")
+    void addWeight_addsAmount_forGProduct() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addWeight(potato, 0.350, Unit.G);
+
+        Map<Product,Quantity> items = purchase.getItemsView();
+        assertEquals(1, items.size());
+        Quantity q = items.get(potato);
+        assertNotNull(q);
+        assertEquals(0.350, q.getAmount(), 0.0001);
+        assertEquals(Unit.G, q.getUnit());
+    }
+
+
 
     @Test
     @DisplayName("addPiece - add piece for piece product ")
