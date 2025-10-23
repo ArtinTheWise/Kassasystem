@@ -9,7 +9,6 @@ import org.example.Product.Product;
 import org.example.Product.Quantity;
 import org.example.Product.WeightPrice;
 import org.example.Product.UnitPrice;
-import org.example.Product.UnitPriceWithPant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +52,6 @@ public class PurchaseTest {
     @Mock Product product;
         private Product mockUnitProduct(String name) {
         Product p = mock(Product.class, name);
-        when(p.getName()).thenReturn(name);
         PriceModel pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
         return p;
@@ -61,7 +59,6 @@ public class PurchaseTest {
 
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
-        when(p.getName()).thenReturn(name);
         PriceModel pm = mock(WeightPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
         return p;
