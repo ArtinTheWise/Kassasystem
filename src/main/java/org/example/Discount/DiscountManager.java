@@ -1,11 +1,13 @@
 package org.example.Discount;
 
+import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static org.example.Product.Unit.PIECE;
 
@@ -22,31 +24,35 @@ public class DiscountManager {
     // Scanna alla 
     public boolean discountCheck(Product product){
         removeOldDiscounts();
-        for (Product p : getActiveDiscounts()) {
+        for (Product p : getActiveDiscounts()){
             ProductDecorator d = (ProductDecorator) p;
-            if (d.getProduct() == product && d.isActive()) {
+            if (d.isActive() && Objects.equals(d.getProduct(), product)) {
                 return true;
             }
-        }
+        }  
         return false;
-}
+    }
 
     public Product getBestDiscount(Product product, Quantity quantity){
-        if(!discountCheck(product)) return product;
+        removeOldDiscounts();
+        if (!discountCheck(product)) return product;
+
         Product cheapest = null;
-        for (Product p : products) {
-            ProductDecorator discountProduct = (ProductDecorator) p;
-        // Jämför wrappad bas product -  inte decorator
-            if (discountProduct.getProduct() == product && discountProduct.isActive()) {
-                if (cheapest == null ||
-                    cheapest.calculatePrice(quantity).getAmountInMinorUnits() >
-                    p.calculatePrice(quantity).getAmountInMinorUnits()) {
-                    cheapest = p;
+        long cheapestVal = Long.MAX_VALUE;
+
+        for (Product p : products){
+            ProductDecorator d = (ProductDecorator) p;
+            if (d.isActive() && Objects.equals(d.getProduct(), product)){
+                Money m = p.calculatePriceWithVat(quantity);
+                if (m == null) m = p.calculatePrice(quantity);
+                    if (m != null) {
+                        long val = m.getAmountInMinorUnits();
+                        if (val < cheapestVal) { cheapestVal = val; cheapest = p; }
+                    }
                 }
             }
-        }
-        return cheapest;
-}
+        return (cheapest != null) ? cheapest : product;
+    }
 
     private void removeOldDiscounts(){
         for(Product p : products){
