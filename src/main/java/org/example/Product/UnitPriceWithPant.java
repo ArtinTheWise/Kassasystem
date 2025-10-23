@@ -35,5 +35,13 @@ public class UnitPriceWithPant implements PriceModel{
         + (pantPerPiece.getAmountInMinorUnits() 
         * quantity.getAmount())));
     }
+
+    public Money getPantPerPiece(){
+        return pantPerPiece;
+    }
+
+    public UnitPrice getUnitPrice(){
+        return basePrice;
+    }
     
 }

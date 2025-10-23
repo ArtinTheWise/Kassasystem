@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
 import org.example.Product.Unit;
@@ -74,6 +75,10 @@ public class Purchase {
     public void removeProduct(Product product){
         items.remove(product);
 
+    }
+
+    public Money getTotalNet(){
+        return null;
     }
 
 

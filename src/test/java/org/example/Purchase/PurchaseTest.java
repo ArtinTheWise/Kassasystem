@@ -1,14 +1,18 @@
 package org.example.Purchase;
 
+import static org.example.Product.VatRate.OTHER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
+import org.example.Money;
+import org.example.Product.VatRate;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -19,6 +23,7 @@ import org.example.Product.UnitPriceWithPant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,12 +45,15 @@ public class PurchaseTest {
      * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen
      * samma som ovan för styck - klar
      * skapa flera mockrabatter och se att den applicerar rätt rabatt på en quantity
-     * räknar pris korrekt
-     * räknar moms korrekt
-     * räknar moms korrekt för blandade momssatser
      * räkna pant korrekt
-     * kan ta bort en vara under ett köp
-     * kan inte ta bort en vara under betalning
+     * kan ta bort en vara under ett köp - klar
+     * 
+     * 
+     * Pris:
+     *      totalNet
+     *      totalGross
+     *      totalVAT
+     *      (inkl räkna på pant)
      */
 
 
@@ -56,25 +64,56 @@ public class PurchaseTest {
     @Mock SalesEmployee salesEmployee; 
     @Mock Quantity quantity;
 
-    @Mock Product product;
-        private Product mockUnitProduct(String name) {
+    private Product mockUnitProduct(String name){
         Product p = mock(Product.class, name);
         PriceModel pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
+        return p;
+    }
+    private Product mockUnitProductWithInfo(String name, Money price, VatRate vatRate){ // namn, pris i öre, moms i %. e.g banan, 500, OTHER - banan 500kr 25% moms
+        Product p = mock(Product.class, name);
+        PriceModel pm = mock(WeightPrice.class);
+
+        when(p.getPriceModel()).thenReturn(pm);
+        when(p.getVatRate()).thenReturn(vatRate);
+        when(p.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                return new Money(price.getAmountInMinorUnits() * (int)q.getAmount());
+            });
+
         return p;
     }
 
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
+
         when(p.getPriceModel()).thenReturn(pm);
+
+        when(pm.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                return new Money(100 * (int)q.getAmount());
+            });
+            
         return p;
     }
 
-    private Product mockUnitProductWithPant(String name) {
+    private Product mockUnitProductWithPant(String name) { // 1 kr pant
         Product p = mock(Product.class, name);
-        PriceModel pm = mock(UnitPriceWithPant.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        UnitPrice basePrice = mock(UnitPrice.class);
+
+        when(basePrice.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                return new Money(100 * (int)q.getAmount());
+
+            });
+        UnitPriceWithPant realPriceModel = new UnitPriceWithPant(basePrice, new Money(1L));
+
+        when(p.getPriceModel()).thenReturn(realPriceModel);
+
         return p;
     }
 
@@ -208,6 +247,7 @@ public class PurchaseTest {
         assertEquals(Unit.PIECE, q.getUnit());
     
     }
+
     @Test
     @DisplayName("addPieceWithPant - add piece for piece with pant product ")
     void addPiece_addsOnePieceWithPant() {
@@ -270,13 +310,24 @@ public class PurchaseTest {
         assertTrue(purchase.getItemsView().isEmpty());
     }
 
+    @Test
+    @DisplayName("getTotalNet - calculates net price correctly")
+    void getTotalNet_calculateTotalNet(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(50000), OTHER);
+        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(40000), OTHER);
+        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(10000), OTHER);
+
+        purchase.addPiece(karinsLasagne);
+        purchase.addPiece(billys);
+        purchase.addPiece(kanelbulle);
+
+        Money netPrice = purchase.getTotalNet();
 
 
+        assertEquals(100000L, netPrice.getAmountInMinorUnits());
 
 
+    }
 
-
-
- 
-    
 }
