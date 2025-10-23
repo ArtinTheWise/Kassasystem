@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.example.Money;
 import org.example.Product.Product;
+import org.example.Product.Quantity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ public class PurchaseTest {
 
     @Mock CashRegister cashRegister;
     @Mock SalesEmployee salesEmployee; 
+    @Mock Quantity quantity;
 
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
@@ -79,7 +81,7 @@ public class PurchaseTest {
     void addNullItemToPurchaseThrowsException(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
-            () -> purchase.addProduct(null, 1));
+            () -> purchase.addProduct(null, quantity));
     }
 
 
