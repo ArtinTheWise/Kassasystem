@@ -87,32 +87,14 @@ public class PurchaseTest {
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
-
         when(p.getPriceModel()).thenReturn(pm);
-
-        when(pm.calculatePrice(any(Quantity.class)))
-            .thenAnswer(inv -> {
-                Quantity q = inv.getArgument(0);
-                return new Money(100 * (int)q.getAmount());
-            });
-            
         return p;
     }
 
-    private Product mockUnitProductWithPant(String name) { // 1 kr pant
+    private Product mockUnitProductWithPant(String name) {
         Product p = mock(Product.class, name);
-        UnitPrice basePrice = mock(UnitPrice.class);
-
-        when(basePrice.calculatePrice(any(Quantity.class)))
-            .thenAnswer(inv -> {
-                Quantity q = inv.getArgument(0);
-                return new Money(100 * (int)q.getAmount());
-
-            });
-        UnitPriceWithPant realPriceModel = new UnitPriceWithPant(basePrice, new Money(1L));
-
-        when(p.getPriceModel()).thenReturn(realPriceModel);
-
+        PriceModel pm = mock(UnitPriceWithPant.class);
+        when(p.getPriceModel()).thenReturn(pm);
         return p;
     }
 
