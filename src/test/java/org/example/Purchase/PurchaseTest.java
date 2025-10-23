@@ -8,9 +8,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.example.Money;
+import org.example.Discount.DiscountManager;
+import org.example.Discount.PercentageDiscount;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -39,18 +42,19 @@ public class PurchaseTest {
      * 
      * lägga till viktvara - klar
      * lägga till styckvara - klar
-     * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen
+     * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen - klar
      * samma som ovan för styck - klar
-     * skapa flera mockrabatter och se att den applicerar rätt rabatt på en quantity
-     * räkna pant korrekt
      * kan ta bort en vara under ett köp - klar
      * 
      * 
      * Pris:
-     *      totalNet
-     *      totalGross
-     *      totalVAT
-     *      (inkl räkna på pant)
+     *      totalNet - klar
+     *      totalGross - klar
+     *      totalVAT - klar
+     *      (inkl räkna på pant) - klar
+     * Rabatt:
+     *      Hämta en rabatt
+     *      Välja den bästa rabatt om flera är tillgängliga
      */
 
 
@@ -407,5 +411,27 @@ public class PurchaseTest {
         
 
     }
+
+    @Test
+    @DisplayName("applyDiscounts - calculates discount correctly")
+    void applyDiscounts_NormalDiscount(){
+
+        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends);
+        DiscountManager discountManager = new DiscountManager(percentageDiscount);
+
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(banana);
+        purchase.applyDiscounts();
+
+        long total = purchase.getTotalGross().getAmountInMinorUnits();
+
+        assertEquals(1200L, total);
+    }
+
+
+
 
 }
