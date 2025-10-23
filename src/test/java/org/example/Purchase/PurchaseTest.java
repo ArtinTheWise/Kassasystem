@@ -38,7 +38,7 @@ public class PurchaseTest {
      * lägga till viktvara - klar
      * lägga till styckvara - klar
      * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen
-     * samma som ovan för styck
+     * samma som ovan för styck - klar
      * skapa flera mockrabatter och se att den applicerar rätt rabatt på en quantity
      * räknar pris korrekt
      * räknar moms korrekt
@@ -238,6 +238,23 @@ public class PurchaseTest {
 
         Quantity q = purchase.getItemsView().get(karinsLasagne);
         assertEquals(2.0, q.getAmount(), 0.0001);
+        assertEquals(Unit.PIECE, q.getUnit());
+    
+    }
+
+    @Test
+    @DisplayName("addPiece + addWeight- add Weight then Piece then Weight correctly")
+    void addPiece_addsUnitsInDifferentOrderTwo() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProduct("Karins lasagne");
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addWeight(potato, 0.350, Unit.G);
+        purchase.addPiece(karinsLasagne);
+        purchase.addWeight(potato, 0.400, Unit.G); //should be added to same quantity as first one
+
+        Quantity q = purchase.getItemsView().get(karinsLasagne);
+        assertEquals(0.750, q.getAmount(), 0.0001);
         assertEquals(Unit.PIECE, q.getUnit());
     
     }
