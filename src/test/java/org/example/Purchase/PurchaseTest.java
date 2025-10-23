@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
+import org.example.Product.WeightPrice;
+import org.example.Product.Unit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +31,7 @@ public class PurchaseTest {
      * 
      * lägga till viktvara
      * lägga till styckvara
-     * lägga till viktvara igen. -e.g. första rtikel är vikt, sen massa andra, sen samma viktvara igen
+     * lägga till viktvara igen. -e.g. första artikel är vikt, sen massa andra, sen samma viktvara igen
      * samma som ovan för styck
      * skapa flera mockrabatter och se att den applicerar rätt rabatt på en quantity
      * räknar pris korrekt
@@ -48,6 +50,7 @@ public class PurchaseTest {
     @Mock SalesEmployee salesEmployee; 
     @Mock Quantity quantity;
     @Mock Product product;
+
 
     @Test
     @DisplayName("Create Purchase with null salesEmployee Object throws exception")
@@ -70,25 +73,25 @@ public class PurchaseTest {
     }
 
     @Test
-    @DisplayName("Add null product to Purchase throws exception")
+    @DisplayName("Add null piece-product to Purchase throws exception")
     void addNullItemToPurchaseThrowsException(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
-            () -> purchase.addProduct(null, quantity));
+            () -> purchase.addPiece(null));
     }
 
     @Test
-    @DisplayName("Add null quantity to Purchase throws exception")
-    void addNullQuantityToPurchaseThrowsException(){
+    @DisplayName("Add piece with weight pricemodel throws exception ")
+    void addPieceWithWeightPricemodelThrowsException() {
+        WeightPrice weightPrice = new WeightPrice(new Money(5000), Unit.KG);
+        Product mockProduct = mock(Product.class);
+
+        when(mockProduct.getPriceModel()).thenReturn(weightPrice);
+
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class,
-        () -> purchase.addProduct(product, null));
+            () -> purchase.addPiece(mockProduct));
     }
-
-
-
-
-
 
 
     
