@@ -68,6 +68,26 @@ public class PurchaseTest {
             () -> new Purchase(cashRegister, null));
     }
 
+    @Test
+    @DisplayName("Create Purchase with valid parameters does not throw exception")
+    void createPurchaseWithValidParametersDoesNotThrowException(){
+        new Purchase(cashRegister, salesEmployee);
+    }
+
+    @Test
+    @DisplayName("Add null item to Purchase throws exception")
+    void addNullItemToPurchaseThrowsException(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        assertThrows(IllegalArgumentException.class, 
+            () -> purchase.addItem(null, 1));
+    }
+
+    
+
+
+
+
+
     
 
     
