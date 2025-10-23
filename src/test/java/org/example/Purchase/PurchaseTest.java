@@ -87,6 +87,12 @@ public class PurchaseTest {
         UnitPrice pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
 
+        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+            return new Money(netPerPiece.getAmountInMinorUnits() * qty);
+        });
+
         when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
@@ -95,6 +101,21 @@ public class PurchaseTest {
 
         return p;
     }
+
+    private Product mockUnitProductGrossOnly(String name, Money grossPerPiece) {
+        Product p = mock(Product.class, name);
+        UnitPrice pm = mock(UnitPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+
+        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+            return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
+        });
+
+        return p;
+    }
+
 
 
     private Product mockWeightProduct(String name) {
@@ -343,9 +364,9 @@ public class PurchaseTest {
     @DisplayName("GetTotalGross - calculates gross price correctly")
     void getTotalGross_calculateTotalGross(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), new Money(6250));
-        Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), new Money(5000));
-        Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), new Money(1250));
+        Product karinsLasagne = mockUnitProductGrossOnly("Karins lasagne", new Money(5000));
+        Product billys = mockUnitProductGrossOnly("Billys Pan Pizza", new Money(4000));
+        Product kanelbulle = mockUnitProductGrossOnly("Kanelbulle", new Money(1000));
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
