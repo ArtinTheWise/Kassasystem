@@ -72,7 +72,8 @@ public class Purchase {
     }
 
     public void removeProduct(Product product){
-        
+        items.remove(product);
+
     }
 
 
