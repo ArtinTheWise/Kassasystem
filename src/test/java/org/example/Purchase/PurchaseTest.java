@@ -153,7 +153,7 @@ public class PurchaseTest {
         assertEquals(1, items.size());
         Quantity q = items.get(banana);
         assertNotNull(q);
-        assertNotEquals(1, q.getAmount(), 0.0001);
+        assertNotEquals(1.0, q.getAmount(), 0.0001);
         assertEquals(Unit.PIECE, q.getUnit());
     }
 
