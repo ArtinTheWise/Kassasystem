@@ -35,6 +35,8 @@ public class Purchase {
         if (!(product.getPriceModel() instanceof UnitPrice || product.getPriceModel() instanceof UnitPriceWithPant)){
             throw new IllegalArgumentException("The product does not have PIECE price-model");
         }
+
+        merge(product, new Quantity(1, Unit.PIECE));
     
     }
 
@@ -44,10 +46,20 @@ public class Purchase {
         if (!(product.getPriceModel() instanceof WeightPrice)){
             throw new IllegalArgumentException("The product does not have WEIGHT price-model");
         }
+        merge(product, new Quantity(amount,unit));
         
     }
 
-    public static void requireNonNullProduct(Product product) {
+    private void merge(Product product, Quantity quantity){
+        items.merge(product, quantity, (oldQ, addQ) -> {
+            if (oldQ.getUnit() != addQ.getUnit()) {
+                throw new IllegalArgumentException("Unit conflict for product");
+            }
+            return new Quantity (oldQ.getAmount() + addQ.getAmount(), oldQ.getUnit());
+        });
+    }
+
+    private static void requireNonNullProduct(Product product) {
         Objects.requireNonNull(product, "product cannot be null");
         if (product.getPriceModel() == null){
             throw new IllegalArgumentException("Product has no PriceModel");
