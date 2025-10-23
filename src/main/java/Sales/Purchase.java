@@ -71,6 +71,10 @@ public class Purchase {
         
     }
 
+    public void removeProduct(Product product){
+        
+    }
+
 
     
 }

@@ -259,6 +259,17 @@ public class PurchaseTest {
     
     }
 
+    @Test
+    @DisplayName("removeProduct - removes the whole row")
+    void removeProduct_removesLine(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product cola = mockUnitProductWithPant("Coca Cola 33cl");
+        purchase.addPiece(cola);
+
+        purchase.removeProduct(cola);
+        assertTrue(purchase.getItemsView().isEmpty());
+    }
+
 
 
 
