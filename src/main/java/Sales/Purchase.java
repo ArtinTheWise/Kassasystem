@@ -1,10 +1,16 @@
 package Sales;
 
+import java.util.Objects;
+import java.util.Map;
 
 import org.example.Product.Product;
+import org.example.Product.Quantity;
+import org.example.Product.Unit;
 import org.example.Product.UnitPrice;
 import org.example.Product.UnitPriceWithPant;
 import org.example.Product.WeightPrice;
+
+
 
 public class Purchase {
     public Purchase(Object cashRegister, Object salesEmployee){
@@ -18,22 +24,32 @@ public class Purchase {
     }
 
     public void addPiece(Product product){
-        if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null.");
-        }
+        requireNonNullProduct(product);
+
         if (!(product.getPriceModel() instanceof UnitPrice || product.getPriceModel() instanceof UnitPriceWithPant)){
             throw new IllegalArgumentException("The product does not have PIECE price-model");
         }
     
     }
 
-    public void addWeight(Product product){
-        if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null.");
-        }
+    public void addWeight(Product product, double amount, Unit unit){
+        requireNonNullProduct(product);
+
         if (!(product.getPriceModel() instanceof WeightPrice)){
             throw new IllegalArgumentException("The product does not have WEIGHT price-model");
         }
+        
+    }
+
+    public static void requireNonNullProduct(Product product) {
+        Objects.requireNonNull(product, "product cannot be null");
+        if (product.getPriceModel() == null){
+            throw new IllegalArgumentException("Product has no PriceModel");
+        }
+    }
+
+    public Map<Product, Quantity> getItemsView() {
+        return null;
         
     }
 

@@ -1,5 +1,6 @@
 package org.example.Purchase;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -7,6 +8,7 @@ import static org.mockito.Mockito.when;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
+import org.example.Product.Unit;
 import org.example.Product.WeightPrice;
 import org.example.Product.UnitPrice;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +84,7 @@ public class PurchaseTest {
     @DisplayName("addPiece: throws exception for null Product")
     void addPiece_onNullProduct_throws(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        assertThrows(IllegalArgumentException.class, 
+        assertThrows(NullPointerException.class, 
             () -> purchase.addPiece(null));
     }
 
@@ -100,8 +102,8 @@ public class PurchaseTest {
     @DisplayName("addWeight: throws exception for null Product")
     void addWeight_onNullProduct_throws(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        assertThrows(IllegalArgumentException.class, 
-            () -> purchase.addWeight(null));
+        assertThrows(NullPointerException.class, 
+            () -> purchase.addWeight(null, 0.432, Unit.G)); // unit + weight doesn't matter.
     }
 
     @Test
@@ -111,7 +113,20 @@ public class PurchaseTest {
 
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class,
-            () -> purchase.addWeight(beef));
+            () -> purchase.addWeight(beef, 0.432, Unit.G)); // unit + weight doesn't matter.
+    }
+
+    @Test
+    @DisplayName("addWeight: add weight for weight product")
+    void addWeight_addsAmount_forWeightProduct() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addWeight(potato, 0.350, Unit.KG);
+
+        Quantity q = purchase.getItemsView().get(potato);
+        assertEquals(Unit.KG, q.getUnit());
+        assertEquals(0.350, q.getAmount(), 0.0001);
     }
 
 
