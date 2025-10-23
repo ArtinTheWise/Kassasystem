@@ -3,6 +3,7 @@ package org.example.Purchase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -176,7 +177,6 @@ public class PurchaseTest {
     }
 
 
-
     @Test
     @DisplayName("addPiece - add piece for piece product ")
     void addPiece_addsOnePiece() {
@@ -207,6 +207,22 @@ public class PurchaseTest {
         assertEquals(3.0, q.getAmount(), 0.0001);
         assertEquals(Unit.PIECE, q.getUnit());
     
+    }
+    @Test
+    @DisplayName("addPieceWithPant - add piece for piece with pant product ")
+    void addPiece_addsOnePieceWithPant() {
+        Purchase purchase = new Purchase (cashRegister, salesEmployee);
+        Product cola = mockUnitProductWithPant("Coca Cola 33cl");
+
+        purchase.addPiece(cola);
+
+        Map<Product,Quantity> items = purchase.getItemsView();
+        assertEquals(1, items.size());
+        Quantity q = items.get(cola);
+        assertNotNull(q);
+        assertEquals(1.0, q.getAmount(), 0.0001);
+        assertEquals(Unit.PIECE, q.getUnit());
+        assertTrue(cola.getPriceModel() instanceof UnitPriceWithPant);
     }
 
     @Test
