@@ -8,6 +8,7 @@ import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
 import org.example.Product.WeightPrice;
+import org.example.Product.UnitPrice;
 import org.example.Product.Unit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -102,11 +103,11 @@ public class PurchaseTest {
 
     @Test
     @DisplayName("Add product with Unit priceModel throws exception ")
-    void addProductWithPiecePriceModelAsWeightThrowsException(){
-        WeightPrice weightPrice = new WeightPrice(new Money(5000), Unit.PIECE);
+    void addProductWithUnitPriceModelAsWeightThrowsException() {
+        UnitPrice unitPrice = new UnitPrice(new Money(5000));
         Product mockProduct = mock(Product.class);
 
-        when(mockProduct.getPriceModel()).thenReturn(weightPrice);
+        when(mockProduct.getPriceModel()).thenReturn(unitPrice);
 
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class,
