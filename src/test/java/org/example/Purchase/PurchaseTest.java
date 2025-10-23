@@ -401,11 +401,9 @@ public class PurchaseTest {
         purchase.addPiece(cola);
         purchase.addPiece(fanta);
 
-        Money totalGrossExPant = purchase.getTotalGross();
-        Money totalPriceWithPant = purchase.getTotalGross().add(200); // 2kr pant
+        Money totalGrossWithPant = purchase.getTotalGross();
         
-        assertEquals(3250L, totalGrossExPant);
-        assertEquals(3450L, totalPriceWithPant.getAmountInMinorUnits()); //32.5 kr + 2 pant
+        assertEquals(3450L, totalGrossWithPant.getAmountInMinorUnits()); //32.5 kr + 2 pant
         
 
     }
