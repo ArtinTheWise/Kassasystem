@@ -364,9 +364,9 @@ public class PurchaseTest {
     @DisplayName("GetTotalGross - calculates gross price correctly")
     void getTotalGross_calculateTotalGross(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductGrossOnly("Karins lasagne", new Money(5000));
-        Product billys = mockUnitProductGrossOnly("Billys Pan Pizza", new Money(4000));
-        Product kanelbulle = mockUnitProductGrossOnly("Kanelbulle", new Money(1000));
+        Product karinsLasagne = mockUnitProductGrossOnly("Karins lasagne", new Money(6250));
+        Product billys = mockUnitProductGrossOnly("Billys Pan Pizza", new Money(5000));
+        Product kanelbulle = mockUnitProductGrossOnly("Kanelbulle", new Money(1250));
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
