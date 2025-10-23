@@ -84,7 +84,7 @@ public class PurchaseTest {
         return p;
     }
 
-    private Product mockUnitProductWithGross(String name, Money netPerPiece, VatRate vatRate) {
+    private Product mockUnitProductWithGross(String name, Money netPerPiece, Money grossPerPiece) {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
@@ -95,14 +95,10 @@ public class PurchaseTest {
             return new Money(netPerPiece.getAmountInMinorUnits() * qty);
         });
 
-      
         when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
-            long net = netPerPiece.getAmountInMinorUnits();
-            double rate = vatRate.getRate();
-            long grossPerPiece = Math.round(net * (1.0) + rate);
-            return new Money(grossPerPiece * qty);
+            return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
         return p;
@@ -338,9 +334,9 @@ public class PurchaseTest {
     @DisplayName("GetTotalVat - calculates vat correctly")
     void getTotalVat_calculateTotalVat() {
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), OTHER);
-        Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), OTHER);
-        Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), OTHER);
+        Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), new Money(6250));
+        Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), new Money(5000));
+        Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), new Money(1250));
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
