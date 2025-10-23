@@ -1,9 +1,13 @@
 package org.example.Purchase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Map;
 
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
@@ -11,6 +15,7 @@ import org.example.Product.Quantity;
 import org.example.Product.Unit;
 import org.example.Product.WeightPrice;
 import org.example.Product.UnitPrice;
+import org.example.Product.UnitPriceWithPant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,6 +67,13 @@ public class PurchaseTest {
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+        return p;
+    }
+
+    private Product mockUnitProductWithPant(String name) {
+        Product p = mock(Product.class, name);
+        PriceModel pm = mock(UnitPriceWithPant.class);
         when(p.getPriceModel()).thenReturn(pm);
         return p;
     }
@@ -128,6 +140,24 @@ public class PurchaseTest {
         assertEquals(0.350, q.getAmount(), 0.0001);
         assertEquals(Unit.KG, q.getUnit());
     }
+
+    @Test
+    @DisplayName("addPiece_addsOnePiece()")
+    void addPiece_addsOnePiece() {
+        Purchase purchase = new Purchase (cashRegister, salesEmployee);
+        Product banana = mockUnitProduct("Banana");
+
+        purchase.addPiece(banana);
+
+        Map<Product,Quantity> items = purchase.getItemsView();
+        assertEquals(1, items.size());
+        Quantity q = items.get(banana);
+        assertNotNull(q);
+        assertNotEquals(1.0, q.getAmount(), 0.0001);
+        assertEquals(Unit.PIECE, q.getUnit());
+    }
+
+
 
 
  
