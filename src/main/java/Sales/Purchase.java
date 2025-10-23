@@ -16,9 +16,11 @@ public class Purchase {
     }
 
     public void addProduct(Product product, Quantity quantity){
-
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null.");
+        }
+        if (quantity == null) {
+            throw new IllegalArgumentException("Quantity cannot be null.");
         }
     
 
