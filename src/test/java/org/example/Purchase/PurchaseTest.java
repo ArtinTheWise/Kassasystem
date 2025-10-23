@@ -69,20 +69,42 @@ public class PurchaseTest {
         when(p.getPriceModel()).thenReturn(pm);
         return p;
     }
-    private Product mockUnitProductWithInfo(String name, Money price, VatRate vatRate){ // namn, pris i öre, moms i %. e.g banan, 500, OTHER - banan 500kr 25% moms
+    private Product mockUnitProductNetOnly(String name, Money netPerPiece) {
         Product p = mock(Product.class, name);
-        PriceModel pm = mock(UnitPrice.class);
-
+        UnitPrice pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
-        when(p.getVatRate()).thenReturn(vatRate);
-        when(p.calculatePrice(any(Quantity.class)))
-            .thenAnswer(inv -> {
-                Quantity q = inv.getArgument(0);
-                return new Money(price.getAmountInMinorUnits() * (int)q.getAmount());
-            });
+
+        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount(); // PIECE quantities are whole numbers in these tests
+            return new Money(netPerPiece.getAmountInMinorUnits() * qty);
+        });
+
+        
+        return p;
+    }
+
+    private Product mockUnitProductWithGross(String name, Money netPerPiece, VatRate vatRate) {
+        Product p = mock(Product.class, name);
+        UnitPrice pm = mock(UnitPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+
+        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+            return new Money(netPerPiece.getAmountInMinorUnits() * qty);
+        });
+
+      
+        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+            return new Money(Math.round(netPerPiece.getAmountInMinorUnits() * vatRate.getRate() * qty));
+        });
 
         return p;
     }
+
 
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
@@ -295,9 +317,9 @@ public class PurchaseTest {
     @DisplayName("getTotalNet - calculates net price correctly")
     void getTotalNet_calculateTotalNet(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(5000), OTHER);
-        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(4000), OTHER);
-        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(1000), OTHER);
+        Product karinsLasagne = mockUnitProductNetOnly("Karins lasagne", new Money(5000));
+        Product billys = mockUnitProductNetOnly("Billys Pan Pizza", new Money(4000));
+        Product kanelbulle = mockUnitProductNetOnly("Kanelbulle", new Money(1000));
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
@@ -313,9 +335,9 @@ public class PurchaseTest {
     @DisplayName("GetTotalVat - calculates vat correctly")
     void getTotalVat_calculateTotalVat() {
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(5000), OTHER);
-        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(4000), OTHER);
-        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(1000), OTHER);
+        Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), OTHER);
+        Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), OTHER);
+        Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), OTHER);
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
