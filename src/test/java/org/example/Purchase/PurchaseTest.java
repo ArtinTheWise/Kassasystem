@@ -116,6 +116,21 @@ public class PurchaseTest {
         return p;
     }
 
+    private Product mockUnitProductWithPantGrossOnly(String name, Money grossPerPiece) {
+        Product p = mock(Product.class, name);
+        UnitPriceWithPant pm = mock(UnitPriceWithPant.class);
+        when(p.getPriceModel()).thenReturn(pm);
+        when(pm.getPantPerPiece()).thenReturn(new Money(100));
+
+        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+            return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
+        });
+
+        return p;
+    }
+
 
 
     private Product mockWeightProduct(String name) {
@@ -372,8 +387,26 @@ public class PurchaseTest {
         purchase.addPiece(billys);
         purchase.addPiece(kanelbulle);
 
-        Money vat = purchase.getTotalGross();
+        Money totalPrice = purchase.getTotalGross();
         assertEquals(12500L, vat.getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("GetTotalGross - calculates pant gross price correctly")
+    void getTotalGross_calculateTotalPantGross(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1625)); //13 kr + 25% moms - 3.25kr
+        Product fanta = mockUnitProductWithPantGrossOnly("Fanta 33cl", new Money(1625)); //13 kr + 25% moms - 3.25kr
+
+        purchase.addPiece(cola);
+        purchase.addPiece(fanta);
+
+        Money totalGrossExPant = purchase.getTotalGross();
+        Money totalPriceWithPant = purchase.getTotalGross().add(200); // 2kr pant
+        
+        assertEquals(3250L, totalGrossExPant);
+        assertEquals(3450L, totalPriceWithPant.getAmountInMinorUnits()); //32.5 kr + 2 pant
+        
 
     }
 
