@@ -323,7 +323,7 @@ public class PurchaseTest {
 
         Money vat = purchase.getTotalVat();
 
-        assertEquals(25L, vat);
+        assertEquals(2500L, vat);
 
     }
 
