@@ -1,6 +1,5 @@
 package org.example.Purchase;
 
-import static org.example.Product.VatRate.OTHER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,7 +11,6 @@ import static org.mockito.Mockito.when;
 import java.util.Map;
 
 import org.example.Money;
-import org.example.Product.VatRate;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -361,8 +359,6 @@ public class PurchaseTest {
 
         Money vat = purchase.getTotalGross();
         assertEquals(12500L, vat.getAmountInMinorUnits());
-
-
 
     }
 
