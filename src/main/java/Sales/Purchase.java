@@ -86,6 +86,11 @@ public class Purchase {
         return new Money(total);
     }
 
+    public Money getTotalVat(){
+        return null;
+
+    }
+
 
     
 }

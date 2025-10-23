@@ -295,9 +295,9 @@ public class PurchaseTest {
     @DisplayName("getTotalNet - calculates net price correctly")
     void getTotalNet_calculateTotalNet(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
-        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(50000), OTHER);
-        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(40000), OTHER);
-        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(10000), OTHER);
+        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(5000), OTHER);
+        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(4000), OTHER);
+        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(1000), OTHER);
 
         purchase.addPiece(karinsLasagne);
         purchase.addPiece(billys);
@@ -306,8 +306,24 @@ public class PurchaseTest {
         Money netPrice = purchase.getTotalNet();
 
 
-        assertEquals(100000L, netPrice.getAmountInMinorUnits());
+        assertEquals(10000L, netPrice.getAmountInMinorUnits());
+    }
 
+    @Test
+    @DisplayName("GetTotalVat - calculates vat correctyl")
+    void getTotalVat_calculateTotalVat() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProductWithInfo("Karins lasagne", new Money(5000), OTHER);
+        Product billys = mockUnitProductWithInfo("Billys Pan Pizza", new Money(4000), OTHER);
+        Product kanelbulle = mockUnitProductWithInfo("Kanelbulle", new Money(1000), OTHER);
+
+        purchase.addPiece(karinsLasagne);
+        purchase.addPiece(billys);
+        purchase.addPiece(kanelbulle);
+
+        Money vat = purchase.getTotalVat();
+
+        assertEquals(25L, vat.getAmountInMinorUnits());
 
     }
 
