@@ -77,11 +77,19 @@ public class PurchaseTest {
     }
 
     @Test
-    @DisplayName("Add null item to Purchase throws exception")
+    @DisplayName("Add null product to Purchase throws exception")
     void addNullItemToPurchaseThrowsException(){
         Purchase purchase = new Purchase(cashRegister, salesEmployee);
         assertThrows(IllegalArgumentException.class, 
             () -> purchase.addProduct(null, quantity));
+    }
+
+    @Test
+    @DisplayName("Add null quantity to Purchase throws exception")
+    void addNullQuantityToPurchaseThrowsException(){
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        assertThrows(IllegalArgumentException.class,
+        () -> purchase.addProduct(getMockProduct(), null));
     }
 
 
