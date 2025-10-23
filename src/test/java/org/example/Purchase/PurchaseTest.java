@@ -87,12 +87,6 @@ public class PurchaseTest {
         UnitPrice pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
 
-        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
-            Quantity q = inv.getArgument(0);
-            long qty = (long) q.getAmount();
-            return new Money(netPerPiece.getAmountInMinorUnits() * qty);
-        });
-
         when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
