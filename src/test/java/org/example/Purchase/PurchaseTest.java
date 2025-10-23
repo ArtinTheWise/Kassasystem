@@ -136,13 +136,16 @@ public class PurchaseTest {
 
         purchase.addWeight(potato, 0.350, Unit.KG);
 
-        Quantity q = purchase.getItemsView().get(potato);
+        Map<Product,Quantity> items = purchase.getItemsView();
+        assertEquals(1, items.size());
+        Quantity q = items.get(potato);
+        assertNotNull(q);
         assertEquals(0.350, q.getAmount(), 0.0001);
         assertEquals(Unit.KG, q.getUnit());
     }
 
     @Test
-    @DisplayName("addPiece_addsOnePiece()")
+    @DisplayName("addPiece - add piece for piece product ")
     void addPiece_addsOnePiece() {
         Purchase purchase = new Purchase (cashRegister, salesEmployee);
         Product banana = mockUnitProduct("Banana");
@@ -155,6 +158,22 @@ public class PurchaseTest {
         assertNotNull(q);
         assertEquals(1.0, q.getAmount(), 0.0001);
         assertEquals(Unit.PIECE, q.getUnit());
+    }
+
+    @Test
+    @DisplayName("addPiece - add several pieces correctly")
+    void addPiece_addsManyPieces() {
+        Purchase purchase = new Purchase(cashRegister, salesEmployee);
+        Product karinsLasagne = mockUnitProduct("Karins lasagne");
+
+        for (int i = 0; i < 3; i++){
+            purchase.addPiece(karinsLasagne);
+        }
+
+        Quantity q = purchase.getItemsView().get(karinsLasagne);
+        assertEquals(3.0, q.getAmount(), 0.0001);
+        assertEquals(Unit.PIECE, q.getUnit());
+    
     }
 
 
