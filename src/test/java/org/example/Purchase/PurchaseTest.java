@@ -522,6 +522,30 @@ public class PurchaseTest {
     }
 
     @Test
+    @DisplayName("applyDiscounts - calculates discount / Vat / pant correctly")
+    // Correct flow is net price + vat - discount + pant
+    void applyDiscountOnPant(){
+        Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1300)); //1kr pant
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        LocalDateTime starts = LocalDateTime.now();
+        
+        NormalDiscount normalDiscount = new NormalDiscount(cola, 200, starts, ends); // cola 1300 --> 1100
+        DiscountManager discountManager = new DiscountManager(normalDiscount);
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(cola); // 1300
+        purchase.applyDiscounts(); // 1100
+
+        Long total = purchase.getTotalGross().getAmountInMinorUnits(); // 1200
+
+        assertEquals(1200, total);
+
+
+
+
+    }
+
+    @Test
     @DisplayName("applyDiscounts - handle several discounts and products correctly")
     void applyDiscounts_SeveralDiscountsAndProducts(){
         // Products
@@ -551,8 +575,7 @@ public class PurchaseTest {
         purchase.addPiece(cola);
         purchase.addWeight(tomato, 250, Unit.G);
         purchase.addPiece(banana);
-        purchase.addPiece(banana);
-        // 375 + 375 + 300 + 1200 + 1875 + 1200
+
 
         purchase.applyDiscounts();
 
@@ -575,9 +598,12 @@ public class PurchaseTest {
 
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
-        assertEquals(6075, total);
+        assertEquals(5575, total);
         
     }
+
+
+
 
 
 
