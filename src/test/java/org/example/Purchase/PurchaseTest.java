@@ -9,9 +9,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.example.Money;
+import org.example.Discount.Discount;
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
 import org.example.Discount.NormalDiscount;
@@ -66,6 +69,31 @@ public class PurchaseTest {
     @Mock CashRegister cashRegister;
     @Mock SalesEmployee salesEmployee; 
     @Mock Quantity quantity;
+
+
+    private double toKg(Quantity q) {
+        switch (q.getUnit()) {
+            case KG: return q.getAmount();
+            case HG: return q.getAmount() / 10.0;
+            case G:  return q.getAmount() / 1000.0;
+            default: throw new IllegalArgumentException("Unsupported unit for weight product: " + q.getUnit());
+        }
+    }
+    
+    private Product mockWeightProductGrossOnly(String name, Money grossPerKg) {
+        Product p = mock(Product.class, name);
+        WeightPrice pm = mock(WeightPrice.class);
+        when(p.getPriceModel()).thenReturn(pm);
+
+        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            double kg = toKg(q);
+            long totalMinor = Math.round(grossPerKg.getAmountInMinorUnits() * kg);
+            return new Money(totalMinor);
+        });
+
+        return p;
+    }
 
     private Product mockUnitProduct(String name){
         Product p = mock(Product.class, name);
@@ -491,6 +519,53 @@ public class PurchaseTest {
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
         assertEquals(3200L, total);
+    }
+
+    @Test
+    @DisplayName("applyDiscounts - handle several discounts and products correctly")
+    void applyDiscounts_SeveralDiscountsAndProducts(){
+        // Products
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(500));
+        Product apple = mockUnitProductGrossOnly("Apple", new Money(400));
+        Product cucumber = mockUnitProductGrossOnly("Cucumber", new Money(1200));
+        Product tomato = mockWeightProductGrossOnly("Tomato", new Money(2500));
+        Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1300)); //1kr pant
+
+        //Discounts
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        LocalDateTime starts = LocalDateTime.now();
+        ThreeForTwoDiscount threeForTwoDiscount = new ThreeForTwoDiscount(banana, ends); // 3 for 2 = 1000 istället för 1500
+        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends); // banana 25% 500 --> 375
+        NormalDiscount normalDiscount = new NormalDiscount(apple, 100, starts, ends); // apple 400 --> 300
+        NormalDiscount normalDiscountTwo = new NormalDiscount(cola, 200, starts, ends); // cola 1300 --> 1100
+
+        DiscountManager discountManager = new DiscountManager(threeForTwoDiscount, percentageDiscount, normalDiscount, normalDiscountTwo);
+
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(banana);
+        purchase.addPiece(banana);
+        purchase.addPiece(apple);
+        purchase.addPiece(cucumber);
+        purchase.addWeight(tomato, 500, Unit.G); //500 g tomater = 1250
+        purchase.addPiece(cola);
+        purchase.addPiece(cola);
+        purchase.addWeight(tomato, 0.250, Unit.G);
+        purchase.addPiece(apple);
+
+        /*
+        applies 
+        banana 25% x 2 | 500 x 2 x 0.25 = 750
+        apple 100 x 2 | 400 x 2 - 200 = 400
+        cola 200 x 2 | 1300 x 2 - 400 = 2200 + 200 pant = 2400
+        = 3550 total
+        
+        */     
+
+        Long total = purchase.getTotalGross().getAmountInMinorUnits();
+
+        assertEquals(3550L, total);
+        
     }
 
 
