@@ -16,7 +16,7 @@ public abstract class ProductDecorator extends Product {
 
     public ProductDecorator(Product product, LocalDateTime startTime, LocalDateTime endTime){
         super(product.getName(), product.getPriceModel(), product.getProductGroup(), product.getVatRate(), product.getAgeRestriction());
-
+        if(product == null) throw new NullPointerException();
         if (startTime == null || endTime == null) {throw new IllegalArgumentException("Start time and end time can't be null.");}
         if (endTime.isBefore(startTime)) {throw new IllegalArgumentException("Start time must be before end time.");}
 

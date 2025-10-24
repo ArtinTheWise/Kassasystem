@@ -2,6 +2,7 @@ package org.example.Discount;
 
 import org.example.Money;
 import org.example.Product.Product;
+import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,14 @@ public class DiscountManager {
         products.addAll(Arrays.asList(product));
     }
 
+    public DiscountManager(ProductGroup group){
+        for(Product p : group.getProductGroup()){
+            if(p instanceof ProductDecorator){
+                products.add(p);
+            }
+        }
+    }
+
     // Scanna alla 
     public boolean discountCheck(Product product){
         removeOldDiscounts();
@@ -29,7 +38,7 @@ public class DiscountManager {
             if (d.isActive() && Objects.equals(d.getProduct(), product)) {
                 return true;
             }
-        }  
+        }
         return false;
     }
 
