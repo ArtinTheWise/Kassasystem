@@ -63,6 +63,21 @@ public class DiscountManager {
         return (cheapest != null) ? cheapest : product;
     }
 
+    public void addDiscount(Product... product){
+        for(Product p : product) {
+            if (p instanceof ProductDecorator) {
+                ProductDecorator d = (ProductDecorator) p;
+                if (!d.getEndTime().isBefore(LocalDateTime.now())) {
+                    products.add(p);
+                }
+            }
+        }
+    }
+
+    public void addDiscount(ProductGroup group){
+        addDiscount(group.getProductGroup().toArray(new Product[0]));
+    }
+
     private void removeOldDiscounts(){
         for(Product p : products){
             ProductDecorator discountProduct = (ProductDecorator) p;

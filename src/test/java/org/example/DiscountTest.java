@@ -208,9 +208,45 @@ public class DiscountTest {
         assertFalse(manager.discountCheck(nonDiscountedProduct));
     }
 
-    //TEST MED 3 FÖR 2 FÖR CHEAPEST DISCOUNT, INDATA KONTROLLER FÖR DISCOUNT MANAGER
-    //DISCOUNT GROUP METOD I DISCOUNT MANAGER
-    //ADD AND REMOVE DISCOUNT I DISCOUNT MANAGER
+    @Test
+    void discountManagerReturnsCheapestDiscountWithThreeForTwo(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product discountPercentage = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        Product discountThreeForTwo = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE);
+        DiscountManager manager = new DiscountManager(discountPercentage, discountThreeForTwo);
+
+        assertEquals(96, manager.getBestDiscount(product, new Quantity(1, PIECE)).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        assertEquals(240, manager.getBestDiscount(product, new Quantity(3, PIECE)).calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
+    }
+
+    @Test
+    void getDiscountedAmountReturnsCorrectDiscount(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+        ProductDecorator discountPercentage = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertEquals(24, discountPercentage.getDiscountedAmount(new Quantity(1, PIECE)).getAmountInMinorUnits());
+    }
+
+    @Test
+    void discountManagerAddMethodWorks(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+        Product productTwo = new Product("Red Milk", mockPriceModel, OTHER);
+
+        Product nonDiscountedProduct = getMockProduct();
+        Product discountedProductOne = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        Product discountedProductTwo = new NormalDiscount(productTwo, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductGroup group = new ProductGroup("Dairy", nonDiscountedProduct, discountedProductOne);
+        DiscountManager manager = new DiscountManager();
+        manager.addDiscount(group);
+        manager.addDiscount(discountedProductTwo);
+
+        assertTrue(manager.discountCheck(discountedProductOne));
+        assertTrue(manager.discountCheck(discountedProductTwo));
+        assertFalse(manager.discountCheck(nonDiscountedProduct));
+    }
 
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);

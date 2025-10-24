@@ -51,4 +51,10 @@ public abstract class ProductDecorator extends Product {
     }
 
     public abstract Money calculatePrice(Quantity quantity);
+
+    public abstract Money calculatePriceWithVat(Quantity quantity);
+
+    public Money getDiscountedAmount(Quantity quantity){
+        return new Money(getProduct().calculatePriceWithVat(quantity).getAmountInMinorUnits() - calculatePriceWithVat(quantity).getAmountInMinorUnits());
+    }
 }
