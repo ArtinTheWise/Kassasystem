@@ -429,6 +429,26 @@ public class PurchaseTest {
         assertEquals(1200L, total);
     }
 
+    @Test
+    @DisplayName("applyDiscounts - calculates best discount if there is 2 PercentageDiscounts correctly")
+    void applyDiscounts_BestPercentageDiscount(){
+
+        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 12, ends); // 12 %
+        PercentageDiscount percentageDiscountTwo = new PercentageDiscount(banana, 25, ends); // 25 %
+        DiscountManager discountManager = new DiscountManager(percentageDiscount, percentageDiscountTwo);
+        
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(banana);
+        purchase.applyDiscounts();
+
+        Long total = purchase.getTotalGross().getAmountInMinorUnits();
+
+        assertEquals(1200L, total);
+    }
+
 
 
 
