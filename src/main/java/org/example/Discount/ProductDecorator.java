@@ -46,7 +46,7 @@ public abstract class ProductDecorator extends Product {
         return endTime;
     }
 
-    protected Product getProduct(){
+    public Product getProduct(){
         return product;
     }
 

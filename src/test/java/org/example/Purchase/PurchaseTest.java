@@ -555,6 +555,23 @@ public class PurchaseTest {
 
         purchase.applyDiscounts();
 
+        for (var e : purchase.getItemsView().entrySet()){
+            var p = e.getKey();
+            var q = e.getValue();
+
+            long price = p.calculatePriceWithVat(q).getAmountInMinorUnits();
+
+            // peek base for pant
+            Product base = (p instanceof org.example.Discount.ProductDecorator pd) ? pd.getProduct() : p;
+            long pant = 0;
+            if (base.getPriceModel() instanceof UnitPriceWithPant upm) {
+                pant = upm.getPantPerPiece().getAmountInMinorUnits() * Math.round(q.getAmount());
+            }
+
+            System.out.println(p + "  qty=" + q.getAmount() + " " + q.getUnit()
+                + "  price=" + price + "  pant=" + pant + "  lineTotal=" + (price + pant));
+        }
+
         /*
          * 2 banana
          * 2 apple
