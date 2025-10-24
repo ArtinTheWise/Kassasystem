@@ -186,6 +186,28 @@ public class DiscountTest {
         assertEquals(96, manager.getBestDiscount(product, new Quantity(1, PIECE)).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
     }
 
+    @Test
+    void productDecoratorChildrenDoesNotAllowNullProduct(){
+        assertThrows(NullPointerException.class, () -> new PercentageDiscount(null, DISCOUNT_AMOUNT, DATE_IN_FUTURE));
+        assertThrows(NullPointerException.class, () -> new NormalDiscount(null, DISCOUNT_AMOUNT, DATE_IN_FUTURE));
+        assertThrows(NullPointerException.class, () -> new ThreeForTwoDiscount(null, DATE_IN_FUTURE));
+
+    }
+
+    @Test
+    void discountManagerAllowsProductGroupInConstructor(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        Product nonDiscountedProduct = getMockProduct();
+        Product discountedProduct = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductGroup group = new ProductGroup("Dairy", nonDiscountedProduct, discountedProduct);
+        DiscountManager manager = new DiscountManager(group);
+
+        assertTrue(manager.discountCheck(discountedProduct));
+        assertFalse(manager.discountCheck(nonDiscountedProduct));
+    }
+
     //TEST MED 3 FÖR 2 FÖR CHEAPEST DISCOUNT, INDATA KONTROLLER FÖR DISCOUNT MANAGER
     //DISCOUNT GROUP METOD I DISCOUNT MANAGER
     //ADD AND REMOVE DISCOUNT I DISCOUNT MANAGER
