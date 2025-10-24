@@ -79,10 +79,8 @@ public class DiscountManager {
     }
 
     private void removeOldDiscounts(){
-        for(Product p : products){
-            ProductDecorator discountProduct = (ProductDecorator) p;
-            if(LocalDateTime.now().isAfter(discountProduct.getEndTime())) products.remove(p);
-        }
+        products.removeIf(p ->
+            LocalDateTime.now().isAfter(((ProductDecorator) p).getEndTime()));
     }
 
     private ArrayList<Product> getActiveDiscounts(){
