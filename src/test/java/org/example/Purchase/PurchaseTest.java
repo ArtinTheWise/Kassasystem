@@ -563,7 +563,13 @@ public class PurchaseTest {
          * tomato 750 g
          * 
          * 
-         * 
+         * 375
+         * 375
+         * 300
+         * 300
+         * 1200
+         * 1875
+         * 2400
          * 
  
         applies 
@@ -573,12 +579,14 @@ public class PurchaseTest {
         cola 200 x 2 | 1300 x 2 - 400 = 2200 + 200 pant = 2400
         tomato 750 G | 2500 x 0.75 = 1875
         =  6625 total
+
+        was 5325
         
         */     
 
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
-        assertEquals(6625L, total);
+        assertEquals(6825L, total);
         
     }
 

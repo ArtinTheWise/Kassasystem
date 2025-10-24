@@ -109,12 +109,21 @@ public class Purchase {
     public Money getTotalGross(){
         long total = 0;
         for (Map.Entry<Product, Quantity> e : items.entrySet()) {
-            total+= e.getKey().calculatePriceWithVat(e.getValue()).getAmountInMinorUnits();
-            if(e.getKey().getPriceModel() instanceof UnitPriceWithPant){
-                total += ((UnitPriceWithPant) e.getKey().getPriceModel()).getPantPerPiece().getAmountInMinorUnits();
+            Product p = e.getKey();
+            Quantity q = e.getValue();
+
+            total += p.calculatePriceWithVat(q).getAmountInMinorUnits();
+
+            if (p.getPriceModel() instanceof UnitPriceWithPant upm) {
+                if (q.getUnit() != Unit.PIECE) {
+                    throw new IllegalArgumentException("Pant product must be counted by PIECE");
+                }
+                long pieces = Math.round(q.getAmount());
+                total += upm.getPantPerPiece().getAmountInMinorUnits() * pieces;
             }
         }
         return new Money(total);
+
     }
 
     public void applyDiscounts(){
