@@ -95,7 +95,6 @@ public class DiscountTest {
         ProductGroup productGroup = new ProductGroup("Milk", productOne, productTwo, productThree);
         ProductGroup discountedProductGroup = NormalDiscount.discountGroup(productGroup, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
         assertEquals(i1, discountedProductGroup.getProductGroup().get(i2).calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
-
     }
 
     @ParameterizedTest
@@ -259,6 +258,8 @@ public class DiscountTest {
         assertEquals(192, discountedProductTwo.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
         assertEquals(288, discountedProductTwo.calculatePrice(new Quantity(4, PIECE)).getAmountInMinorUnits());
     }
+
+
 
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);

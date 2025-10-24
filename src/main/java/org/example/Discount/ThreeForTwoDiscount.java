@@ -2,6 +2,7 @@ package org.example.Discount;
 
 import org.example.Money;
 import org.example.Product.Product;
+import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 import org.example.Product.WeightPrice;
 
@@ -37,5 +38,19 @@ public class ThreeForTwoDiscount extends ProductDecorator{
         Quantity charged = new Quantity(chargedAmount, q.getUnit());
 
         return withVat ? getProduct().calculatePriceWithVat(charged) : getProduct().calculatePrice(charged);
+    }
+
+    public static ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
+        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
+
+        for(Product p : productGroup.getProductGroup()){
+            discountedProductGroup.addProduct(new ThreeForTwoDiscount(p, startTime, endTime));
+        }
+
+        return discountedProductGroup;
+    }
+
+    public static ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
+        return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 }
