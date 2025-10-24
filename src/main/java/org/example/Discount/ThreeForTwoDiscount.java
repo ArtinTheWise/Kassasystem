@@ -19,11 +19,33 @@ public class ThreeForTwoDiscount extends ProductDecorator{
     }
 
     @Override
-    public Money calculatePrice(Quantity quantity){
-        if(isActive()){
-            int whatToDiscount = (int) quantity.getAmount() / 3;
-            return getProduct().calculatePrice(new Quantity(quantity.getAmount() - whatToDiscount, quantity.getUnit()));
-        }
-        return getProduct().calculatePrice(quantity);
-    }
+    public Money calculatePrice(Quantity q) {
+        if (!isActive()) return getProduct().calculatePrice(q);
+
+        double amount = q.getAmount();
+        long free = (long) Math.floor(amount) / 3;
+        double chargedAmount = Math.max(0d, amount - free);
+        Quantity charged = new Quantity(chargedAmount, q.getUnit());
+
+        Money net = getProduct().calculatePrice(charged);
+        if (net == null) return null; // undvik NPE
+        return net;
+}
+
+    @Override
+    public Money calculatePriceWithVat(Quantity q) {
+        if (!isActive()) return getProduct().calculatePriceWithVat(q);
+
+        double amount = q.getAmount();
+        long wholeItems = (long) Math.floor(amount); 
+        long free = wholeItems / 3;                  
+        double chargedAmount = Math.max(0d, amount - free);
+
+        Quantity charged = new Quantity(chargedAmount, q.getUnit());
+
+        Money gross = getProduct().calculatePriceWithVat(charged);
+        if (gross == null) return null; // undvik NPE
+
+        return gross;
+}
 }
