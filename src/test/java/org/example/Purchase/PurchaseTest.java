@@ -544,12 +544,15 @@ public class PurchaseTest {
         Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
 
         purchase.addPiece(banana);
+        purchase.addPiece(banana);
         purchase.addPiece(apple);
         purchase.addPiece(cucumber);
         purchase.addWeight(tomato, 500, Unit.G); //500 g tomater = 1250
         purchase.addPiece(cola);
         purchase.addWeight(tomato, 250, Unit.G);
-        // 375 + 300 + 1200 + 1875 + 1200
+        purchase.addPiece(banana);
+        purchase.addPiece(banana);
+        // 375 + 375 + 300 + 1200 + 1875 + 1200
 
         purchase.applyDiscounts();
 
@@ -570,38 +573,9 @@ public class PurchaseTest {
                 + "  price=" + price + "  pant=" + pant + "  lineTotal=" + (price + pant));
         }
 
-        /*
-         * 2 banana
-         * 2 apple
-         * 1 cucumber
-         * 2 cola
-         * tomato 750 g
-         * 
-         * 
-         * 375
-         * 375
-         * 300
-         * 300
-         * 1200
-         * 1875
-         * 2400
-         * 
- 
-        applies 
-        banana 25% x 2 | 500 x 2 x 0.25 = 750
-        apple 100 x 2 | 400 x 2 - 200 = 400
-        cucumber 1200 x 1 = 1200
-        cola 200 x 2 | 1300 x 2 - 400 = 2200 + 200 pant = 2400
-        tomato 750 G | 2500 x 0.75 = 1875
-        =  6625 total
-
-        was 5325
-        
-        */     
-
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
-        assertEquals(4950L, total);
+        assertEquals(6075, total);
         
     }
 
