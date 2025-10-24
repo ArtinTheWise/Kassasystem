@@ -15,6 +15,7 @@ import org.example.Money;
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
 import org.example.Discount.NormalDiscount;
+import org.example.Discount.ThreeForTwoDiscount;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -415,7 +416,7 @@ public class PurchaseTest {
     @DisplayName("applyDiscounts - calculates PercentageDiscount correctly")
     void applyDiscounts_PercentageDiscount(){
 
-        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
         PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends);
         DiscountManager discountManager = new DiscountManager(percentageDiscount);
@@ -434,7 +435,7 @@ public class PurchaseTest {
     @DisplayName("applyDiscounts - calculates best discount if there is 2 PercentageDiscounts correctly")
     void applyDiscounts_BestPercentageDiscount(){
 
-        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
         PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 12, ends); // 12 %
         PercentageDiscount percentageDiscountTwo = new PercentageDiscount(banana, 25, ends); // 25 %
@@ -454,7 +455,7 @@ public class PurchaseTest {
     @DisplayName("applyDiscounts - calculates best discount if there is PercentageDiscount + NormalDiscount")
     void applyDiscounts_BestDiscountNormalAndPercentage(){
         
-        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
         LocalDateTime starts = LocalDateTime.now();
         PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends); // 25 % - ^ 1600 --> 1200
@@ -471,6 +472,26 @@ public class PurchaseTest {
         assertEquals(1000L, total);
     }
 
+    @Test
+    @DisplayName("applyDiscounts - identifies 3 for 2 discount correctly")
+    void applyDiscounts_ThreeForTwoDiscount(){
+
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        ThreeForTwoDiscount threeForTwoDiscount = new ThreeForTwoDiscount(banana, ends); // 3 for 2 = 1600 x 3 - 1 unit = 3200kr
+        DiscountManager discountManager = new DiscountManager(threeForTwoDiscount);
+        
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(banana);
+        purchase.addPiece(banana);
+        purchase.addPiece(banana);
+        purchase.applyDiscounts();
+
+        Long total = purchase.getTotalGross().getAmountInMinorUnits();
+
+        assertEquals(3200L, total);
+    }
 
 
 
