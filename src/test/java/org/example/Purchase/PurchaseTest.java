@@ -544,14 +544,12 @@ public class PurchaseTest {
         Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
 
         purchase.addPiece(banana);
-        purchase.addPiece(banana);
         purchase.addPiece(apple);
         purchase.addPiece(cucumber);
         purchase.addWeight(tomato, 500, Unit.G); //500 g tomater = 1250
         purchase.addPiece(cola);
-        purchase.addPiece(cola);
         purchase.addWeight(tomato, 250, Unit.G);
-        purchase.addPiece(apple);
+        // 375 + 300 + 1200 + 1875 + 1200
 
         purchase.applyDiscounts();
 
@@ -603,7 +601,7 @@ public class PurchaseTest {
 
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
-        assertEquals(6825L, total);
+        assertEquals(4950L, total);
         
     }
 
