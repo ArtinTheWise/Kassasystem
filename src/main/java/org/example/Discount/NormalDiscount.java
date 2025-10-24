@@ -21,12 +21,29 @@ public class NormalDiscount extends ProductDecorator {
     }
 
     @Override
-    public Money calculatePrice(Quantity quantity){
-        if(isActive()){
-            long discounted = getProduct().calculatePrice(quantity).getAmountInMinorUnits() - discount;
-            return new Money(discounted);
-        }
-        return getProduct().calculatePrice(quantity);
+    public Money calculatePrice(Quantity q) {
+        Money net = getProduct().calculatePrice(q);
+
+        if (!isActive()) return net;
+        if (net == null) return null; // undvik NPE
+
+        long amount = net.getAmountInMinorUnits();
+        long discounted = Math.max(0L, amount - (long) discount);
+
+        return new Money(discounted);
+    }
+
+    @Override
+    public Money calculatePriceWithVat(Quantity q) {
+        Money gross = getProduct().calculatePriceWithVat(q);
+
+        if (!isActive()) return gross;
+        if (gross == null) return null; // undvik NPE
+
+        long amount = gross.getAmountInMinorUnits();
+        long discounted = Math.max(0L, amount - (long) discount);
+
+        return new Money(discounted);
     }
 
     public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime startTime, LocalDateTime endTime) {
