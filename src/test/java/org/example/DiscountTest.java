@@ -248,6 +248,18 @@ public class DiscountTest {
         assertFalse(manager.discountCheck(nonDiscountedProduct));
     }
 
+    @Test
+    void threeForTwoDiscountWrapsProperly(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+        Product discountedProductOne = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE);
+        Product discountedProductTwo = new PercentageDiscount(discountedProductOne, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+
+        assertEquals(96, discountedProductTwo.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        assertEquals(192, discountedProductTwo.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
+        assertEquals(288, discountedProductTwo.calculatePrice(new Quantity(4, PIECE)).getAmountInMinorUnits());
+    }
+
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
         when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));

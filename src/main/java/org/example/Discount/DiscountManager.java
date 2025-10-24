@@ -54,12 +54,15 @@ public class DiscountManager {
             if (d.isActive() && Objects.equals(d.getProduct(), product)){
                 Money m = p.calculatePriceWithVat(quantity);
                 if (m == null) m = p.calculatePrice(quantity);
-                    if (m != null) {
-                        long val = m.getAmountInMinorUnits();
-                        if (val < cheapestVal) { cheapestVal = val; cheapest = p; }
+                if (m != null) {
+                    long val = m.getAmountInMinorUnits();
+                    if (val < cheapestVal) {
+                        cheapestVal = val;
+                        cheapest = p;
                     }
                 }
             }
+        }
         return (cheapest != null) ? cheapest : product;
     }
 
