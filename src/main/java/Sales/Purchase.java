@@ -145,7 +145,7 @@ public class Purchase {
 
             Product priced = discountManager.getBestDiscount(base, qty);
 
-            updated.merge(priced, qty, (q1, q2) -> {
+            updated.merge(base, qty, (q1, q2) -> {
                 if (q1.getUnit() != q2.getUnit()) {
                     throw new IllegalArgumentException("Unit conflict for product");
                 }
