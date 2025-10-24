@@ -550,21 +550,35 @@ public class PurchaseTest {
         purchase.addWeight(tomato, 500, Unit.G); //500 g tomater = 1250
         purchase.addPiece(cola);
         purchase.addPiece(cola);
-        purchase.addWeight(tomato, 0.250, Unit.G);
+        purchase.addWeight(tomato, 250, Unit.G);
         purchase.addPiece(apple);
 
+        purchase.applyDiscounts();
+
         /*
+         * 2 banana
+         * 2 apple
+         * 1 cucumber
+         * 2 cola
+         * tomato 750 g
+         * 
+         * 
+         * 
+         * 
+ 
         applies 
         banana 25% x 2 | 500 x 2 x 0.25 = 750
         apple 100 x 2 | 400 x 2 - 200 = 400
+        cucumber 1200 x 1 = 1200
         cola 200 x 2 | 1300 x 2 - 400 = 2200 + 200 pant = 2400
-        = 3550 total
+        tomato 750 G | 2500 x 0.75 = 1875
+        =  6625 total
         
         */     
 
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
-        assertEquals(3550L, total);
+        assertEquals(6625L, total);
         
     }
 
