@@ -18,6 +18,8 @@ import org.example.Product.WeightPrice;
 public class Purchase {
 
     private Map<Product, Quantity> items = new LinkedHashMap<>();// Hashmap + LinkedList - sorterad ordning men med konstant get
+    private Map<Product, Product> pricedByBase = new LinkedHashMap<>(); // för att hålla baspriset
+
     private DiscountManager discountManager;
 
     public Purchase(Object cashRegister, Object salesEmployee, DiscountManager discountManager){
@@ -43,6 +45,10 @@ public class Purchase {
         
         this.discountManager = null;
 
+    }
+
+    private Product pricedFor(Product base){
+        return pricedByBase.getOrDefault(base, base);
     }
 
     public void addPiece(Product product){
@@ -95,7 +101,10 @@ public class Purchase {
     public Money getTotalNet(){
         long total = 0;
         for (Map.Entry<Product, Quantity> e : items.entrySet()) {
-            total+= e.getKey().calculatePrice(e.getValue()).getAmountInMinorUnits();
+            Product base = e.getKey();
+            Quantity q = e.getValue();
+            total += pricedFor(base).calculatePrice(q).getAmountInMinorUnits();
+            
         }
         return new Money(total);
     }
@@ -112,7 +121,7 @@ public class Purchase {
             Product p = e.getKey();
             Quantity q = e.getValue();
 
-            total += p.calculatePriceWithVat(q).getAmountInMinorUnits();
+            total += pricedFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
 
             if (p.getPriceModel() instanceof UnitPriceWithPant upm) {
                 if (q.getUnit() != Unit.PIECE) {
@@ -128,6 +137,7 @@ public class Purchase {
 
     public void applyDiscounts(){
         Map<Product, Quantity> updated = new LinkedHashMap<>();
+        Map<Product, Product> chosen = new LinkedHashMap<>();
 
         for (Map.Entry<Product, Quantity> e : items.entrySet()) {
             Product base = e.getKey();
@@ -141,8 +151,11 @@ public class Purchase {
                 }
                 return new Quantity (q1.getAmount() + q2.getAmount(), q1.getUnit());
             });
+
+            chosen.put(base, priced);
         }
         items = updated;
+        pricedByBase = chosen;
     }
     
 }
