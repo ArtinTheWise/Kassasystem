@@ -14,6 +14,7 @@ import java.util.Map;
 import org.example.Money;
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
+import org.example.Discount.NormalDiscount;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -447,6 +448,27 @@ public class PurchaseTest {
         Long total = purchase.getTotalGross().getAmountInMinorUnits();
 
         assertEquals(1200L, total);
+    }
+
+    @Test
+    @DisplayName("applyDiscounts - calculates best discount if there is PercentageDiscount + NormalDiscount")
+    void applyDiscounts_BestDiscountNormalAndPercentage(){
+        
+        Product banana = mockUnitProductGrossOnly("Banan", new Money(1600));
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+        LocalDateTime starts = LocalDateTime.now();
+        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends); // 25 % - ^ 1600 --> 1200
+        NormalDiscount normalDiscount = new NormalDiscount(banana, 600, starts, ends); // 600kr - ^ 1600 --> 1000
+        DiscountManager discountManager = new DiscountManager(percentageDiscount, normalDiscount);
+        
+        Purchase purchase = new Purchase(cashRegister, salesEmployee, discountManager);
+
+        purchase.addPiece(banana);
+        purchase.applyDiscounts();
+
+        Long total = purchase.getTotalGross().getAmountInMinorUnits();
+
+        assertEquals(1000L, total);
     }
 
 
