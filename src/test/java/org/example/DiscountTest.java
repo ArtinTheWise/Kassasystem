@@ -198,7 +198,7 @@ public class DiscountTest {
     @Test
     void discountManagerAllowsProductGroupInConstructor(){
         PriceModel mockPriceModel = new UnitPrice(new Money(120));
-        Product product = new Product("Milk", mockPriceModel, OTHER);
+        Product product = new Product("Red Milk", mockPriceModel, OTHER);
 
         Product nonDiscountedProduct = getMockProduct();
         Product discountedProduct = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
@@ -233,7 +233,7 @@ public class DiscountTest {
     @Test
     void discountManagerAddMethodWorks(){
         PriceModel mockPriceModel = new UnitPrice(new Money(120));
-        Product product = new Product("Milk", mockPriceModel, OTHER);
+        Product product = new Product("Blue Milk", mockPriceModel, OTHER);
         Product productTwo = new Product("Red Milk", mockPriceModel, OTHER);
 
         Product nonDiscountedProduct = getMockProduct();
@@ -276,19 +276,36 @@ public class DiscountTest {
     @Test
     void discountAtXTimeIsActiveAtCorrectTimes(){
         ProductDecorator activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductDecorator inactiveDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
         LocalTime start = LocalTime.now();
+        LocalTime startInFuture = start.plusMinutes(10);
         LocalTime end = start.plusHours(1);
 
-        ProductDecorator specificDiscount = new DiscountAtXTime(activeDiscount, start, end);
-        assertTrue(specificDiscount.isActive());
-
-
+        ProductDecorator specificActiveDiscount = new DiscountAtXTime(activeDiscount, start, end);
+        ProductDecorator specificInactiveDiscount = new DiscountAtXTime(inactiveDiscount, start, end);
+        ProductDecorator specificInactiveDiscountTwo = new DiscountAtXTime(activeDiscount, startInFuture, end);
+        assertTrue(specificActiveDiscount.isActive());
+        assertFalse(specificInactiveDiscount.isActive());
+        assertFalse(specificInactiveDiscountTwo.isActive());
     }
 
-    private Product getMockProduct(){
-        Product mockProduct = mock(Product.class);
-        when(mockProduct.calculatePrice(any())).thenReturn(new Money(120));
-        when(mockProduct.getName()).thenReturn("Milk");
-        return mockProduct;
+    @Test
+    void discountAtXTimeGivesCorrectDiscount(){
+        ProductDecorator activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        LocalTime start = LocalTime.now();
+        LocalTime startInFuture = start.plusMinutes(10);
+        LocalTime end = start.plusHours(1);
+        ProductDecorator specificActiveDiscount = new DiscountAtXTime(activeDiscount, start, end);
+        ProductDecorator specificInactiveDiscount = new DiscountAtXTime(activeDiscount, startInFuture, end);
+
+        assertEquals(96, specificActiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+        assertEquals(120, specificInactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+    }
+
+    private Product getMockProduct() {
+        PriceModel mockPriceModel = mock(PriceModel.class);
+        when(mockPriceModel.calculatePrice(any())).thenReturn(new Money(120));
+
+        return new Product("Milk", mockPriceModel, OTHER);
     }
 }

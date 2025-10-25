@@ -32,12 +32,14 @@ public class DiscountAtXTime extends ProductDecorator {
 
     @Override
     public Money calculatePrice(Quantity quantity) {
-        return getProduct().calculatePrice(quantity);
+        if (isActive()) return discount.calculatePrice(quantity);
+        return discount.getProduct().calculatePrice(quantity);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity quantity) {
-        return getProduct().calculatePriceWithVat(quantity);
+        if (isActive()) return discount.calculatePriceWithVat(quantity);
+        return discount.getProduct().calculatePriceWithVat(quantity);
     }
 
 }
