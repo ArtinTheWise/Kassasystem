@@ -1,5 +1,6 @@
 package org.example;
 
+import jdk.jfr.Percentage;
 import org.example.Discount.*;
 import org.example.Product.*;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -259,7 +261,29 @@ public class DiscountTest {
         assertEquals(288, discountedProductTwo.calculatePrice(new Quantity(4, PIECE)).getAmountInMinorUnits());
     }
 
+    @Test
+    void discountAtXTimeMustHaveCorrectStartAndEndTime(){
+        ProductDecorator discounted = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(17, 0);
+        LocalTime endTimeEqualToStart = LocalTime.of(8, 0);
 
+        assertThrows(IllegalArgumentException.class, () -> new DiscountAtXTime(discounted, end, start));
+        assertDoesNotThrow(() -> new DiscountAtXTime(discounted, start, end));
+        assertThrows(IllegalArgumentException.class, () -> new DiscountAtXTime(discounted, endTimeEqualToStart, start));
+    }
+
+    @Test
+    void discountAtXTimeIsActiveAtCorrectTimes(){
+        ProductDecorator activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        LocalTime start = LocalTime.now();
+        LocalTime end = start.plusHours(1);
+
+        ProductDecorator specificDiscount = new DiscountAtXTime(activeDiscount, start, end);
+        assertTrue(specificDiscount.isActive());
+
+
+    }
 
     private Product getMockProduct(){
         Product mockProduct = mock(Product.class);
