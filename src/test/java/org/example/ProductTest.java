@@ -35,6 +35,46 @@ public class ProductTest {
     }
 
     @Test
+    void constructorsThrowExceptionForNullName() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product(null, new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product(null, new UnitPrice(new Money(1500)), FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product(null, new UnitPrice(new Money(1500)), FOOD)
+        );
+    }
+
+    @Test
+    void constructorsThrowExceptionForNullPriceModel() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", null, new ProductGroup("Godis"), FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", null, FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", null, FOOD)
+        );
+    }
+
+    @Test
+    void constructorsThrowExceptionForNullVatRate() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), null, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), null, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), null)
+        );
+    }
+
+
+    @Test
     void calculatePriceReturnsCorrectPrice() {
         Product product = new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false);
         Quantity quantity = new Quantity(3, Unit.PIECE);

@@ -3,8 +3,6 @@ import org.example.Money;
 
 import java.util.Objects;
 
-import static org.example.Product.VatRate.FOOD;
-
 public class Product {
     private final String name;
     private final PriceModel priceModel;
@@ -13,6 +11,15 @@ public class Product {
     private final Boolean ageRestriction;
 
     public Product(String name, PriceModel priceModel, ProductGroup productGroup, VatRate vatRate, Boolean ageRestriction){
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Product name cannot be null or blank");
+        }
+        if (priceModel == null) {
+            throw new IllegalArgumentException("PriceModel cannot be null");
+        }
+        if (vatRate == null) {
+            throw new IllegalArgumentException("VatRate cannot be null");
+        }
         this.name = name;
         this.priceModel = priceModel;
         this.productGroup = productGroup;
@@ -23,8 +30,16 @@ public class Product {
         this.ageRestriction = ageRestriction;
     }
 
-    // en produkt behöver inte ha en grupp.
     public Product(String name, PriceModel priceModel, VatRate vatRate, boolean ageRestriction){
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Product name cannot be null or blank");
+        }
+        if (priceModel == null) {
+            throw new IllegalArgumentException("PriceModel cannot be null");
+        }
+        if (vatRate == null) {
+            throw new IllegalArgumentException("VatRate cannot be null");
+        }
         this.name = name;
         this.priceModel = priceModel;
         this.productGroup = null;
@@ -33,6 +48,15 @@ public class Product {
     }
 
     public Product(String name, PriceModel priceModel, VatRate vatRate){
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Product name cannot be null or blank");
+        }
+        if (priceModel == null) {
+            throw new IllegalArgumentException("PriceModel cannot be null");
+        }
+        if (vatRate == null) {
+            throw new IllegalArgumentException("VatRate cannot be null");
+        }
         this.name = name;
         this.priceModel = priceModel;
         this.productGroup = null;
@@ -81,5 +105,16 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hashCode(this.name);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + name + '\'' +
+                ", priceModel=" + priceModel +
+                ", productGroup=" + (productGroup != null ? productGroup.getName() : "none") +
+                ", vatRate=" + vatRate +
+                ", ageRestriction=" + ageRestriction +
+                '}';
     }
 }
