@@ -45,7 +45,6 @@ public class DiscountTest {
 
     @Test
     void percentDiscountGivesCorrectDiscount(){
-
         Product activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
         assertEquals(96, activeDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
 
@@ -300,6 +299,28 @@ public class DiscountTest {
 
         assertEquals(96, specificActiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
         assertEquals(120, specificInactiveDiscount.calculatePrice(new Quantity(1, PIECE)).getAmountInMinorUnits());
+    }
+
+    @Test
+    void maxXDiscountOnlyAllowsMaxMoreThan0(){
+        ProductDecorator activeDiscount = new PercentageDiscount(getMockProduct(), DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        assertThrows(IllegalArgumentException.class, () -> new MaxXDiscount(activeDiscount, 0));
+        assertDoesNotThrow(() -> new MaxXDiscount(activeDiscount, 1));
+    }
+
+    @Test
+    void maxXDiscountCalculatesPriceCorrectly(){
+        PriceModel mockPriceModel = new UnitPrice(new Money(120));
+        Product product = new Product("Milk", mockPriceModel, OTHER);
+
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductDecorator inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE);
+        ProductDecorator maxActiveDiscount = new MaxXDiscount(activeDiscount, 2);
+        ProductDecorator maxInactiveDiscount = new MaxXDiscount(inactiveDiscount, 2);
+
+        assertEquals(192, maxActiveDiscount.calculatePrice(new Quantity(2, PIECE)).getAmountInMinorUnits());
+        assertEquals(360, maxInactiveDiscount.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
+        assertEquals(312, maxActiveDiscount.calculatePrice(new Quantity(3, PIECE)).getAmountInMinorUnits());
     }
 
     private Product getMockProduct() {
