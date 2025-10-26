@@ -1,4 +1,4 @@
-package Sales;
+package org.example.Sales;
 
 import java.util.Objects;
 import java.util.Collections;

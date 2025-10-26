@@ -1,4 +1,4 @@
-package Sales;
+package org.example.Sales;
 
 public class CashRegister {
 

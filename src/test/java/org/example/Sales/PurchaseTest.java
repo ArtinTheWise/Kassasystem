@@ -1,4 +1,4 @@
-package org.example.Purchase;
+package org.example.Sales;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,12 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.example.Money;
-import org.example.Discount.Discount;
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
 import org.example.Discount.NormalDiscount;
@@ -31,8 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import Sales.Purchase;
 
 @ExtendWith(MockitoExtension.class)
 public class PurchaseTest {
