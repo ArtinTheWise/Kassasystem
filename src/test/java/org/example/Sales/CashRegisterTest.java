@@ -32,7 +32,7 @@ class CashRegisterTest {
 //        Om rabatt: += total rabatt
 //
 //    4. Scanna Product 2:
-//        Finns produkten i listan - sökning i O(N), låg overheadd ArrayList - Array?
+//        Finns produkten i listan - sökning i O(N), låg overhead ArrayList - Array?
 //        JA:
 //        Weight: amount += productWeight
 //        Unit: amount++
@@ -44,7 +44,7 @@ class CashRegisterTest {
 //
 //    5. Köpt slutfört
 //        sök rabatter: discountManager.getBestDiscount(quantity.getProduct(), amount);
-//        kolla medlemsskap
+//        kolla medlemskap
 //        sätter pris
 //    6. Betalning
 //
