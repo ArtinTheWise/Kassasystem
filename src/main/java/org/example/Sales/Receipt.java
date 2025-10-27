@@ -25,7 +25,7 @@ public class Receipt {
 
         sb.append("====== StoreName ==========");
         sb.append("====== StoreLocation ======");
-        
+        sb.append(purchase.getCashier().getId());
 
 
         return sb.toString();

@@ -21,6 +21,23 @@ import org.mockito.Mock;
 
 public class ReceiptTest {
 
+    private Cashier mockCashier(){
+        Cashier c = mock(Cashier.class);
+        return c;
+    }
+
+    private CashRegister mockCashRegister(){
+        CashRegister cr = mock(CashRegister.class);
+        return cr;
+    }
+
+    private Purchase mockPurchase(CashRegister cr, Cashier c){
+        Purchase p = mock(Purchase.class);
+        lenient().when(p.getCashier().getId()).thenReturn(1);
+        lenient().when(p.getCashRegister().getId()).thenReturn(1);
+        return p;
+    }
+
     // receipt with null purchase
     // receipt with no products in purchase
 
@@ -209,8 +226,8 @@ public class ReceiptTest {
     @Test
     @DisplayName("constructor: purchase with no articles throws exception")
     void createReceiptWithPurchaseWithoutArticlesThrowsException(){
-        var cashRegister = new Object();
-        var cashier = new Object();
+        CashRegister cashRegister = mockCashRegister();
+        Cashier cashier = mockCashier();
 
         Purchase empty = new Purchase(cashRegister, cashier);
         assertThrows(IllegalArgumentException.class, 
@@ -220,8 +237,8 @@ public class ReceiptTest {
     @Test
     @DisplayName("Header: receipt contains cashier id")
     void receiptHeaderContainsCashierId(){
-        var cashRegister = new Object();
-        var cashier = new Object();
+        CashRegister cashRegister = mockCashRegister();
+        Cashier cashier = mockCashier();
     }
 
     

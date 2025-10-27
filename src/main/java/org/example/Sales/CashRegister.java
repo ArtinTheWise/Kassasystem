@@ -5,7 +5,7 @@ import org.example.Product.Product;
 
 public class CashRegister {
 
-    String cashRegisterID;
+    int cashRegisterId;
 
 
     public CashRegister(DiscountManager dm) {
@@ -24,5 +24,9 @@ public class CashRegister {
     }
 
     public void removeProduct(Product bread) {
+    }
+
+    public int getId(){
+        return cashRegisterId;
     }
 }

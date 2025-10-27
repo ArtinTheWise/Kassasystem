@@ -27,7 +27,6 @@ import org.example.Product.VatRate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,13 +58,15 @@ public class PurchaseTest {
      */
 
 
-    public interface Cashier { String getId(); }
-    public interface CashRegister  { String getId(); }
+    private Cashier mockCashier(){
+        Cashier c = mock(Cashier.class);
+        return c;
+    }
 
-    @Mock CashRegister cashRegister;
-    @Mock Cashier cashier; 
-    @Mock Quantity quantity;
-
+    private CashRegister mockCashRegister(){
+        CashRegister cr = mock(CashRegister.class);
+        return cr;
+    }
 
     private double toKg(Quantity q) {
         switch (q.getUnit()) {
@@ -75,6 +76,7 @@ public class PurchaseTest {
             default: throw new IllegalArgumentException("Unsupported unit for weight product: " + q.getUnit());
         }
     }
+
     
     private Product mockWeightProductGrossOnly(String name, Money grossPerKg) {
         Product p = mock(Product.class, name);
@@ -245,20 +247,20 @@ public class PurchaseTest {
     @DisplayName("constructor: null cashier throws exception")
     void createPurchaseWithNullCashRegisterThrowsException(){
         assertThrows(IllegalArgumentException.class, 
-            () -> new Purchase(null, cashier));
+            () -> new Purchase(null, mockCashier()));
     }
 
     @Test
     @DisplayName("constructor: null cashRegister throws exception")
     void createPurchaseWithNullCashierThrowsException(){
         assertThrows(IllegalArgumentException.class, 
-            () -> new Purchase(cashRegister, null));
+            () -> new Purchase(mockCashRegister(), null));
     }
 
     @Test
     @DisplayName("addPiece: throws exception for null Product")
     void addPiece_onNullProduct_throws(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         assertThrows(NullPointerException.class, 
             () -> purchase.addPiece(null));
     }
@@ -266,7 +268,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPiece: throws exception for weightPice")
     void addPiece_onWeightProduct_throws(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product cheese = mockWeightProduct("Cheese");
         
         assertThrows(IllegalArgumentException.class,
@@ -276,7 +278,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addWeight: throws exception for null Product")
     void addWeight_onNullProduct_throws(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         assertThrows(NullPointerException.class, 
             () -> purchase.addWeight(null, 0.432, Unit.G)); // unit + weight doesn't matter.
     }
@@ -286,7 +288,7 @@ public class PurchaseTest {
     void addWeight_onPieceProduct_throws() {
         Product beef = mockUnitProduct("beef");
 
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         assertThrows(IllegalArgumentException.class,
             () -> purchase.addWeight(beef, 0.432, Unit.G)); // unit + weight doesn't matter.
     }
@@ -294,7 +296,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addWeight: add weight for KG product")
     void addWeight_addsAmount_forKGProduct() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product potato = mockWeightProduct("Potato");
 
         purchase.addWeight(potato, 0.350, Unit.KG);
@@ -310,7 +312,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addWeight: add weight for HG product")
     void addWeight_addsAmount_forHGProduct() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product potato = mockWeightProduct("Potato");
 
         purchase.addWeight(potato, 0.350, Unit.HG);
@@ -326,7 +328,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addWeight: add weight for G product")
     void addWeight_addsAmount_forGProduct() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product potato = mockWeightProduct("Potato");
 
         purchase.addWeight(potato, 0.350, Unit.G);
@@ -343,7 +345,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPiece - add piece for piece product ")
     void addPiece_addsOnePiece() {
-        Purchase purchase = new Purchase (cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product banana = mockUnitProduct("Banana");
 
         purchase.addPiece(banana);
@@ -359,7 +361,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPiece - add several pieces correctly")
     void addPiece_addsManyPieces() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProduct("Karins lasagne");
 
         for (int i = 0; i < 3; i++){
@@ -375,7 +377,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPieceWithPant - add piece for piece with pant product ")
     void addPiece_addsOnePieceWithPant() {
-        Purchase purchase = new Purchase (cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product cola = mockUnitProductWithPant("Coca Cola 33cl");
 
         purchase.addPiece(cola);
@@ -392,7 +394,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPiece + addWeight- add Piece then weight then piece correctly")
     void addPiece_addsUnitsInDifferentOrder() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProduct("Karins lasagne");
         Product potato = mockWeightProduct("Potato");
 
@@ -409,7 +411,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("addPiece + addWeight- add Weight then Piece then Weight correctly")
     void addPiece_addsUnitsInDifferentOrderTwo() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProduct("Karins lasagne");
         Product potato = mockWeightProduct("Potato");
 
@@ -426,7 +428,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("removeProduct - removes the whole row")
     void removeProduct_removesLine(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product cola = mockUnitProductWithPant("Coca Cola 33cl");
         purchase.addPiece(cola);
 
@@ -437,7 +439,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("getTotalNet - calculates net price correctly")
     void getTotalNet_calculateTotalNet(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProductNetOnly("Karins lasagne", new Money(5000));
         Product billys = mockUnitProductNetOnly("Billys Pan Pizza", new Money(4000));
         Product kanelbulle = mockUnitProductNetOnly("Kanelbulle", new Money(1000));
@@ -455,7 +457,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("GetTotalVat - calculates vat correctly")
     void getTotalVat_calculateTotalVat() {
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProductWithGross("Karins lasagne", new Money(5000), new Money(6250));
         Product billys = mockUnitProductWithGross("Billys Pan Pizza", new Money(4000), new Money(5000));
         Product kanelbulle = mockUnitProductWithGross("Kanelbulle", new Money(1000), new Money(1250));
@@ -472,7 +474,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("GetTotalGross - calculates gross price correctly")
     void getTotalGross_calculateTotalGross(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product karinsLasagne = mockUnitProductGrossOnly("Karins lasagne", new Money(6250));
         Product billys = mockUnitProductGrossOnly("Billys Pan Pizza", new Money(5000));
         Product kanelbulle = mockUnitProductGrossOnly("Kanelbulle", new Money(1250));
@@ -488,7 +490,7 @@ public class PurchaseTest {
     @Test
     @DisplayName("GetTotalGross - calculates pant gross price correctly")
     void getTotalGross_calculateTotalPantGross(){
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
         Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1625)); //13 kr + 25% moms - 3.25kr
         Product fanta = mockUnitProductWithPantGrossOnly("Fanta 33cl", new Money(1625)); //13 kr + 25% moms - 3.25kr
 
@@ -511,7 +513,7 @@ public class PurchaseTest {
         PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends);
         DiscountManager discountManager = new DiscountManager(percentageDiscount);
 
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -531,7 +533,7 @@ public class PurchaseTest {
         PercentageDiscount percentageDiscountTwo = new PercentageDiscount(banana, 25, ends); // 25 %
         DiscountManager discountManager = new DiscountManager(percentageDiscount, percentageDiscountTwo);
         
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -552,7 +554,7 @@ public class PurchaseTest {
         NormalDiscount normalDiscount = new NormalDiscount(banana, 600, starts, ends); // 600kr - ^ 1600 --> 1000
         DiscountManager discountManager = new DiscountManager(percentageDiscount, normalDiscount);
         
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -571,7 +573,7 @@ public class PurchaseTest {
         ThreeForTwoDiscount threeForTwoDiscount = new ThreeForTwoDiscount(banana, ends); // 3 for 2 = 1600 x 3 - 1 unit = 3200kr
         DiscountManager discountManager = new DiscountManager(threeForTwoDiscount);
         
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(banana);
         purchase.addPiece(banana);
@@ -593,7 +595,7 @@ public class PurchaseTest {
         
         NormalDiscount normalDiscount = new NormalDiscount(cola, 200, starts, ends); // cola 1300 --> 1100
         DiscountManager discountManager = new DiscountManager(normalDiscount);
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(cola); // 1300
         purchase.applyDiscounts(); // 1100
@@ -624,7 +626,7 @@ public class PurchaseTest {
 
         DiscountManager discountManager = new DiscountManager(threeForTwoDiscount, percentageDiscount, normalDiscount, normalDiscountTwo);
 
-        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
 
         purchase.addPiece(banana);
         purchase.addPiece(banana);
@@ -666,7 +668,7 @@ public class PurchaseTest {
     void applyDiscountsWithNullDiscountManagerThrowsException(){
         Product banana = mockUnitProductGrossOnly("Banana", new Money(500));
 
-        Purchase purchase = new Purchase(cashRegister, cashier);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
 
         purchase.addPiece(banana);
 
