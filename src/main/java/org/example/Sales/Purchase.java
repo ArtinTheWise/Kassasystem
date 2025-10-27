@@ -136,6 +136,9 @@ public class Purchase {
     }
 
     public void applyDiscounts(){
+        if (discountManager == null){
+            throw new IllegalStateException("DiscountManager is required for discounts");
+        }
         Map<Product, Quantity> updated = new LinkedHashMap<>();
         Map<Product, Product> chosen = new LinkedHashMap<>();
 

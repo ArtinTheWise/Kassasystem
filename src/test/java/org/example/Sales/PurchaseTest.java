@@ -80,15 +80,16 @@ public class PurchaseTest {
     private Product mockWeightProductGrossOnly(String name, Money grossPerKg) {
         Product p = mock(Product.class, name);
         WeightPrice pm = mock(WeightPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
-        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             double kg = toKg(q);
             long totalMinor = Math.round(grossPerKg.getAmountInMinorUnits() * kg);
             return new Money(totalMinor);
         });
 
+        lenient().when(pm.getUnit()).thenReturn(Unit.KG);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -101,8 +102,9 @@ public class PurchaseTest {
     private Product mockUnitProduct(String name){
         Product p = mock(Product.class, name);
         PriceModel pm = mock(UnitPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -115,14 +117,15 @@ public class PurchaseTest {
     private Product mockUnitProductNetOnly(String name, Money netPerPiece) {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
-        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount(); // PIECE quantities are whole numbers in these tests
             return new Money(netPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -133,20 +136,21 @@ public class PurchaseTest {
     private Product mockUnitProductWithGross(String name, Money netPerPiece, Money grossPerPiece) {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
-        when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
             return new Money(netPerPiece.getAmountInMinorUnits() * qty);
         });
 
-        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -157,14 +161,25 @@ public class PurchaseTest {
     private Product mockUnitProductGrossOnly(String name, Money grossPerPiece) {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
-        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+
+            long gross = grossPerPiece.getAmountInMinorUnits() * qty;
+            return new Money(gross);
+        });
+
+
+
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);  
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -175,15 +190,24 @@ public class PurchaseTest {
     private Product mockUnitProductWithPantGrossOnly(String name, Money grossPerPiece) {
         Product p = mock(Product.class, name);
         UnitPriceWithPant pm = mock(UnitPriceWithPant.class);
-        when(p.getPriceModel()).thenReturn(pm);
-        when(pm.getPantPerPiece()).thenReturn(new Money(100));
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(pm.getPantPerPiece()).thenReturn(new Money(100));
 
-        when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
             long qty = (long) q.getAmount();
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            long qty = (long) q.getAmount();
+
+            long gross = grossPerPiece.getAmountInMinorUnits() * qty;
+            return new Money(gross);
+        });
+
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -194,8 +218,9 @@ public class PurchaseTest {
     private Product mockWeightProduct(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
-        when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
 
+        lenient().when(pm.getUnit()).thenReturn(Unit.KG);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -207,8 +232,9 @@ public class PurchaseTest {
     private Product mockUnitProductWithPant(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(UnitPriceWithPant.class);
-        when(p.getPriceModel()).thenReturn(pm);
-        
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+
+        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -577,9 +603,6 @@ public class PurchaseTest {
 
         assertEquals(1200, total);
 
-
-
-
     }
 
     @Test
@@ -638,6 +661,22 @@ public class PurchaseTest {
         assertEquals(5575, total);
         
     }
+
+    @Test
+    @DisplayName("null discountManger in applyDiscount throws exception")
+    void applyDiscountsWithNullDiscountManagerThrowsException(){
+        Product banana = mockUnitProductGrossOnly("Banana", new Money(500));
+
+        Purchase purchase = new Purchase(cashRegister, cashier);
+
+        purchase.addPiece(banana);
+
+        assertThrows(Exception.class, () -> purchase.applyDiscounts());
+
+
+
+    }
+
 
 
 

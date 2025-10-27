@@ -7,10 +7,12 @@ public class Receipt {
     private final Purchase purchase;
 
     public Receipt(Purchase purchase){
-        if (purchase.getItemsView().isEmpty()){
+        this.purchase = Objects.requireNonNull(purchase, "purchase musn't be null");
+
+        if (this.purchase.getItemsView().isEmpty()){
             throw new IllegalArgumentException("the purchase has no scanned articles yet");
         }
-        this.purchase = Objects.requireNonNull(purchase, "purchase musn't be null");
+
     }
 
     public Purchase getPurchase(){
