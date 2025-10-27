@@ -9,6 +9,8 @@ public class Customer {
 
     private final String socialSecurityNumber;
     private final String emailAddress;
+    private final int age; //så jag kan göra andra typer av rabatter
+    private final boolean student;
     // samling av checkar
 
 
@@ -18,6 +20,10 @@ public class Customer {
     // ev? lista av köphistorik
 
     public Customer(String socialSecurityNumber, String emailAddress) {
+        this(socialSecurityNumber, emailAddress, 18, false);
+    }
+
+    public Customer(String socialSecurityNumber, String emailAddress, int age, boolean student) {
         validateSSN(socialSecurityNumber);
 
 
@@ -25,6 +31,8 @@ public class Customer {
         this.socialSecurityNumber = socialSecurityNumber;
         this.emailAddress = emailAddress;
         membership = null;
+        this.age = age;
+        this.student = student;
     }
 
     private void validateSSN(String ssn) {

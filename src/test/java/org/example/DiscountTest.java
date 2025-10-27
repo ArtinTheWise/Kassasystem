@@ -100,7 +100,7 @@ public class DiscountTest {
     @DisplayName("PercentageDiscount/calculatePrice - discount returns correct amount of money")
     void percentDiscountGivesCorrectDiscount(int i1, int i2){
         Product activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        assertEquals(96, activeDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
+        assertEquals(i1, activeDiscount.calculatePrice(quantity(i2)).getAmountInMinorUnits());
 
         Product inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
         assertEquals(120, inactiveDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
@@ -363,5 +363,13 @@ public class DiscountTest {
         assertEquals(192, maxActiveDiscount.calculatePrice(quantity(2)).getAmountInMinorUnits());
         assertEquals(360, maxInactiveDiscount.calculatePrice(quantity(3)).getAmountInMinorUnits());
         assertEquals(312, maxActiveDiscount.calculatePrice(quantity(3)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("SpecialDiscount/calculatePrice - only x amount of products gets discounted")
+    void specialDiscountDoesNotAllowUnreasonableAges(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+
+        assertThrows(IllegalArgumentException.class, () -> new SpecialDiscount(activeDiscount, 0, false));
     }
 }
