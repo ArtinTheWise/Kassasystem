@@ -25,20 +25,130 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T3_R5() {
+    void T3_R4() {
         assertDoesNotThrow(() -> {
             Customer customerExample = new Customer("201002283343", validEmailAddress);
         });
     }
 
     @Test
-    void T4_R5() {
+    void T4_R4() {
         assertDoesNotThrow(() -> {
             Customer customerExample = new Customer("200402283341", validEmailAddress);
         });
     }
 
-
-
+    @Test
+    void T5_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer(null, validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T6_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T7_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("20004300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T8_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("2000004300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T9_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("2ooo04300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T10_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("2000o4300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T11_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("2000043o0006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T12_R3() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("20000430ooo6", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong format"));
+    }
+    @Test
+    void T13_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("000204300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T14_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("200000300000", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T15_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("200014300006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T16_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("200004000006", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T17_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("200003320005", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T18_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("200004310005", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T19_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("201002293343", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
+    @Test
+    void T20_R1() {
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            Customer customerExample = new Customer("20040230334", validEmailAddress);
+        });
+        assertTrue(e.getMessage().contains("Wrong date"));
+    }
 
 }
