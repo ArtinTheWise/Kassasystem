@@ -13,7 +13,7 @@ class SocialSecurityNumberTest {
     private final String invalidDate = "Invalid date";
 
     @Test
-    void T1_R2() {
+    void T1_R2_invalidCheckDigit() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("199012309999", validEmailAddress);
         });
@@ -21,7 +21,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T2_R2() {
+    void T2_R2_invalidCheckDigit() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200004300000", validEmailAddress);
         });
@@ -29,14 +29,14 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T3_R4() {
+    void T3_R4_validSSN() {
         assertDoesNotThrow(() -> {
             Customer customerExample = new Customer("201002283343", validEmailAddress);
         });
     }
 
     @Test
-    void T4_R4() {
+    void T4_R4_validSSN() {
         assertDoesNotThrow(() -> {
             Customer customerExample = new Customer("200402283341", validEmailAddress);
         });

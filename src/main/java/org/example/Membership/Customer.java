@@ -31,8 +31,11 @@ public class Customer {
         if (ssn == null || !ssn.matches("^[0-9]{12}$")) {
             throw new IllegalArgumentException("Invalid format");
         }
-        if (validateDate(ssn.substring(0,8))) {
+        if (!validateDate(ssn.substring(0,8))) {
             throw new IllegalArgumentException("Invalid date");
+        }
+        if (!validateCheckDigit(ssn)) {
+            throw new IllegalArgumentException("Invalid check digit");
         }
     }
 
@@ -42,22 +45,41 @@ public class Customer {
         int day = Integer.parseInt(date.substring(6, 8));
 
         if (year < 1582 || month < 1 || month > 12 || day < 1 || day > 31) {
-            return true;
+            return false;
         }
 
         if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30){
-            return true;
+            return false;
         }
 
         if (month == 2 && day > 29){
-            return true;
+            return false;
         }
 
         if (month == 2 && day > 28 && !(year%4 == 0 && year%100 != 0 && year%400 == 0)){
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
+    }
+
+    private boolean validateCheckDigit(String checkDigit) {
+
+        int nSum = 0;
+        boolean isSecond = false;
+        for (int i = checkDigit.length() - 1; i >= 0; i--){
+
+            int d = checkDigit.charAt(i) - '0';
+
+            if (isSecond)
+                d = d * 2;
+
+            nSum += d / 10;
+            nSum += d % 10;
+
+            isSecond = !isSecond;
+        }
+        return (nSum % 10 == 0);
     }
 
     public String getSocialSecurityNumber() {
