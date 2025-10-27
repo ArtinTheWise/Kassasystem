@@ -5,6 +5,7 @@ import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.UnitPrice;
 import org.example.Product.VatRate;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,6 +14,8 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerTest {
+
+    private Customer customer;
 
     //can använda before each
 
@@ -76,5 +79,51 @@ class CustomerTest {
         assertThrows(IllegalStateException.class, customer::getMembership);
     }
 
+    @Test
+    void constructorThrowsWhenEmailFormatIsInvalid() {
+        String[] invalidEmails = {
+                "", "Å@test.se", "A @test.se", "A..@test.se",
+                "A.se", "@test.se", ".A@Test.se", "a@.com",
+                "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c."
+        };
 
+        for (String email : invalidEmails) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new Customer("200001011234", email),
+                    "Should fail for: " + email);
+        }
+    }
+
+    @Test
+    void constructorThrowsWhenLocalPartIsTooLong() {
+        String longLocal = "a".repeat(65) + "@test.se";
+        assertThrows(IllegalArgumentException.class,
+                () -> new Customer("200001011234", longLocal));
+    }
+
+    @Test
+    void constructorThrowsWhenDomainIsTooLong() {
+        String longDomain = "a@" + "a".repeat(256) + ".com";
+        assertThrows(IllegalArgumentException.class,
+                () -> new Customer("200001011234", longDomain));
+    }
+
+    @Test
+    void constructorThrowsWhenAdressIsTooLong() {
+        String longAdress = "a@y." + "a".repeat(64);
+        assertThrows(IllegalArgumentException.class,
+                () -> new Customer("200001011234", longAdress));
+    }
+
+    @Test
+    void constructorAcceptsValidEmails() {
+        String[] validEmails = {
+                "A.HEIDARI0554@GMAIL.COM",
+                "Aa\" \"1!.@gmail.com"
+        };
+
+        for (String email : validEmails) {
+            assertDoesNotThrow(() -> new Customer("200001011234", email));
+        }
+    }
 }
