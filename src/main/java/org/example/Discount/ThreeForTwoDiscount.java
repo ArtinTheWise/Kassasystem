@@ -6,17 +6,24 @@ import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 import org.example.Product.WeightPrice;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
-public class ThreeForTwoDiscount extends ProductDecorator{
+import static org.example.Product.Unit.PIECE;
+
+public class ThreeForTwoDiscount extends ProductDecorator {
 
     public ThreeForTwoDiscount(Product product, LocalDateTime endTime){
-        this(product, LocalDateTime.now(), endTime);
+        this(product, LocalDateTime.now(), endTime, Clock.systemDefaultZone());
     }
 
     public ThreeForTwoDiscount(Product product, LocalDateTime startTime, LocalDateTime endTime){
-        super(product, startTime, endTime);
-        if(product.getPriceModel() instanceof WeightPrice) throw new IllegalArgumentException();
+        this(product, startTime, endTime, Clock.systemDefaultZone());
+    }
+
+    public ThreeForTwoDiscount(Product product, LocalDateTime startTime, LocalDateTime endTime, Clock clock){
+        super(product, startTime, endTime, clock);
+        if(!(product.getPriceModel().getUnit() == PIECE)) throw new IllegalArgumentException();
     }
 
     @Override
@@ -40,17 +47,17 @@ public class ThreeForTwoDiscount extends ProductDecorator{
         return withVat ? getProduct().calculatePriceWithVat(charged) : getProduct().calculatePrice(charged);
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
         ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
 
         for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(new ThreeForTwoDiscount(p, startTime, endTime));
+            discountedProductGroup.addProduct(new ThreeForTwoDiscount(p, startTime, endTime, clock));
         }
 
         return discountedProductGroup;
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
         return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 }

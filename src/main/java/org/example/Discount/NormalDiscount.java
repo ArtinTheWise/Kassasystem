@@ -5,18 +5,23 @@ import org.example.Product.Product;
 import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 public class NormalDiscount extends ProductDecorator {
     private final int discount;
 
     public NormalDiscount(Product product, int discount, LocalDateTime endTime){
-        this(product, discount, LocalDateTime.now(), endTime);
+        this(product, discount, LocalDateTime.now(), endTime, Clock.systemDefaultZone());
     }
 
     public NormalDiscount(Product product, int discount, LocalDateTime startTime, LocalDateTime endTime){
-        super(product, startTime, endTime);
-        if(discount < 0) throw new IllegalArgumentException();
+        this(product, discount, startTime, endTime, Clock.systemDefaultZone());
+    }
+
+    public NormalDiscount(Product product, int discount, LocalDateTime startTime, LocalDateTime endTime, Clock clock){
+        super(product, startTime, endTime, clock);
+        if(discount < 0 || discount > product.calculatePrice(new Quantity(1, product.getPriceModel().getUnit())).getAmountInMinorUnits()) throw new IllegalArgumentException();
         this.discount = discount;
     }
 
@@ -28,7 +33,7 @@ public class NormalDiscount extends ProductDecorator {
         if (net == null) return null; // undvik NPE
 
         long amount = net.getAmountInMinorUnits();
-        long discounted = Math.max(0L, amount - (long) discount);
+        long discounted = Math.max(0L, amount - discount * (long) q.getAmount());
 
         return new Money(discounted);
     }
@@ -46,18 +51,18 @@ public class NormalDiscount extends ProductDecorator {
         return new Money(discounted);
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime startTime, LocalDateTime endTime) {
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
         ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
 
         for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(new NormalDiscount(p, discount, startTime, endTime));
+            discountedProductGroup.addProduct(new NormalDiscount(p, discount, startTime, endTime, clock));
         }
 
         return discountedProductGroup;
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime endTime){
-        return discountGroup(productGroup, discount, LocalDateTime.now(), endTime);
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
+        return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 
 }
