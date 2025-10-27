@@ -18,13 +18,46 @@ public class Customer {
     // ev? lista av köphistorik
 
     public Customer(String socialSecurityNumber, String emailAddress) {
-        if (emailAddress == null || socialSecurityNumber == null) {
-            throw new IllegalArgumentException("Cannot be null.");
-        }
+        validateSSN(socialSecurityNumber);
+
+
         // validate SSN & email
         this.socialSecurityNumber = socialSecurityNumber;
         this.emailAddress = emailAddress;
         membership = null;
+    }
+
+    private void validateSSN(String ssn) {
+        if (ssn == null || !ssn.matches("^[0-9]{12}$")) {
+            throw new IllegalArgumentException("Invalid format");
+        }
+        if (validateDate(ssn.substring(0,8))) {
+            throw new IllegalArgumentException("Invalid date");
+        }
+    }
+
+    private boolean validateDate(String date) {
+        int year = Integer.parseInt(date.substring(0, 4));
+        int month = Integer.parseInt(date.substring(4, 6));
+        int day = Integer.parseInt(date.substring(6, 8));
+
+        if (year < 1582 || month < 1 || month > 12 || day < 1 || day > 31) {
+            return true;
+        }
+
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30){
+            return true;
+        }
+
+        if (month == 2 && day > 29){
+            return true;
+        }
+
+        if (month == 2 && day > 28 && !(year%4 == 0 && year%100 != 0 && year%400 == 0)){
+            return true;
+        }
+
+        return false;
     }
 
     public String getSocialSecurityNumber() {

@@ -43,7 +43,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T5_R3() {
+    void T5_R3_null() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer(null, validEmailAddress);
         });
@@ -51,7 +51,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T6_R3() {
+    void T6_R3_emptyString() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("", validEmailAddress);
         });
@@ -59,7 +59,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T7_R3() {
+    void T7_R3_lessThen12() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("20004300006", validEmailAddress);
         });
@@ -67,7 +67,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T8_R3() {
+    void T8_R3_moreThen12() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("2000004300006", validEmailAddress);
         });
@@ -75,7 +75,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T9_R3() {
+    void T9_R3_notNumericYear() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("2ooo04300006", validEmailAddress);
         });
@@ -83,7 +83,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T10_R3() {
+    void T10_R3_notNumericMonth() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("2000o4300006", validEmailAddress);
         });
@@ -91,7 +91,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T11_R3() {
+    void T11_R3_notNumericDay() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("2000043o0006", validEmailAddress);
         });
@@ -99,7 +99,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T12_R3() {
+    void T12_R3_notNumericLast4() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("20000430ooo6", validEmailAddress);
         });
@@ -107,7 +107,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T13_R1() {
+    void T13_R1_yearBelow1582() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("000204300006", validEmailAddress);
         });
@@ -115,7 +115,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T14_R1() {
+    void T14_R1_monthBelow1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200000300000", validEmailAddress);
         });
@@ -123,7 +123,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T15_R1() {
+    void T15_R1_monthOver12() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200014300006", validEmailAddress);
         });
@@ -131,7 +131,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T16_R1() {
+    void T16_R1_dayBelow1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200004000006", validEmailAddress);
         });
@@ -139,7 +139,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T17_R1() {
+    void T17_R1_moreThen31Days() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200003320005", validEmailAddress);
         });
@@ -147,7 +147,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T18_R1() {
+    void T18_R1_moreThen30Days() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("200004310005", validEmailAddress);
         });
@@ -155,7 +155,7 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T19_R1() {
+    void T19_R1_moreThen28Days() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             Customer customerExample = new Customer("201002293343", validEmailAddress);
         });
@@ -163,9 +163,9 @@ class SocialSecurityNumberTest {
     }
 
     @Test
-    void T20_R1() {
+    void T20_R1_moreThen29Days() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            Customer customerExample = new Customer("20040230334", validEmailAddress);
+            Customer customerExample = new Customer("200402303343", validEmailAddress);
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
