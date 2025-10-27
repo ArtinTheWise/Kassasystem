@@ -21,29 +21,36 @@ public class Purchase {
     private Map<Product, Product> pricedByBase = new LinkedHashMap<>(); // för att hålla baspriset
 
     private DiscountManager discountManager;
+    Object cashRegister;
+    Object cashier;
 
-    public Purchase(Object cashRegister, Object salesEmployee, DiscountManager discountManager){
+
+    public Purchase(Object cashRegister, Object cashier, DiscountManager discountManager){
         if (cashRegister == null) {
             throw new IllegalArgumentException("CashRegister cannot be null.");
         }
-        if (salesEmployee == null) {
-            throw new IllegalArgumentException("SalesEmployee cannot be null.");
+        if (cashier == null) {
+            throw new IllegalArgumentException("cashier cannot be null.");
         }
         if (discountManager == null){
             throw new IllegalArgumentException("DiscountManager cannot be null");
         }
 
         this.discountManager = discountManager;
+        this.cashRegister = cashRegister;
+        this.cashier = cashier;
     }
-        public Purchase(Object cashRegister, Object salesEmployee){
+        public Purchase(Object cashRegister, Object cashier){
         if (cashRegister == null) {
             throw new IllegalArgumentException("CashRegister cannot be null.");
         }
-        if (salesEmployee == null) {
-            throw new IllegalArgumentException("SalesEmployee cannot be null.");
+        if (cashier == null) {
+            throw new IllegalArgumentException("cashier cannot be null.");
         }
         
         this.discountManager = null;
+        this.cashRegister = cashRegister;
+        this.cashier = cashier;
 
     }
 
@@ -159,6 +166,14 @@ public class Purchase {
         }
         items = updated;
         pricedByBase = chosen;
+    }
+
+    public Object getCashier(){
+        return cashier;
+    }
+
+    public Object getCashRegister(){
+        return cashRegister;
     }
     
 }
