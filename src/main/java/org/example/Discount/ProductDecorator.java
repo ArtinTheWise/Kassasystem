@@ -1,5 +1,6 @@
 package org.example.Discount;
 
+import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.ProductGroup;
@@ -56,7 +57,15 @@ public abstract class ProductDecorator extends Product {
 
     public abstract Money calculatePrice(Quantity quantity);
 
+    public Money calculatePrice(Quantity quantity, Customer customer) {
+        return calculatePrice(quantity); //Needed for specialDiscount
+    }
+
     public abstract Money calculatePriceWithVat(Quantity quantity);
+
+    public Money calculatePriceWithVat(Quantity quantity, Customer customer) {
+        return calculatePrice(quantity); //Needed for specialDiscount
+    }
 
     public Money getDiscountedAmount(Quantity quantity){
         return new Money(getProduct().calculatePrice(quantity).getAmountInMinorUnits() - calculatePrice(quantity).getAmountInMinorUnits());

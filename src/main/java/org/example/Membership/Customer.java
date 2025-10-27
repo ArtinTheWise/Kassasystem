@@ -120,6 +120,10 @@ public class Customer {
         }
     }
 
+    public int getAge(){return age;}
+
+    public boolean isStudent(){return student;}
+
     protected void cancelMembership() {
         membership = null;
     }
