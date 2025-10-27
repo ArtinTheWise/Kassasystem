@@ -1,5 +1,6 @@
 package org.example.Discount;
 
+import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.ProductGroup;
@@ -52,13 +53,37 @@ public class DiscountManager {
         for (Product p : products){
             ProductDecorator d = (ProductDecorator) p;
             if (d.isActive() && Objects.equals(d.getProduct(), product)){
-                Money m = p.calculatePriceWithVat(quantity);
-                if (m == null) m = p.calculatePrice(quantity);
+                Money m = d.calculatePriceWithVat(quantity);
+                if (m == null) m = d.calculatePrice(quantity);
                 if (m != null) {
                     long val = m.getAmountInMinorUnits();
                     if (val < cheapestVal) {
                         cheapestVal = val;
-                        cheapest = p;
+                        cheapest = d;
+                    }
+                }
+            }
+        }
+        return (cheapest != null) ? cheapest : product;
+    }
+
+    public Product getBestDiscount(Product product, Quantity quantity, Customer customer){
+        removeOldDiscounts();
+        if (!discountCheck(product)) return product;
+
+        Product cheapest = null;
+        long cheapestVal = Long.MAX_VALUE;
+
+        for (Product p : products){
+            ProductDecorator d = (ProductDecorator) p;
+            if (d.isActive() && Objects.equals(d.getProduct(), product)){
+                Money m = d.calculatePriceWithVat(quantity, customer);
+                if (m == null) m = d.calculatePrice(quantity, customer);
+                if (m != null) {
+                    long val = m.getAmountInMinorUnits();
+                    if (val < cheapestVal) {
+                        cheapestVal = val;
+                        cheapest = d;
                     }
                 }
             }

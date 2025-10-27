@@ -416,4 +416,20 @@ public class DiscountTest {
     }
 
 
+    @Test
+    @DisplayName("DiscountManager/getBestDiscount - returns cheapest discount when SpecialDiscount")
+    void specialDiscountGetsReturnedIfBestDiscount(){
+        Customer student = getMockCustomer("Artin", 21, true);
+        Customer normalCustomer = getMockCustomer("Martin", 18, false);
+
+        ProductDecorator bestActiveDiscountNotInManager = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator discountForNonStudents = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator studentDiscount = new SpecialDiscount(bestActiveDiscountNotInManager, true);
+
+        DiscountManager manager = new DiscountManager(discountForNonStudents, studentDiscount);
+
+        assertEquals(100, ((ProductDecorator) manager.getBestDiscount(product, quantity(1), normalCustomer)).calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
+        assertEquals(96, ((ProductDecorator) manager.getBestDiscount(product, quantity(1), student)).calculatePrice(quantity(1), student).getAmountInMinorUnits()); //satt här i 1 timme :(
+        assertEquals(100, manager.getBestDiscount(product, quantity(1)).calculatePrice(quantity(1)).getAmountInMinorUnits());
+    }
 }
