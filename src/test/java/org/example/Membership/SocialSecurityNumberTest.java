@@ -49,6 +49,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T6_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -56,6 +57,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T7_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -63,6 +65,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T8_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -70,6 +73,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T9_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -77,6 +81,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T10_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -84,6 +89,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T11_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -91,6 +97,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T12_R3() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -98,6 +105,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidFormat));
     }
+
     @Test
     void T13_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -105,6 +113,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T14_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -112,6 +121,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T15_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -119,6 +129,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T16_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -126,6 +137,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T17_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -133,6 +145,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T18_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -140,6 +153,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T19_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
@@ -147,6 +161,7 @@ class SocialSecurityNumberTest {
         });
         assertTrue(e.getMessage().contains(invalidDate));
     }
+
     @Test
     void T20_R1() {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
