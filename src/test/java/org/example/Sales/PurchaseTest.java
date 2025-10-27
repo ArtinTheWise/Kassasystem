@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,7 @@ import org.example.Product.Unit;
 import org.example.Product.WeightPrice;
 import org.example.Product.UnitPrice;
 import org.example.Product.UnitPriceWithPant;
+import org.example.Product.VatRate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,14 +89,27 @@ public class PurchaseTest {
             return new Money(totalMinor);
         });
 
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
+
+
     }
 
     private Product mockUnitProduct(String name){
         Product p = mock(Product.class, name);
         PriceModel pm = mock(UnitPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
+
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
+
+
     }
 
     private Product mockUnitProductNetOnly(String name, Money netPerPiece) {
@@ -108,7 +123,10 @@ public class PurchaseTest {
             return new Money(netPerPiece.getAmountInMinorUnits() * qty);
         });
 
-        
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
     }
 
@@ -129,6 +147,10 @@ public class PurchaseTest {
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
     }
 
@@ -142,6 +164,10 @@ public class PurchaseTest {
             long qty = (long) q.getAmount();
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
+
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
 
         return p;
     }
@@ -158,6 +184,10 @@ public class PurchaseTest {
             return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
         });
 
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
     }
 
@@ -165,13 +195,24 @@ public class PurchaseTest {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(WeightPrice.class);
         when(p.getPriceModel()).thenReturn(pm);
+
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
+
     }
 
     private Product mockUnitProductWithPant(String name) {
         Product p = mock(Product.class, name);
         PriceModel pm = mock(UnitPriceWithPant.class);
         when(p.getPriceModel()).thenReturn(pm);
+        
+        lenient().when(p.getName()).thenReturn(name);
+        lenient().when(p.getPriceModel()).thenReturn(pm);
+        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
+
         return p;
     }
 
