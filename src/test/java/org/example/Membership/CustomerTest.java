@@ -5,7 +5,6 @@ import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.UnitPrice;
 import org.example.Product.VatRate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -14,8 +13,6 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerTest {
-
-    private Customer customer;
 
     //can använda before each
 
