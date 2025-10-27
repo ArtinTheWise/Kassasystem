@@ -49,7 +49,7 @@ public class Purchase {
         this.dateTime = LocalDateTime.now(this.clock); 
     }
 
-    private Product pricedFor(Product base){
+    public Product pricedFor(Product base){
         return pricedByBase.getOrDefault(base, base);
     }
 

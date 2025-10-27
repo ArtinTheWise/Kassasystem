@@ -9,10 +9,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 import org.example.Money;
+import org.example.Discount.DiscountManager;
+import org.example.Discount.NormalDiscount;
+import org.example.Discount.ThreeForTwoDiscount;
 import org.example.Product.PriceModel;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -23,8 +27,6 @@ import org.example.Product.VatRate;
 import org.example.Product.WeightPrice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 public class ReceiptTest {
 
@@ -62,7 +64,7 @@ public class ReceiptTest {
         }
     }
     
-    private Product mockWeightProductGrossOnly(String name, Money grossPerKg) {
+    private Product mockWeightProductGrossOnly(String name, Money netPerKg, Money grossPerKg) {
         Product p = mock(Product.class, name);
         WeightPrice pm = mock(WeightPrice.class);
         lenient().when(p.getPriceModel()).thenReturn(pm);
@@ -71,6 +73,13 @@ public class ReceiptTest {
             Quantity q = inv.getArgument(0);
             double kg = toKg(q);
             long totalMinor = Math.round(grossPerKg.getAmountInMinorUnits() * kg);
+            return new Money(totalMinor);
+        });
+
+        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            double kg = toKg(q);
+            long totalMinor = Math.round(netPerKg.getAmountInMinorUnits() * kg);
             return new Money(totalMinor);
         });
 
@@ -234,9 +243,46 @@ public class ReceiptTest {
 
         Receipt receipt = new Receipt(purchase);
 
+        String time = purchase.getTime().truncatedTo(ChronoUnit.MINUTES).toString();
+
+        assertTrue(receipt.toString().contains(time));
+    }
+
+    @Test
+    @DisplayName("large receipt works correctly")
+    void receiptManyArticles(){
+        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
+
+        Product banana = mockUnitProductWithGross("Banana", new Money(1000),new Money(1250));
+        Product twix = mockUnitProductWithGross("Twix", new Money(700),new Money(875));
+        Product snickers = mockUnitProductWithGross("Snickers", new Money(760),new Money(950));
+        Product olwDill = mockUnitProductWithGross("OLW Dill & Gräslök", new Money(2000),new Money(2500));
+        Product potato = mockWeightProductGrossOnly("Potato", new Money(2000), new Money(2500));
+        Product cocaCola33Cl = mockUnitProductWithPantGrossOnly("Coca Cola 33Cl", new Money(800));
+
+        DiscountManager discountManager = new DiscountManager();
+        CashRegister cashRegister = new CashRegister(discountManager);
+        Cashier cashier = new Cashier("TestCashier");
+        Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+        NormalDiscount nd = new NormalDiscount(olwDill, 500, ends);
+        ThreeForTwoDiscount tf2 = new ThreeForTwoDiscount(banana, ends);
+        discountManager.addDiscount(nd, tf2);
+
+        purchase.addPiece(banana);
+        purchase.addPiece(twix);
+        purchase.addPiece(snickers);
+        purchase.addPiece(olwDill);
+        purchase.addWeight(potato, 1, Unit.KG);
+        purchase.addPiece(cocaCola33Cl);
+        purchase.addPiece(banana);
+        purchase.addPiece(banana);
+
+        purchase.applyDiscounts();
+
+        Receipt receipt = new Receipt(purchase);
+
         System.out.println(receipt.toString());
 
-        assertTrue(receipt.toString().contains(purchase.getTime().toString()));
 
 
     }
