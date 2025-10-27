@@ -1,6 +1,10 @@
 package org.example.Sales;
 
 import java.util.Objects;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,37 +25,28 @@ public class Purchase {
     private Map<Product, Product> pricedByBase = new LinkedHashMap<>(); // för att hålla baspriset
 
     private DiscountManager discountManager;
-    CashRegister cashRegister;
-    Cashier cashier;
+    private CashRegister cashRegister;
+    private Cashier cashier;
+    private final Clock clock;
+    private LocalDateTime dateTime;
 
-
-    public Purchase(CashRegister cashRegister, Cashier cashier, DiscountManager discountManager){
-        if (cashRegister == null) {
-            throw new IllegalArgumentException("CashRegister cannot be null.");
-        }
-        if (cashier == null) {
-            throw new IllegalArgumentException("cashier cannot be null.");
-        }
-        if (discountManager == null){
-            throw new IllegalArgumentException("DiscountManager cannot be null");
-        }
-
-        this.discountManager = discountManager;
-        this.cashRegister = cashRegister;
-        this.cashier = cashier;
+    public Purchase(CashRegister cashRegister, Cashier cashier) {
+        this(cashRegister, cashier, null, Clock.systemDefaultZone());
     }
-        public Purchase(CashRegister cashRegister, Cashier cashier){
-        if (cashRegister == null) {
-            throw new IllegalArgumentException("CashRegister cannot be null.");
-        }
-        if (cashier == null) {
-            throw new IllegalArgumentException("cashier cannot be null.");
-        }
-        
-        this.discountManager = null;
+    public Purchase(CashRegister cashRegister, Cashier cashier, DiscountManager discountManager) {
+        this(cashRegister, cashier, discountManager, Clock.systemDefaultZone());
+    }
+
+    public Purchase(CashRegister cashRegister, Cashier cashier,
+                    DiscountManager discountManager, Clock clock) {
+        if (cashRegister == null) throw new IllegalArgumentException("CashRegister cannot be null.");
+        if (cashier == null) throw new IllegalArgumentException("cashier cannot be null.");
+        if (discountManager == null && clock == null) { /* no-op; just clarifies flow */ }
         this.cashRegister = cashRegister;
         this.cashier = cashier;
-
+        this.discountManager = discountManager; 
+        this.clock = Objects.requireNonNull(clock, "clock cannot be null");
+        this.dateTime = LocalDateTime.now(this.clock); 
     }
 
     private Product pricedFor(Product base){
@@ -168,12 +163,14 @@ public class Purchase {
         pricedByBase = chosen;
     }
 
-    public Cashier getCashier(){
-        return cashier;
-    }
+    public Cashier getCashier(){ return cashier; }
 
-    public CashRegister getCashRegister(){
-        return cashRegister;
-    }
+    public CashRegister getCashRegister(){ return cashRegister; }
+
+    public LocalDateTime getLocalDateTimeObject(){ return dateTime; }
+
+    public LocalDate getDate(){ return dateTime.toLocalDate(); }
+
+    public LocalTime getTime(){ return dateTime.toLocalTime(); }
     
 }

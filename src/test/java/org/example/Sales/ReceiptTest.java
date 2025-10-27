@@ -1,10 +1,16 @@
 package org.example.Sales;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.example.Money;
 import org.example.Product.PriceModel;
@@ -17,7 +23,8 @@ import org.example.Product.VatRate;
 import org.example.Product.WeightPrice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class ReceiptTest {
 
@@ -31,11 +38,16 @@ public class ReceiptTest {
         return cr;
     }
 
-    private Purchase mockPurchase(CashRegister cr, Cashier c){
-        Purchase p = mock(Purchase.class);
-        lenient().when(p.getCashier().getId()).thenReturn(1);
-        lenient().when(p.getCashRegister().getId()).thenReturn(1);
-        return p;
+    private Purchase mockPurchase() {
+        Cashier cashier = mock(Cashier.class);
+        when(cashier.getId()).thenReturn(1);
+
+        CashRegister register = mock(CashRegister.class);
+        when(register.getId()).thenReturn(1);
+
+        // real Purchase so addPiece/addWeight/use of internal maps all work
+        Purchase real = new Purchase(register, cashier);
+        return spy(real); // spy allows override if needed later
     }
 
     // receipt with null purchase
@@ -87,25 +99,6 @@ public class ReceiptTest {
 
     }
 
-    private Product mockUnitProductNetOnly(String name, Money netPerPiece) {
-        Product p = mock(Product.class, name);
-        UnitPrice pm = mock(UnitPrice.class);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-
-        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
-            Quantity q = inv.getArgument(0);
-            long qty = (long) q.getAmount(); // PIECE quantities are whole numbers in these tests
-            return new Money(netPerPiece.getAmountInMinorUnits() * qty);
-        });
-
-        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
-        lenient().when(p.getName()).thenReturn(name);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
-
-        return p;
-    }
-
     private Product mockUnitProductWithGross(String name, Money netPerPiece, Money grossPerPiece) {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
@@ -124,35 +117,6 @@ public class ReceiptTest {
         });
 
         lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
-        lenient().when(p.getName()).thenReturn(name);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
-
-        return p;
-    }
-
-    private Product mockUnitProductGrossOnly(String name, Money grossPerPiece) {
-        Product p = mock(Product.class, name);
-        UnitPrice pm = mock(UnitPrice.class);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-
-        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
-            Quantity q = inv.getArgument(0);
-            long qty = (long) q.getAmount();
-            return new Money(grossPerPiece.getAmountInMinorUnits() * qty);
-        });
-
-        lenient().when(p.calculatePrice(any(Quantity.class))).thenAnswer(inv -> {
-            Quantity q = inv.getArgument(0);
-            long qty = (long) q.getAmount();
-
-            long gross = grossPerPiece.getAmountInMinorUnits() * qty;
-            return new Money(gross);
-        });
-
-
-
-        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);  
         lenient().when(p.getName()).thenReturn(name);
         lenient().when(p.getPriceModel()).thenReturn(pm);
         lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
@@ -188,33 +152,6 @@ public class ReceiptTest {
         return p;
     }
 
-    private Product mockWeightProduct(String name) {
-        Product p = mock(Product.class, name);
-        PriceModel pm = mock(WeightPrice.class);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-
-        lenient().when(pm.getUnit()).thenReturn(Unit.KG);
-        lenient().when(p.getName()).thenReturn(name);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
-
-        return p;
-
-    }
-
-    private Product mockUnitProductWithPant(String name) {
-        Product p = mock(Product.class, name);
-        PriceModel pm = mock(UnitPriceWithPant.class);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-
-        lenient().when(pm.getUnit()).thenReturn(Unit.PIECE);
-        lenient().when(p.getName()).thenReturn(name);
-        lenient().when(p.getPriceModel()).thenReturn(pm);
-        lenient().when(p.getVatRate()).thenReturn(mock(VatRate.class));
-
-        return p;
-    }
-
 
     @Test
     @DisplayName("constructor: null purchase throws exception")
@@ -235,17 +172,74 @@ public class ReceiptTest {
     }
 
     @Test
-    @DisplayName("Header: receipt contains cashier id")
-    void receiptHeaderContainsCashierId(){
-        CashRegister cashRegister = mockCashRegister();
-        Cashier cashier = mockCashier();
+    @DisplayName("Constructor: receipts generate unique ids")
+    void receiptHeaderContainsReceiptId(){
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProduct("banana");
+        purchase.addPiece(banana);
+
+        Receipt receiptOne = new Receipt(purchase);
+        Receipt receiptTwo = new Receipt(purchase);
+
+        assertNotEquals(receiptOne.getId(), receiptTwo.getId());
     }
 
-    
+    @Test
+    @DisplayName("Header: receipt contains cashier id")
+    void receiptHeaderContainsCashierId(){
+
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProductWithGross("banana", new Money(1000),new Money(1250));
+        purchase.addPiece(banana);
+        
+        Receipt receipt = new Receipt(purchase);
+
+        assertTrue(receipt.toString().contains("cashier: 1"));
+    }
+
+    @Test
+    @DisplayName("Header: receipt contains cashRegister id")
+    void receiptHeaderContainsCashRegisterId(){
+
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProductWithGross("banana", new Money(1000),new Money(1250));
+        purchase.addPiece(banana);
+        
+        Receipt receipt = new Receipt(purchase);
+
+        assertTrue(receipt.toString().contains("cashRegister: 1"));
+    }
+
+    @Test
+    @DisplayName("Header: receipt contains date")
+    void receiptHeaderContainsDate(){
+
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProductWithGross("banana", new Money(1000),new Money(1250));
+        purchase.addPiece(banana);
+
+        Receipt receipt = new Receipt(purchase);
+
+        assertTrue(receipt.toString().contains(purchase.getDate().toString()));
+        
+    }
+
+    @Test
+    @DisplayName("Header: receipt contains time")
+    void receiptHeaderContainsTime(){
+
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProductWithGross("banana", new Money(1000),new Money(1250));
+        purchase.addPiece(banana);
+
+        Receipt receipt = new Receipt(purchase);
+
+        System.out.println(receipt.toString());
+
+        assertTrue(receipt.toString().contains(purchase.getTime().toString()));
 
 
-
-
+    }
 
 
 }
