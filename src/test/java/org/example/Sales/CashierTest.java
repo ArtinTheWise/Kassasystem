@@ -1,4 +1,5 @@
 package org.example.Sales;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,6 +32,14 @@ public class CashierTest {
 
         assertNotEquals(cashierOne.getId(), cashierTwo.getId());
 
+    }
+
+    @Test
+    @DisplayName("Getters: getName returns name correctly")
+    void getNameReturnsName(){
+        Cashier cashier = new Cashier("Testname");
+
+        assertEquals("Testname", cashier.getName());
     }
 
 
