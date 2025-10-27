@@ -33,4 +33,5 @@ public class UnitPrice implements PriceModel {
         * quantity.getAmount())); 
     }
 
+    public Unit getUnit(){return Unit.PIECE;}
 }

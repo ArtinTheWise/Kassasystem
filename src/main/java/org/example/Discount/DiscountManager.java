@@ -70,7 +70,7 @@ public class DiscountManager {
         for(Product p : product) {
             if (p instanceof ProductDecorator) {
                 ProductDecorator d = (ProductDecorator) p;
-                if (!d.getEndTime().isBefore(LocalDateTime.now())) {
+                if (!d.getEndTime().isBefore(LocalDateTime.now(d.clock))) {
                     products.add(p);
                 }
             }
@@ -82,8 +82,10 @@ public class DiscountManager {
     }
 
     private void removeOldDiscounts(){
-        products.removeIf(p ->
-            LocalDateTime.now().isAfter(((ProductDecorator) p).getEndTime()));
+        products.removeIf(p -> {
+            ProductDecorator d = (ProductDecorator) p;
+            return LocalDateTime.now(d.clock).isAfter(d.getEndTime());
+        });
     }
 
     private ArrayList<Product> getActiveDiscounts(){

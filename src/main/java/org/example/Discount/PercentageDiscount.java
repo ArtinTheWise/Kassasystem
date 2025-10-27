@@ -5,17 +5,22 @@ import org.example.Product.Product;
 import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 public class PercentageDiscount extends ProductDecorator {
     private final int percent;
 
     public PercentageDiscount(Product product, int percent, LocalDateTime endTime){
-        this(product, percent, LocalDateTime.now(), endTime);
+        this(product, percent, LocalDateTime.now(), endTime, Clock.systemDefaultZone());
     }
 
     public PercentageDiscount(Product product, int percent, LocalDateTime startTime, LocalDateTime endTime){
-        super(product, startTime, endTime);
+        this(product, percent, startTime, endTime, Clock.systemDefaultZone());
+    }
+
+    public PercentageDiscount(Product product, int percent, LocalDateTime startTime, LocalDateTime endTime, Clock clock){
+        super(product, startTime, endTime, clock);
         if(percent < 0 || percent > 100) throw new IllegalArgumentException();
         this.percent = percent;
     }
@@ -41,17 +46,17 @@ public class PercentageDiscount extends ProductDecorator {
         return new Money(discounted);
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime startTime, LocalDateTime endTime) {
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
         ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
 
         for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(new PercentageDiscount(p, discount, startTime, endTime));
+            discountedProductGroup.addProduct(new PercentageDiscount(p, percent, startTime, endTime, clock));
         }
 
         return discountedProductGroup;
     }
 
-    public static ProductGroup discountGroup(ProductGroup productGroup, int discount, LocalDateTime endTime){
-        return discountGroup(productGroup, discount, LocalDateTime.now(), endTime);
+    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
+        return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 }

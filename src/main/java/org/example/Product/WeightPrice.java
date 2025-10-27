@@ -40,4 +40,6 @@ public class WeightPrice implements PriceModel {
         * quantity.getAmount()));
         
     }
+
+    public Unit getUnit(){return unit;}
 }

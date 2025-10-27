@@ -43,5 +43,6 @@ public class UnitPriceWithPant implements PriceModel{
     public UnitPrice getUnitPrice(){
         return basePrice;
     }
-    
+
+    public Unit getUnit(){return Unit.PIECE;}
 }

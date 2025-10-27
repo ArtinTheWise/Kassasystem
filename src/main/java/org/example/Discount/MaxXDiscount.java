@@ -3,18 +3,19 @@ package org.example.Discount;
 import org.example.Money;
 import org.example.Product.Quantity;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class MaxXDiscount extends ProductDecorator {
-    private int max;
-    private ProductDecorator discount;
+    private final int max;
+    private final ProductDecorator discount;
 
-    public MaxXDiscount(ProductDecorator product, int max){
-        super(product, product.getStartTime(), product.getEndTime());
+    public MaxXDiscount(ProductDecorator discount, int max){
+        super(discount.getProduct(), discount.getStartTime(), discount.getEndTime(), discount.clock);
         if(max < 1) throw new IllegalArgumentException();
         this.max = max;
-        discount = product;
+        this.discount = discount;
     }
 
     @Override
