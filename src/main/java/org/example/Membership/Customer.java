@@ -25,7 +25,7 @@ public class Customer {
 
     public Customer(String socialSecurityNumber, String emailAddress, int age, boolean student) {
         validateSSN(socialSecurityNumber);
-
+        validateEmail(emailAddress);
 
         // validate SSN & email
         this.socialSecurityNumber = socialSecurityNumber;
@@ -33,6 +33,57 @@ public class Customer {
         membership = null;
         this.age = age;
         this.student = student;
+    }
+
+    private void validateEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
+        if (email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (email.length() > 320) {
+            throw new IllegalArgumentException("Email is too long");
+        }
+        int atIndex = email.indexOf('@');
+        int lastAtIndex = email.lastIndexOf('@');
+        if (atIndex == -1 || atIndex != lastAtIndex) {
+            throw new IllegalArgumentException("Email must contain exactly one @");
+        }
+
+        String localPart = email.substring(0, atIndex);
+        String domainPart = email.substring(atIndex + 1);
+
+        validateLocalPart(localPart);
+        validateDomainPart(domainPart);
+    }
+
+    private void validateLocalPart(String localPart) {
+        if (localPart.isEmpty() || localPart.length() > 64) {
+            throw new IllegalArgumentException("Invalid local part length");
+        }
+        if (localPart.startsWith(".") || localPart.endsWith(".")) {
+            throw new IllegalArgumentException("Local part cannot start or end with dot");
+        }
+        if (localPart.contains("..")) {
+            throw new IllegalArgumentException("Local part cannot have consecutive dots");
+        }
+        for (int i = 0; i < localPart.length(); i++) {
+            char c = localPart.charAt(i);
+            if (!isValidLocalPartChar(c)) {
+                throw new IllegalArgumentException("Invalid character in local part: " + c);
+            }
+        }
+    }
+
+    private boolean isValidLocalPartChar(char c) {
+        if (Character.isLetterOrDigit(c)) return true;
+        if ("!#$%&'*+-/=?^_`{|}~.\"() ".indexOf(c) >= 0) return true;
+        return false;
+    }
+
+    private void validateDomainPart(String domainPart) {
+
     }
 
     private void validateSSN(String ssn) {
