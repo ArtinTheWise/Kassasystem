@@ -186,6 +186,16 @@ public class ProductTest {
     }
 
     @Test
+    void equalsReturnsFalseForNull() {
+        assertFalse(candyProduct.equals(null));
+    }
+
+    @Test
+    void equalsReturnsFalseForDifferentType() {
+        assertFalse(candyProduct.equals("Not a Product"));
+    }
+
+    @Test
     void sameProductHasTheSameHashCode() {
         Product productTwo = new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false);
 
