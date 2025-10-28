@@ -12,8 +12,84 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-
 class CashRegisterTest {
+
+    @Test
+    void sellerCanLoginWithValidIds() {
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        boolean loggedIn = register.login("KASSA01", "SELLER123");
+        assertTrue(loggedIn);
+    }
+
+    @Test
+    void shouldStartNewPurchaseWhenLoggedIn() {
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login("KASSA01", "SELLER123");
+
+        Purchase purchase = register.startPurchase();
+        assertNotNull(purchase);
+    }
+
+    @Test
+    void shouldAddProductWithoutDiscount() {
+        Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login("KASSA01", "SELLER123");
+        Purchase purchase = register.startPurchase();
+
+        // Simulerar scanning av 1 produkt
+        register.scanProduct(milk, 1);
+
+        // Inga rabatter har applicerats
+        assertEquals(new Money(10), purchase.getTotalNet());
+    }
+
+    @Test
+    void shouldApplyDiscountWhenAvailable() {
+        // Produkt
+        Product coffee = new Product("Coffee", new UnitPrice(new Money(50)), VatRate.FOOD, false);
+
+        // Rabatt
+        DiscountManager dm = new DiscountManager();
+        PercentageDiscount discount = new PercentageDiscount(
+                coffee,
+                10,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMonths(6)
+        );
+        dm.addDiscount(discount);
+
+        CashRegister register = new CashRegister(dm);
+        register.login("KASSA01", "SELLER123");
+        Purchase purchase = register.startPurchase();
+
+        register.scanProduct(coffee, 1);
+
+        purchase.applyDiscounts();
+
+        assertEquals(new Money(45), purchase.getTotalNet());
+    }
+
+    @Test
+    void shouldAllowRemovingProductBeforeCompletion() {
+        Product bread = new Product("Bread", new UnitPrice(new Money(20)), VatRate.FOOD, false);
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login("KASSA01", "SELLER123");
+        Purchase purchase = register.startPurchase();
+
+        register.scanProduct(bread, 2); // 40 kr
+        register.removeProduct(bread);  // ta bort
+
+        assertEquals(new Money(0), purchase.getTotalNet());
+    }
+}
+
+
+
 
 //    Kassa - taget från Bäckmans discord meddelande
 //
@@ -61,89 +137,3 @@ class CashRegisterTest {
 //
 //
 //    7. Skriv ut kvitto
-
-    @Test
-    void sellerCanLoginWithValidIds() {
-        DiscountManager dm = new DiscountManager();
-        CashRegister register = new CashRegister(dm);
-        boolean loggedIn = register.login("KASSA01", "SELLER123");
-        assertTrue(loggedIn);
-    }
-    @Test
-    void shouldStartNewPurchaseWhenLoggedIn() {
-        DiscountManager dm = new DiscountManager();
-        CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
-
-        Purchase purchase = register.startPurchase();
-        assertNotNull(purchase);
-
-        //Finns inte i purchase
-
-//        assertEquals("KASSA01", purchase.getCashRegisterId());
-//        assertEquals("SELLER123", purchase.getSellerId());
-    }
-    @Test
-    void shouldAddProductWithoutDiscount() {
-        Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
-        DiscountManager dm = new DiscountManager();
-        CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
-        Purchase purchase = register.startPurchase();
-
-        register.scanProduct(milk, 1);
-        assertEquals(new Money(10), purchase.getTotalNet());
-
-        //Finns inte i purchase
-
-//        assertEquals(1, purchase.getProducts().size());
-    }
-    @Test
-    void shouldApplyDiscountWhenAvailable() {
-        Product coffee = new Product("Coffee", new UnitPrice(new Money(50)), VatRate.FOOD, false);
-        DiscountManager dm = new DiscountManager();
-        new PercentageDiscount( coffee ,10, LocalDateTime.now().plusMonths(6));
-
-        CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
-        Purchase purchase = register.startPurchase();
-
-        register.scanProduct(coffee, 1);
-        assertEquals(new Money(45), purchase.getTotalNet());
-    }
-    @Test
-    void shouldAllowRemovingProductBeforeCompletion() {
-        Product bread = new Product("Bread", new UnitPrice(new Money(20)), VatRate.FOOD, false);
-        DiscountManager dm = new DiscountManager();
-        CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
-        Purchase purchase = register.startPurchase();
-
-        register.scanProduct(bread, 2);
-        register.removeProduct(bread);
-
-        //Finns inte i purchase
-
-//        assertEquals(0, purchase.getProducts().size());
-        assertEquals(new Money(0), purchase.getTotalNet());
-    }
-
-    //Klassen finns inte än(receipt klassen)
-
-//    @Test
-//    void shouldFinalizePurchaseAndGenerateReceipt() {
-//        Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
-//        CashRegister register = new CashRegister();
-//        register.login("KASSA01", "SELLER123");
-//        Purchase purchase = register.startPurchase();
-//
-//        register.scanProduct(milk, 1);
-//        Receipt receipt = register.completePurchase();
-//
-//        assertNotNull(receipt);
-//        assertEquals(new Money(10.00), receipt.getTotal());
-//        assertTrue(receipt.getDateTime() != null);
-//    }
-
-
-}
