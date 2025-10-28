@@ -68,8 +68,22 @@ public class Customer {
         if (localPart.contains("..")) {
             throw new IllegalArgumentException("Local part cannot have consecutive dots");
         }
+
+        boolean insideQuotes = false;
+
         for (int i = 0; i < localPart.length(); i++) {
             char c = localPart.charAt(i);
+            if (c == '"') {
+                insideQuotes = !insideQuotes;
+                continue;
+            }
+            if (c == '\\' && i + 1 < localPart.length()) {
+                i++;
+                continue;
+            }
+            if (insideQuotes) {
+                continue;
+            }
             if (!isValidLocalPartChar(c)) {
                 throw new IllegalArgumentException("Invalid character in local part: " + c);
             }
@@ -77,13 +91,45 @@ public class Customer {
     }
 
     private boolean isValidLocalPartChar(char c) {
-        if (Character.isLetterOrDigit(c)) return true;
-        if ("!#$%&'*+-/=?^_`{|}~.\"() ".indexOf(c) >= 0) return true;
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+            return true;
+        }
+        if ("!#$%&'*+-/=?^_`{|}~.".indexOf(c) >= 0) {return true;}
         return false;
     }
 
     private void validateDomainPart(String domainPart) {
+        if (domainPart.isEmpty() || domainPart.length() > 255) {
+            throw new IllegalArgumentException("Invalid domain part length");
+        }
+        if (!domainPart.contains(".")) {
+            throw new IllegalArgumentException("Domain must have at least one dot");
+        }
+        if (domainPart.startsWith(".") || domainPart.endsWith(".") ||
+                domainPart.startsWith("-") || domainPart.endsWith("-")) {
+            throw new IllegalArgumentException("Invalid domain format");
+        }
+        String[] labels = domainPart.split("\\.");
 
+        for (String label : labels) {
+            if (label.isEmpty() || label.length() > 63) {
+                throw new IllegalArgumentException("Invalid domain label length");
+            }
+
+            if (label == labels[labels.length - 1] && label.length() < 2) {
+                throw new IllegalArgumentException("Domain label must be at least 2 characters");
+            }
+
+            if (label.startsWith("-") || label.endsWith("-")) {
+                throw new IllegalArgumentException("Domain label cannot start or end with hyphen");
+            }
+
+            for (char c : label.toCharArray()) {
+                if (!Character.isLetterOrDigit(c) && c != '-') {
+                    throw new IllegalArgumentException("Invalid character in domain: " + c);
+                }
+            }
+        }
     }
 
     private void validateSSN(String ssn) {

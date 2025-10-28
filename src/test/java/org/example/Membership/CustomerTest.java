@@ -99,14 +99,14 @@ class CustomerTest {
     }
 
     @Test
-    void constructorThrowsWhenDomainIsTooLong() {
+    void constructorThrowsWhenDomainPartIsTooLong() {
         String longDomain = "a@" + "a".repeat(256) + ".com";
         assertThrows(IllegalArgumentException.class,
                 () -> new Customer("200001011234", longDomain));
     }
 
     @Test
-    void constructorThrowsWhenAdressIsTooLong() {
+    void constructorThrowsWhenEndAdressIsTooLong() {
         String longAdress = "a@y." + "a".repeat(64);
         assertThrows(IllegalArgumentException.class,
                 () -> new Customer("200001011234", longAdress));
@@ -116,7 +116,7 @@ class CustomerTest {
     void constructorAcceptsValidEmails() {
         String[] validEmails = {
                 "A.HEIDARI0554@GMAIL.COM",
-                "Aa\" \"1!.@gmail.com"
+                "Aa\" \"1!@gmail.com"
         };
 
         for (String email : validEmails) {
