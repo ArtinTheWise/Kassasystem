@@ -1,9 +1,6 @@
 package org.example.Membership;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class Customer {
 
@@ -41,9 +38,6 @@ public class Customer {
         }
         if (email.isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
-        }
-        if (email.length() > 320) {
-            throw new IllegalArgumentException("Email is too long");
         }
         int atIndex = email.indexOf('@');
         int lastAtIndex = email.lastIndexOf('@');
@@ -105,8 +99,7 @@ public class Customer {
         if (!domainPart.contains(".")) {
             throw new IllegalArgumentException("Domain must have at least one dot");
         }
-        if (domainPart.startsWith(".") || domainPart.endsWith(".") ||
-                domainPart.startsWith("-") || domainPart.endsWith("-")) {
+        if (domainPart.startsWith(".") || domainPart.endsWith(".") || domainPart.startsWith("-")) {
             throw new IllegalArgumentException("Invalid domain format");
         }
         String[] labels = domainPart.split("\\.");
@@ -115,15 +108,9 @@ public class Customer {
             if (label.isEmpty() || label.length() > 63) {
                 throw new IllegalArgumentException("Invalid domain label length");
             }
-
             if (label == labels[labels.length - 1] && label.length() < 2) {
                 throw new IllegalArgumentException("Domain label must be at least 2 characters");
             }
-
-            if (label.startsWith("-") || label.endsWith("-")) {
-                throw new IllegalArgumentException("Domain label cannot start or end with hyphen");
-            }
-
             for (char c : label.toCharArray()) {
                 if (!Character.isLetterOrDigit(c) && c != '-') {
                     throw new IllegalArgumentException("Invalid character in domain: " + c);

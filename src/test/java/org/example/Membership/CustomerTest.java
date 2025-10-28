@@ -1,14 +1,8 @@
 package org.example.Membership;
 
-import org.example.Discount.NormalDiscount;
-import org.example.Money;
-import org.example.Product.Product;
-import org.example.Product.UnitPrice;
-import org.example.Product.VatRate;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,7 +78,8 @@ class CustomerTest {
         String[] invalidEmails = {
                 "", "Å@test.se", "A @test.se", "A..@test.se",
                 "A.se", "@test.se", ".A@Test.se", "a@.com",
-                "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c."
+                "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c.",
+                "A..A@test.se"
         };
 
         for (String email : invalidEmails) {
@@ -119,7 +114,8 @@ class CustomerTest {
     void constructorAcceptsValidEmails() {
         String[] validEmails = {
                 "A.HEIDARI0554@GMAIL.COM",
-                "Aa\" \"1!@gmail.com"
+                "Aa\" \"1!@gmail.com",
+                "\"test\\\"user\"@gmail.com"
         };
 
         for (String email : validEmails) {
