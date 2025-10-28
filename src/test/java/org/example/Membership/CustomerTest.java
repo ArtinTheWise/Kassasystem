@@ -14,34 +14,37 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerTest {
 
+    private final String validSSN = "200001011234";
+    private final String validEmailAddress = "mail@example.com";
+
     //can använda before each
 
     @Test
     void constructorWithNullTest() {
         assertThrows(IllegalArgumentException.class, () -> {
-            new Customer("200404301234", null);
+            new Customer(validSSN, null);
         });
         assertThrows(IllegalArgumentException.class, () -> {
-            new Customer(null, "test@example.com");
+            new Customer(null, validEmailAddress);
         });
     }
 
     @Test
     void getSocialSecurityNumberTest() {
-        Customer customer = new Customer("200404301234", "test@example.com");
-        assertEquals("200404301234", customer.getSocialSecurityNumber());
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        assertEquals(validSSN, customer.getSocialSecurityNumber());
     }
 
     @Test
     void getEmailAddressTest() {
-        Customer customer = new Customer("200404301234", "test@example.com");
-        assertEquals("test@example.com", customer.getEmailAddress());
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        assertEquals(validEmailAddress, customer.getEmailAddress());
     }
 
     //membership
     @Test
     void isMemberTest() {
-        Customer customer = new Customer("200404301234", "test@example.com");
+        Customer customer = new Customer(validSSN, validEmailAddress);
         assertThrows(IllegalStateException.class, customer::getMembership); // kollar att man inte är det från början
         customer.becomeMember();
         assertNotNull(customer.getMembership());
@@ -49,15 +52,15 @@ class CustomerTest {
 
     @Test
     void isExpiredMemberTest() {
-        Customer customer = new Customer("130404301234", "test@example.com");
+        Customer customer = new Customer("158204301234", validEmailAddress);
         customer.becomeMember();
-        customer.getMembership().changeExpirationDate(LocalDate.of(1324, 4, 30));//test metod bara
+        customer.getMembership().changeExpirationDate(LocalDate.of(1600, 4, 30));//test metod bara
         assertThrows(IllegalStateException.class, customer::getMembership);
     }
 
     @Test
     void renewMembershipTest() {
-        Customer customer = new Customer("200404301234", "test@example.com");
+        Customer customer = new Customer(validSSN, validEmailAddress);
         customer.becomeMember();
         customer.getMembership().changeExpirationDate(LocalDate.of(2027, 4, 30));//test metod bara
 
@@ -70,7 +73,7 @@ class CustomerTest {
 
     @Test
     void cancelMembershipTest() {
-        Customer customer = new Customer("200404301234", "test@example.com");
+        Customer customer = new Customer(validSSN, validEmailAddress);
         customer.becomeMember();
         customer.cancelMembership();
         assertThrows(IllegalStateException.class, customer::getMembership);
@@ -86,7 +89,7 @@ class CustomerTest {
 
         for (String email : invalidEmails) {
             assertThrows(IllegalArgumentException.class,
-                    () -> new Customer("200001011234", email),
+                    () -> new Customer(validSSN, email),
                     "Should fail for: " + email);
         }
     }
@@ -95,21 +98,21 @@ class CustomerTest {
     void constructorThrowsWhenLocalPartIsTooLong() {
         String longLocal = "a".repeat(65) + "@test.se";
         assertThrows(IllegalArgumentException.class,
-                () -> new Customer("200001011234", longLocal));
+                () -> new Customer(validSSN, longLocal));
     }
 
     @Test
     void constructorThrowsWhenDomainPartIsTooLong() {
         String longDomain = "a@" + "a".repeat(256) + ".com";
         assertThrows(IllegalArgumentException.class,
-                () -> new Customer("200001011234", longDomain));
+                () -> new Customer(validSSN, longDomain));
     }
 
     @Test
     void constructorThrowsWhenEndAdressIsTooLong() {
         String longAdress = "a@y." + "a".repeat(64);
         assertThrows(IllegalArgumentException.class,
-                () -> new Customer("200001011234", longAdress));
+                () -> new Customer(validSSN, longAdress));
     }
 
     @Test
@@ -120,7 +123,7 @@ class CustomerTest {
         };
 
         for (String email : validEmails) {
-            assertDoesNotThrow(() -> new Customer("200001011234", email));
+            assertDoesNotThrow(() -> new Customer(validSSN, email));
         }
     }
 }
