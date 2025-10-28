@@ -24,12 +24,19 @@ public class MembershipTest {
     }
 
     @Test
-    public void getPointsTest() {} // todo finns igen sätt att skaffa points just nu
+    public void getPointsTest() {
+        Membership membership = new Membership(new Customer(validSSN, validEmailAddress));
 
+        assertEquals(0, membership.getPoints().getAmount());
 
+        membership.getPoints().add(100);
 
+        assertEquals(100, membership.getPoints().getAmount());
 
+        membership.getPoints().subtract(50);
 
+        assertEquals(50, membership.getPoints().getAmount());
+    }
 
     //bonusCheckar
     @Test
