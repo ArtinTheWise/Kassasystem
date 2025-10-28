@@ -5,13 +5,10 @@ import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-
-import static org.example.Product.Unit.PIECE;
 
 public class DiscountManager {
     ArrayList<Product> products = new ArrayList<>();
@@ -31,7 +28,6 @@ public class DiscountManager {
         }
     }
 
-    // Scanna alla 
     public boolean discountCheck(Product product){
         removeOldDiscounts();
         for (Product p : getActiveDiscounts()){

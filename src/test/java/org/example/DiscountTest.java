@@ -1,5 +1,6 @@
 package org.example;
 
+import java.time.*;
 import org.example.Discount.*;
 import org.example.Membership.Customer;
 import org.example.Product.*;
@@ -11,13 +12,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.example.Product.Unit.KG;
 import static org.example.Product.Unit.PIECE;
 import static org.example.Product.VatRate.OTHER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
-import java.time.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DiscountTest {
@@ -415,7 +413,6 @@ public class DiscountTest {
         assertEquals(96, elderlyDiscount.calculatePrice(quantity(1), elderlyAndStudent).getAmountInMinorUnits());
     }
 
-
     @Test
     @DisplayName("DiscountManager/getBestDiscount - returns cheapest discount when SpecialDiscount")
     void specialDiscountGetsReturnedIfBestDiscount(){
@@ -431,5 +428,13 @@ public class DiscountTest {
         assertEquals(100, ((ProductDecorator) manager.getBestDiscount(product, quantity(1), normalCustomer)).calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
         assertEquals(96, ((ProductDecorator) manager.getBestDiscount(product, quantity(1), student)).calculatePrice(quantity(1), student).getAmountInMinorUnits()); //satt här i 1 timme :(
         assertEquals(100, manager.getBestDiscount(product, quantity(1)).calculatePrice(quantity(1)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts when inactive")
+    void overXTotalDiscountAppliesDiscountCorrectly(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator overXTotalDiscount = new OverXTotalDiscount(activeDiscount, new Money(200));
+        assertEquals(120, overXTotalDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
     }
 }

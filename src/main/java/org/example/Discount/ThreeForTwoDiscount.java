@@ -1,12 +1,9 @@
 package org.example.Discount;
 
-import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
-import org.example.Product.WeightPrice;
-
 import java.time.Clock;
 import java.time.LocalDateTime;
 
@@ -60,5 +57,10 @@ public class ThreeForTwoDiscount extends ProductDecorator {
 
     public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
         return discountGroup(productGroup, LocalDateTime.now(), endTime);
+    }
+
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new ThreeForTwoDiscount(product, getStartTime(), getEndTime(), clock);
     }
 }

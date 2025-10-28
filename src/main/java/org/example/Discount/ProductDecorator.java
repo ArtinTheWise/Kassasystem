@@ -3,13 +3,10 @@ package org.example.Discount;
 import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
-import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
-
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public abstract class ProductDecorator extends Product {
     private final LocalDateTime startTime;
@@ -57,11 +54,11 @@ public abstract class ProductDecorator extends Product {
 
     public abstract Money calculatePrice(Quantity quantity);
 
+    public abstract Money calculatePriceWithVat(Quantity quantity);
+
     public Money calculatePrice(Quantity quantity, Customer customer) {
         return calculatePrice(quantity); //Needed for specialDiscount
     }
-
-    public abstract Money calculatePriceWithVat(Quantity quantity);
 
     public Money calculatePriceWithVat(Quantity quantity, Customer customer) {
         return calculatePrice(quantity); //Needed for specialDiscount
@@ -69,5 +66,9 @@ public abstract class ProductDecorator extends Product {
 
     public Money getDiscountedAmount(Quantity quantity){
         return new Money(getProduct().calculatePrice(quantity).getAmountInMinorUnits() - calculatePrice(quantity).getAmountInMinorUnits());
+    }
+
+    public ProductDecorator createFor(Product product) {
+        throw new UnsupportedOperationException("This decorator must implement createFor(Product)"); //Needed for OverXTotalDiscount
     }
 }

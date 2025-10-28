@@ -1,6 +1,5 @@
 package org.example.Discount;
 
-import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.ProductGroup;
@@ -59,5 +58,10 @@ public class PercentageDiscount extends ProductDecorator {
 
     public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
         return discountGroup(productGroup, LocalDateTime.now(), endTime);
+    }
+
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new PercentageDiscount(product, percent, getStartTime(), getEndTime(), clock);
     }
 }

@@ -1,11 +1,8 @@
 package org.example.Discount;
 
-import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
-
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -44,4 +41,8 @@ public class DiscountAtXTime extends ProductDecorator {
         return discount.getProduct().calculatePriceWithVat(quantity);
     }
 
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new DiscountAtXTime(discount.createFor(product), startTimeInDay, endTimeInDay);
+    }
 }

@@ -2,6 +2,7 @@ package org.example.Discount;
 
 import org.example.Membership.Customer;
 import org.example.Money;
+import org.example.Product.Product;
 import org.example.Product.Quantity;
 
 public class SpecialDiscount extends ProductDecorator {
@@ -27,30 +28,35 @@ public class SpecialDiscount extends ProductDecorator {
 
     @Override
     public Money calculatePrice(Quantity q) {
-        return getProduct().calculatePrice(q);
+        return discount.getProduct().calculatePrice(q);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity q) {
-        return getProduct().calculatePriceWithVat(q);
+        return discount.getProduct().calculatePriceWithVat(q);
     }
 
     @Override
     public Money calculatePrice(Quantity q, Customer c) {
-        if(!isActive()) return getProduct().calculatePrice(q);
+        if(!isActive() || !discount.isActive()) return discount.getProduct().calculatePrice(q);
         if((c.isStudent() && student) || (c.getAge() >= age && age >= 65)){
             return discount.calculatePrice(q);
         }
-        return getProduct().calculatePrice(q);
+        return discount.getProduct().calculatePrice(q);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity q, Customer c) {
-        if(!isActive()) return getProduct().calculatePriceWithVat(q);
+        if(!isActive() || !discount.isActive()) return discount.getProduct().calculatePriceWithVat(q);
         if((c.isStudent() && student) || (c.getAge() >= age && age >= 65)){
             return discount.calculatePriceWithVat(q);
         }
-        return getProduct().calculatePriceWithVat(q);
+        return discount.getProduct().calculatePriceWithVat(q);
+    }
+
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new SpecialDiscount(discount.createFor(product), age, student);
     }
 
 }

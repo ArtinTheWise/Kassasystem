@@ -1,12 +1,8 @@
 package org.example.Discount;
 
-import org.example.Membership.Customer;
 import org.example.Money;
+import org.example.Product.Product;
 import org.example.Product.Quantity;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class MaxXDiscount extends ProductDecorator {
     private final int max;
@@ -21,7 +17,7 @@ public class MaxXDiscount extends ProductDecorator {
 
     @Override
     public Money calculatePrice(Quantity quantity) {
-        if (isActive()) {
+        if (isActive() && discount.isActive()) {
             if((int) quantity.getAmount() > max){
                 int notDiscountedAmount = (int) quantity.getAmount() - max;
                 long discounted = discount.calculatePrice(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
@@ -35,7 +31,7 @@ public class MaxXDiscount extends ProductDecorator {
 
     @Override
     public Money calculatePriceWithVat(Quantity quantity) {
-        if (isActive()) {
+        if (isActive() && discount.isActive()) {
             if((int) quantity.getAmount() > max){
                 int notDiscountedAmount = (int) quantity.getAmount() - max;
                 long discounted = discount.calculatePriceWithVat(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
@@ -47,4 +43,8 @@ public class MaxXDiscount extends ProductDecorator {
         return discount.getProduct().calculatePriceWithVat(quantity);
     }
 
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new MaxXDiscount(discount.createFor(product), max);
+    }
 }
