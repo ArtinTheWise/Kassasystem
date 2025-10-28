@@ -45,6 +45,16 @@ public class Membership {
 
     //bonuscheckar
     public List<BonusCheck> getChecks() {
+        List<BonusCheck> checksToRemove = new ArrayList<>();
+        for (BonusCheck check : checks) {
+            if (!check.getDiscount().isActive()){
+                checksToRemove.add(check);
+            }
+        }
+        for (BonusCheck check : checksToRemove) {
+            customer.getMembership().removeCheck(check);
+        }
+
         return Collections.unmodifiableList(checks);
     }
 

@@ -1,9 +1,13 @@
 package org.example.Sales;
 
 import org.example.Discount.DiscountManager;
+import org.example.Membership.BonusCheck;
+import org.example.Membership.Customer;
 import org.example.Product.Product;
 import org.example.Product.Unit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CashRegister {
@@ -15,6 +19,7 @@ public class CashRegister {
     private DiscountManager dm;
     private Cashier cashier;
     private Purchase purchase;
+    private Customer customer;
 
 
     public CashRegister(DiscountManager dm) {
@@ -39,8 +44,15 @@ public class CashRegister {
         cashier = null;
     }
 
-    public void startPurchase() {
+    public void startPurchase(Customer customer) {
         isSomeoneLoggedIn();
+
+        if (customer != null && customer.getMembership() != null){
+            this.customer = customer;
+            for (BonusCheck check : customer.getMembership().getChecks()) {
+                dm.addDiscount(check.getDiscount());
+            }
+        }
 
         purchase = new Purchase(this, cashier, dm);
     }
@@ -50,6 +62,29 @@ public class CashRegister {
         isPurchaseUnderWay();
 
         Receipt receipt = new Receipt(purchase);
+
+        if (customer != null && customer.getMembership() != null){
+            long pointsGained = purchase.getTotalGross().getAmountInMajorUnits() / 100;
+            customer.getMembership().getPoints().add(pointsGained);
+
+            List<BonusCheck> checksToRemove = new ArrayList<>();
+
+            for (BonusCheck check : customer.getMembership().getChecks()) {
+
+                Product product= check.getDiscount().getProduct();
+
+                if (purchase.getItemsView().containsKey(product)) {
+                    if (dm.getBestDiscount(product, purchase.getItemsView().get(product)) == check.getDiscount()) {
+                        checksToRemove.add(check);
+                    }
+                }
+            }
+            for (BonusCheck check : checksToRemove) {
+                customer.getMembership().removeCheck(check);
+            }
+        }
+
+        customer = null;
         purchase = null;
         return receipt.toString();
     }
