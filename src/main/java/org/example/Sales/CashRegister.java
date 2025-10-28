@@ -11,7 +11,7 @@ public class CashRegister {
     public CashRegister(DiscountManager dm) {
     }
 
-    public boolean login(String username, String password) {
+    public boolean login(int username, int password) {
         return false;
     }
 
@@ -28,5 +28,9 @@ public class CashRegister {
 
     public int getId(){
         return cashRegisterId;
+    }
+
+    public boolean loggedIn() {
+        return false;
     }
 }

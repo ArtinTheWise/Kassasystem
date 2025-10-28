@@ -16,17 +16,19 @@ class CashRegisterTest {
 
     @Test
     void sellerCanLoginWithValidIds() {
+        Cashier cashier = new Cashier("Cashier");
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        boolean loggedIn = register.login("KASSA01", "SELLER123");
-        assertTrue(loggedIn);
+        register.login(register.getId(), cashier.getId());
+        assertTrue(register.loggedIn());
     }
 
     @Test
     void shouldStartNewPurchaseWhenLoggedIn() {
+        Cashier cashier = new Cashier("Cashier");
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
+        register.login(register.getId(), cashier.getId());
 
         Purchase purchase = register.startPurchase();
         assertNotNull(purchase);
@@ -34,10 +36,11 @@ class CashRegisterTest {
 
     @Test
     void shouldAddProductWithoutDiscount() {
+        Cashier cashier = new Cashier("Cashier");
         Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
+        register.login(register.getId(), cashier.getId());
         Purchase purchase = register.startPurchase();
 
         // Simulerar scanning av 1 produkt
@@ -49,6 +52,7 @@ class CashRegisterTest {
 
     @Test
     void shouldApplyDiscountWhenAvailable() {
+        Cashier cashier = new Cashier("Cashier");
         // Produkt
         Product coffee = new Product("Coffee", new UnitPrice(new Money(50)), VatRate.FOOD, false);
 
@@ -63,7 +67,7 @@ class CashRegisterTest {
         dm.addDiscount(discount);
 
         CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
+        register.login(register.getId(), cashier.getId());
         Purchase purchase = register.startPurchase();
 
         register.scanProduct(coffee, 1);
@@ -75,10 +79,11 @@ class CashRegisterTest {
 
     @Test
     void shouldAllowRemovingProductBeforeCompletion() {
+        Cashier cashier = new Cashier("Cashier");
         Product bread = new Product("Bread", new UnitPrice(new Money(20)), VatRate.FOOD, false);
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login("KASSA01", "SELLER123");
+        register.login(register.getId(), cashier.getId());
         Purchase purchase = register.startPurchase();
 
         register.scanProduct(bread, 2); // 40 kr
