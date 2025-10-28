@@ -19,7 +19,7 @@ class CashRegisterTest {
         Cashier cashier = new Cashier("Cashier");
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login(register.getId(), cashier.getId());
+        register.login(cashier.getId());
         assertTrue(register.loggedIn());
     }
 
@@ -28,7 +28,7 @@ class CashRegisterTest {
         Cashier cashier = new Cashier("Cashier");
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login(register.getId(), cashier.getId());
+        register.login(cashier.getId());
 
         Purchase purchase = register.startPurchase();
         assertNotNull(purchase);
@@ -40,7 +40,7 @@ class CashRegisterTest {
         Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login(register.getId(), cashier.getId());
+        register.login(cashier.getId());
         Purchase purchase = register.startPurchase();
 
         // Simulerar scanning av 1 produkt
@@ -67,7 +67,7 @@ class CashRegisterTest {
         dm.addDiscount(discount);
 
         CashRegister register = new CashRegister(dm);
-        register.login(register.getId(), cashier.getId());
+        register.login(cashier.getId());
         Purchase purchase = register.startPurchase();
 
         register.scanProduct(coffee, 1);
@@ -83,7 +83,7 @@ class CashRegisterTest {
         Product bread = new Product("Bread", new UnitPrice(new Money(20)), VatRate.FOOD, false);
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
-        register.login(register.getId(), cashier.getId());
+        register.login(cashier.getId());
         Purchase purchase = register.startPurchase();
 
         register.scanProduct(bread, 2); // 40 kr

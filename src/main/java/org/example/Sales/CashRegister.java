@@ -11,8 +11,7 @@ public class CashRegister {
     public CashRegister(DiscountManager dm) {
     }
 
-    public boolean login(int username, int password) {
-        return false;
+    public void login(int password) {
     }
 
     public Purchase startPurchase() {
