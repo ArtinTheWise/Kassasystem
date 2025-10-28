@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
+import org.example.Membership.BonusCheck;
+import org.example.Membership.Customer;
+import org.example.Membership.Points;
 import org.example.Money;
 import org.example.Product.*;
 import org.junit.jupiter.api.Test;
@@ -11,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 class CashRegisterTest {
+
+    private final String validSSN = "200001011234";
+    private final String validEmailAddress = "mail@example.com";
 
     @Test
     void sellerCanLoginWithValidIds() {
@@ -28,7 +34,7 @@ class CashRegisterTest {
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
 
-        register.startPurchase();
+        register.startPurchase(null);
         assertNotNull(register.getPurchase());
     }
 
@@ -47,7 +53,7 @@ class CashRegisterTest {
         Cashier cashier = new Cashier("Cashier");
         CashRegister register = new CashRegister(new DiscountManager());
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         assertThrows(IllegalArgumentException.class, register::logout);
     }
@@ -56,7 +62,7 @@ class CashRegisterTest {
         Cashier cashier = new Cashier("Cashier");
         CashRegister register = new CashRegister(new DiscountManager());
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
         register.scanProduct(milk, 1);
@@ -102,7 +108,7 @@ class CashRegisterTest {
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         DiscountManager newDm = new DiscountManager();
         assertThrows(IllegalStateException.class, () -> register.changeDiscountManager(newDm));
@@ -123,9 +129,8 @@ class CashRegisterTest {
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
-        // Simulerar scanning av 1 produkt
         register.scanProduct(milk, 1);
 
         // Inga rabatter har applicerats
@@ -135,10 +140,8 @@ class CashRegisterTest {
     @Test
     void shouldApplyDiscountWhenAvailable() {
         Cashier cashier = new Cashier("Cashier");
-        // Produkt
         Product coffee = new Product("Coffee", new UnitPrice(new Money(50)), VatRate.FOOD, false);
 
-        // Rabatt
         DiscountManager dm = new DiscountManager();
         PercentageDiscount discount = new PercentageDiscount(
                 coffee,
@@ -150,7 +153,7 @@ class CashRegisterTest {
 
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         register.scanProduct(coffee, 1);
 
@@ -166,7 +169,7 @@ class CashRegisterTest {
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         register.scanProduct(bread, 2); // 40 kr
         register.removeProduct(bread);  // ta bort
@@ -180,15 +183,12 @@ class CashRegisterTest {
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
-        // 1️⃣ Skapa produkt med viktpris: 30 kr/kg
         Product bananas = new Product("Bananas", new WeightPrice(new Money(30), Unit.KG), VatRate.FOOD, false);
 
-        // 2️⃣ Lägg till 1.5 kg bananer
         register.scanProduct(bananas, 1.5);
 
-        // 3️⃣ Kontrollera totalpris (30 kr/kg * 1.5 kg = 45 kr)
         assertEquals(new Money(45), register.getPurchase().getTotalNet());
     }
 
@@ -198,7 +198,7 @@ class CashRegisterTest {
         DiscountManager dm = new DiscountManager();
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         Product milk = new Product("Milk", new UnitPrice(new Money(10)), VatRate.FOOD, false);
         Product bread = new Product("Bread", new UnitPrice(new Money(20)), VatRate.FOOD, false);
@@ -217,13 +217,145 @@ class CashRegisterTest {
 
         CashRegister register = new CashRegister(dm);
         register.login(cashier);
-        register.startPurchase();
+        register.startPurchase(null);
 
         register.scanProduct(milk, 1);
         register.scanProduct(milk, 2); // totalt 3 stycken
 
         assertEquals(new Money(30), register.getPurchase().getTotalNet());
     }
+
+    @Test
+    void startPurchaseShouldAddBonusCheckDiscountsFromCustomer() {
+        Cashier cashier = new Cashier("Cashier");
+        Product coffee = new Product("Coffee", new UnitPrice(new Money(100)), VatRate.FOOD, false);
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+
+        // Bonuscheck = 50% rabatt på coffee
+        customer.getMembership().addCheck(new BonusCheck("Coffee 50%",
+                new PercentageDiscount(coffee, 50, LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
+                new Points(200)
+        ));
+
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login(cashier);
+
+        register.startPurchase(customer);
+
+        //DiscountManager ska nu innehålla bonuscheck-rabatten
+        assertTrue(dm.discountCheck(coffee), "DiscountManager should contain customer's bonus discount");
+    }
+
+    @Test
+    void endPurchaseShouldAddPointsToCustomerMembership() {
+        Cashier cashier = new Cashier("Cashier");
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login(cashier);
+
+        register.startPurchase(customer);
+
+        // Lägg till produkt för 500 kr
+        Product tv = new Product("TV", new UnitPrice(new Money(50000)), VatRate.OTHER, false);
+        register.scanProduct(tv, 1);
+
+        register.endPurchase();
+
+        //500.00 kr = 500 i major units 500/100 = 5 poäng
+        assertEquals(5, customer.getMembership().getPoints().getAmount(), "Customer should gain correct points from purchase");
+    }
+
+    @Test
+    void bonusCheckDiscountShouldAffectFinalPrice() {
+        Cashier cashier = new Cashier("Cashier");
+        Product coffee = new Product("Coffee", new UnitPrice(new Money(100)), VatRate.FOOD, false);
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+
+        // Bonuscheck 50% rabatt på coffee
+        BonusCheck bonusCheck = new BonusCheck("Coffee 50%",
+                new PercentageDiscount(coffee,50, LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
+                new Points(200)
+        );
+        customer.getMembership().addCheck(bonusCheck);
+
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login(cashier);
+
+        register.startPurchase(customer); // ska ladda in bonuscheckens rabatt i DiscountManager
+        register.scanProduct(coffee, 1);
+        register.getPurchase().applyDiscounts();
+
+        //rabatten på 50% ska ge totalpris 50 kr
+        assertEquals(new Money(50), register.getPurchase().getTotalNet(),
+                "Bonus check discount should reduce product price by 50%");
+    }
+
+    @Test
+    void bonusCheckShouldBeRemovedIfUsedOtherwiseRemain() {
+        Cashier cashier = new Cashier("Cashier");
+        Product coffee = new Product("Coffee", new UnitPrice(new Money(100)), VatRate.FOOD, false);
+        Product tea = new Product("Tea", new UnitPrice(new Money(80)), VatRate.FOOD, false);
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+
+        // Bonuscheck = 50% rabatt på Coffee
+        BonusCheck bonusCheck = new BonusCheck(
+                "Coffee 50%",
+                new PercentageDiscount(
+                        coffee,
+                        50,
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusDays(1)
+                ),
+                new Points(200)
+        );
+        customer.getMembership().addCheck(bonusCheck);
+
+        DiscountManager dm = new DiscountManager();
+        CashRegister register = new CashRegister(dm);
+        register.login(cashier);
+
+        // bonuscheck ska användas (Coffee köps)
+        register.startPurchase(customer);
+        register.scanProduct(coffee, 1);
+        register.getPurchase().applyDiscounts();
+        register.endPurchase();
+
+        // Kontrollera att bonuschecken nu har tagits bort
+        assertTrue(customer.getMembership().getChecks().isEmpty(),
+                "BonusCheck should be removed after it has been used on a matching product");
+
+        // bonuscheck ska INTE användas (Tea köps)
+        // Lägg till ny bonuscheck
+        BonusCheck bonusCheck2 = new BonusCheck(
+                "Coffee 50%",
+                new PercentageDiscount(
+                        coffee,
+                        50,
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusDays(1)
+                ),
+                new Points(200)
+        );
+        customer.getMembership().addCheck(bonusCheck2);
+
+        register.startPurchase(customer);
+        register.scanProduct(tea, 1);
+        register.getPurchase().applyDiscounts();
+        register.endPurchase();
+
+        // Kontrollera att bonuschecken finns kvar eftersom den inte användes
+        assertFalse(customer.getMembership().getChecks().isEmpty(),
+                "BonusCheck should remain if it was not applied to any product");
+    }
+
 }
 
 
