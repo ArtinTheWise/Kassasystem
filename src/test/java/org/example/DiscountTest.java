@@ -1,6 +1,9 @@
 package org.example;
 
 import java.time.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.example.Discount.*;
 import org.example.Membership.Customer;
 import org.example.Product.*;
@@ -431,10 +434,54 @@ public class DiscountTest {
     }
 
     @Test
-    @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts when inactive")
+    @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts")
     void overXTotalDiscountAppliesDiscountCorrectly(){
-        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
-        ProductDecorator overXTotalDiscount = new OverXTotalDiscount(activeDiscount, new Money(200));
-        assertEquals(120, overXTotalDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator overXTotalDiscountOne = new OverXTotalDiscount(activeDiscount, new Money(200));
+        ProductDecorator overXTotalDiscountTwo = new OverXTotalDiscount(inactiveDiscount, new Money(200));
+
+        assertEquals(120, overXTotalDiscountOne.calculatePrice(quantity(1)).getAmountInMinorUnits());
+        assertEquals(192, overXTotalDiscountOne.calculatePrice(quantity(2)).getAmountInMinorUnits());
+        assertEquals(240, overXTotalDiscountTwo.calculatePrice(quantity(2)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts with no discounted product")
+    void overXTotalDiscountDoesNotApplyDiscountIfNoDiscountedProduct(){
+        Product productOne = getRealProduct("Milk", 120);
+        Product productTwo = getRealProduct("Egg", 50);
+        Product productThree = getRealProduct("Apple", 200);
+
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        OverXTotalDiscount overXTotalDiscountOne = new OverXTotalDiscount(activeDiscount, new Money(400));
+
+        Map<Product, Quantity> items = new HashMap<>();
+        items.put(productOne, quantity(1));
+        items.put(productTwo, quantity(2));
+        items.put(productThree, quantity(1));
+
+        assertEquals(420, overXTotalDiscountOne.calculatePrice(items).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts with discounted product and other products")
+    void overXTotalDiscountAppliesDiscountWithMultipleProductsAndDiscountedProduct(){
+        Product productOne = getRealProduct("Milk", 120);
+        Product productTwo = getRealProduct("Egg", 50);
+        Product productThree = getRealProduct("Apple", 200);
+
+        ProductDecorator activeDiscount = new PercentageDiscount(productOne, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        OverXTotalDiscount overXTotalDiscountOne = new OverXTotalDiscount(activeDiscount, new Money(400));
+
+        Map<Product, Quantity> items = new HashMap<>();
+        items.put(productOne, quantity(1));
+        items.put(productTwo, quantity(2));
+        items.put(productThree, quantity(1));
+
+        assertEquals(336, overXTotalDiscountOne.calculatePrice(items).getAmountInMinorUnits());
+
+        items.remove(productThree);
+        assertEquals(220, overXTotalDiscountOne.calculatePrice(items).getAmountInMinorUnits());
     }
 }

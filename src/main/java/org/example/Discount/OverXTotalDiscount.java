@@ -32,10 +32,40 @@ public class OverXTotalDiscount extends ProductDecorator {
     }
 
     public Money calculatePrice(Map<Product, Quantity> items) {
-        return new Money(0);
+        long amount = 0;
+        for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
+            Product p = entry.getKey();
+            Quantity q = entry.getValue();
+            amount += p.calculatePrice(q).getAmountInMinorUnits();
+        }
+        if(amount > money.getAmountInMinorUnits() && items.containsKey(discount.getProduct())){
+            long newAmount = 0;
+            for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
+                Product p = entry.getKey();
+                Quantity q = entry.getValue();
+                newAmount += discount.createFor(p).calculatePrice(q).getAmountInMinorUnits();
+            }
+            return new Money(newAmount);
+        }
+        return new Money(amount);
     }
 
     public Money calculatePriceWithVat(Map<Product, Quantity> items) {
-        return new Money(0);
+        long amount = 0;
+        for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
+            Product p = entry.getKey();
+            Quantity q = entry.getValue();
+            amount += p.calculatePriceWithVat(q).getAmountInMinorUnits();
+        }
+        if(amount > money.getAmountInMinorUnits() && items.containsKey(discount.getProduct())){
+            long newAmount = 0;
+            for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
+                Product p = entry.getKey();
+                Quantity q = entry.getValue();
+                newAmount += discount.createFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
+            }
+            return new Money(newAmount);
+        }
+        return new Money(amount);
     }
 }
