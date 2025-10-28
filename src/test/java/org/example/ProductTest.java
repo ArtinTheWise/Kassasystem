@@ -187,4 +187,30 @@ public class ProductTest {
 
         assertEquals(product.hashCode(), productTwo.hashCode());
     }
+
+    @Test
+    void toStringReturnsCorrectFormat() {
+        Product product = new Product("Ahlgrens Bilar", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false);
+        Product productTwo = new Product("Snus", new UnitPrice(new Money(5000)), OTHER, true);
+        Product productThree = new Product("Bok", new UnitPrice(new Money(150000)), BOOKSANDPAPERS);
+
+        String productString = product.toString();
+        assertTrue(productString.contains("name='Ahlgrens Bilar'"));
+        assertTrue(productString.contains("priceModel="));
+        assertTrue(productString.contains("productGroup=Godis"));
+        assertTrue(productString.contains("vatRate=FOOD"));
+        assertTrue(productString.contains("ageRestriction=false"));
+
+        String productTwoString = productTwo.toString();
+        assertTrue(productTwoString.contains("name='Snus'"));
+        assertTrue(productTwoString.contains("productGroup=none"));
+        assertTrue(productTwoString.contains("vatRate=OTHER"));
+        assertTrue(productTwoString.contains("ageRestriction=true"));
+
+        String productThreeString = productThree.toString();
+        assertTrue(productThreeString.contains("name='Bok'"));
+        assertTrue(productThreeString.contains("productGroup=none"));
+        assertTrue(productThreeString.contains("vatRate=BOOKSANDPAPERS"));
+        assertTrue(productThreeString.contains("ageRestriction=false"));
+    }
 }
