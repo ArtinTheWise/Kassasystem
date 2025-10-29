@@ -232,4 +232,28 @@ public class ProductTest {
         assertTrue(productThreeString.contains("vatRate=BOOKSANDPAPERS"));
         assertTrue(productThreeString.contains("ageRestriction=false"));
     }
+
+    @Test
+    void toStringReturnsCorrectFormat_ProductGroup() {
+        String productString = candyProduct.getProductGroup().toString();
+
+        assertTrue(productString.contains("name='Godis'\nProducts:"));
+
+        assertTrue(productString.contains("name='Ahlgrens Bilar'"));
+        assertTrue(productString.contains("priceModel="));
+        assertTrue(productString.contains("productGroup=Godis"));
+        assertTrue(productString.contains("vatRate=FOOD"));
+        assertTrue(productString.contains("ageRestriction=false"));
+    }
+
+    @Test
+    void removeProductFromProductGroup() {
+        ProductGroup productGroup = candyProduct.getProductGroup();
+
+        assertTrue(productGroup.getProductGroup().contains(candyProduct));
+
+        productGroup.removeProduct(candyProduct);
+
+        assertFalse(productGroup.getProductGroup().contains(candyProduct));
+    }
 }
