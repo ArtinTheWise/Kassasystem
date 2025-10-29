@@ -41,7 +41,6 @@ public class Purchase {
                     DiscountManager discountManager, Clock clock) {
         if (cashRegister == null) throw new IllegalArgumentException("CashRegister cannot be null.");
         if (cashier == null) throw new IllegalArgumentException("cashier cannot be null.");
-        if (discountManager == null && clock == null) { /* no-op; just clarifies flow */ }
         this.cashRegister = cashRegister;
         this.cashier = cashier;
         this.discountManager = discountManager; 

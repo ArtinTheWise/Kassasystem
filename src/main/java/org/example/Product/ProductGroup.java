@@ -35,6 +35,8 @@ public class ProductGroup {
 
     @Override
     public String toString(){
-        return name;
+
+
+        return "name='" + name + "'\n" + "Products:" + "\n" + products;
     }
 }

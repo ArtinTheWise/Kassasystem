@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MembershipTest {
 
@@ -47,19 +46,20 @@ public class MembershipTest {
 
         membership.addCheck(new BonusCheck("snackSale",
                 new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(6)),
+                        VatRate.FOOD, false), 20, LocalDateTime.now().plusMonths(6)),
                 new Points(200)));
         membership.addCheck(new BonusCheck("snackSale",
                 new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
-                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(6)),
+                        VatRate.FOOD, false), 20, LocalDateTime.now().plusMonths(6)),
                 new Points(200)));                                                                   //dubblett ???
         membership.addCheck(new BonusCheck("santaSale",
                 new NormalDiscount(new Product("skumtomtar", new UnitPrice(new Money(50)),
-                        VatRate.FOOD, false),20, LocalDateTime.now().plusMonths(3)),
+                        VatRate.FOOD, false), 20, LocalDateTime.now().plusMonths(3)),
                 new Points(150)));
 
         assertEquals(3, membership.getChecks().size());
     }
+
     @Test
     void cancelMembershipCallsCustomerCancelMembership() {
         Customer customer = new Customer(validSSN, validEmailAddress);
@@ -69,6 +69,45 @@ public class MembershipTest {
         membership.cancelMembership();
 
         assertNull(customer.getMembership());
+    }
+
+    @Test
+    void addCheckThrowsForInactiveDiscount() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        Membership membership = new Membership(customer);
+
+        Product product = new Product("soda", new UnitPrice(new Money(20)), VatRate.FOOD, false);
+
+        LocalDateTime startTime = LocalDateTime.now().minusDays(10);
+        LocalDateTime endTime = LocalDateTime.now().minusDays(1); // slutade igår
+
+        NormalDiscount expiredDiscount = new NormalDiscount(product, 10, startTime, endTime);
+        BonusCheck expiredCheck = new BonusCheck("expired", expiredDiscount, new Points(50));
+
+        assertThrows(IllegalArgumentException.class, () -> membership.addCheck(expiredCheck));
+    }
+
+    @Test
+    void removeCheckThatDoesNotExist() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        Membership membership = new Membership(customer);
+
+        membership.addCheck(new BonusCheck("snackSale",
+                new NormalDiscount(new Product("chips", new UnitPrice(new Money(30)),
+                        VatRate.FOOD, false), 20, LocalDateTime.now().plusMonths(6)),
+                new Points(200)));
+
+
+        assertThrows(IllegalArgumentException.class, () ->
+                membership.removeCheck(new BonusCheck("santaSale",
+                        new NormalDiscount(new Product("skumtomtar", new UnitPrice(new Money(50)),
+                                VatRate.FOOD, false), 20, LocalDateTime.now().plusMonths(3)),
+                        new Points(150)))
+
+
+        );
+
+
     }
 
 

@@ -78,6 +78,7 @@ public class MoneyTest {
         assertEquals(m1, m2);
         assertNotEquals(m1, m3);
         assertNotEquals(new Object(), m1);
+        assertFalse((m1.equals(new Object()))); // endast för att få full coverage
     }
 
     @Test

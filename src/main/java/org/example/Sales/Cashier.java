@@ -9,8 +9,11 @@ public class Cashier {
     private int id;
 
     public Cashier(String name){
-        if (name.isBlank() || name == null){
-            throw new NullPointerException("There must be a name and it can't be null");
+        if (name == null){
+            throw new NullPointerException("name can't be null");
+        }
+        if (name.isEmpty()){
+            throw new NullPointerException("Name can't be empty");
         }
         this.name = name;
         this.id = SEQ.getAndIncrement();

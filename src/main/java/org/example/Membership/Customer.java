@@ -105,7 +105,7 @@ public class Customer {
         String[] labels = domainPart.split("\\.");
 
         for (String label : labels) {
-            if (label.length() > 63) {
+            if (label.isEmpty() || label.length() > 63) {
                 throw new IllegalArgumentException("Invalid domain label length");
             }
             if (label == labels[labels.length - 1] && label.length() < 2) {
@@ -144,16 +144,16 @@ public class Customer {
             return false;
         }
 
-        if (month == 2 && day > 29){
-            return false;
-        }
-
-        if (month == 2 && day > 28 && !(year%4 == 0 && year%100 != 0 && year%400 == 0)){
-            return false;
+        if (month == 2) {
+            boolean leapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+            if ((leapYear && day > 29) || (!leapYear && day > 28)) {
+                return false;
+            }
         }
 
         return true;
     }
+
 
     private boolean validateCheckDigit(String checkDigit) {
 
