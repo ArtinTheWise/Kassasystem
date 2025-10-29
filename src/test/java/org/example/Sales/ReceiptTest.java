@@ -168,6 +168,7 @@ public class ReceiptTest {
             () -> new Receipt(null));
     }
 
+    @SuppressWarnings("unused")
     @Test
     @DisplayName("constructor: purchase with no articles throws exception")
     void createReceiptWithPurchaseWithoutArticlesThrowsException(){
@@ -278,6 +279,7 @@ public class ReceiptTest {
 
         purchase.applyDiscounts();
 
+        @SuppressWarnings("unused")
         Receipt receipt = new Receipt(purchase);
 
         // System.out.println(receipt.toString());
