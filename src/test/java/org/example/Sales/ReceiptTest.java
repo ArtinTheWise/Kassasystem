@@ -248,7 +248,7 @@ public class ReceiptTest {
     }
 
     @Test
-    @DisplayName("large receipt works correctly")
+    @DisplayName("large receipt works correctly") // just for reading purposes
     void receiptManyArticles(){
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
 
@@ -280,7 +280,7 @@ public class ReceiptTest {
 
         Receipt receipt = new Receipt(purchase);
 
-        System.out.println(receipt.toString());
+        // System.out.println(receipt.toString());
 
 
 
