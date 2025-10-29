@@ -39,7 +39,7 @@ class CustomerTest {
     @Test
     void isMemberTest() {
         Customer customer = new Customer(validSSN, validEmailAddress);
-        assertThrows(IllegalStateException.class, customer::getMembership); // kollar att man inte är det från början
+        assertNull(customer.getMembership());// kollar att man inte är det från början
         customer.becomeMember();
         assertNotNull(customer.getMembership());
     }
@@ -49,7 +49,7 @@ class CustomerTest {
         Customer customer = new Customer("158204301234", validEmailAddress);
         customer.becomeMember();
         customer.getMembership().changeExpirationDate(LocalDate.of(1600, 4, 30));//test metod bara
-        assertThrows(IllegalStateException.class, customer::getMembership);
+        assertNull(customer.getMembership());
     }
 
     @Test
@@ -70,7 +70,7 @@ class CustomerTest {
         Customer customer = new Customer(validSSN, validEmailAddress);
         customer.becomeMember();
         customer.cancelMembership();
-        assertThrows(IllegalStateException.class, customer::getMembership);
+        assertNull(customer.getMembership());
     }
 
     @Test

@@ -186,7 +186,7 @@ public class Customer {
     public Membership getMembership() {
         if (membership == null || membership.getExpirationDate().isBefore(LocalDate.now())) {
             membership = null;                              // tas den bort om du glömt att renew:a den, tappar då alla poäng
-            throw new IllegalStateException("Non-member");
+            return null;
         }
         return membership;
     }
