@@ -41,12 +41,41 @@ public class WeightPriceTest {
      */
 
     @Test
+    @DisplayName("Constructor: PIECE throws exception")
+    void constructorPieceThrowsException(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        try {
+            @SuppressWarnings("unused")
+            WeightPrice weightPrice = new WeightPrice(pricePerPiece, Unit.PIECE);
+            assert(false);
+        } catch (IllegalArgumentException e) {
+            assert(true);
+        }
+    }
+    @Test
+    @DisplayName("calculatePrice: amount < 0.001 throws exception")
+    void calculatePriceAmountLessThanMinimumThrowsException(){    
+        Money pricePerKg = new Money(1000); // 10.00 kr per kg
+        WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
+        org.example.Product.Quantity quantity = new org.example.Product.Quantity (0.0009, Unit.KG);
+
+        try {
+            weightPrice.calculatePrice(quantity);
+            assert(false); 
+        } catch (IllegalArgumentException e) {
+            assert(true);
+        }
+    }
+
+
+    @Test
     @DisplayName("Can create WeightPrice with kilogram as unit")
         void canCreateWeightPriceWithKilogramAsUnit(){
             Money pricePerKg = new Money(1000); // 10.00 kr per kg
             WeightPrice weightPrice = new WeightPrice(pricePerKg, Unit.KG);
             assert(weightPrice != null);
         }
+    
 
     @Test
     @DisplayName("Can create WeightPrice with hectogram as unit")

@@ -1,5 +1,7 @@
 package org;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.example.Money;
 import org.example.Product.Quantity;
 import org.example.Product.Unit;
@@ -22,9 +24,30 @@ public class UnitPriceTest {
      * kastar undantag för negativt pris per enhet
      */
 
-     @Test
-     @DisplayName("Calculate price for one unit correctly")
-     void calculatesCorrectPriceForOneUnit(){
+    @Test
+    @DisplayName("Constructor: throws exception for null price per piece")
+    void constructorThrowsExceptionForNullPricePerPiece(){
+        assertThrows(Exception.class, () -> new UnitPrice(null));
+
+    }
+
+    @Test
+    @DisplayName("Calculate price with quantity amount < 1 throws exception")
+    void calculatePriceWithQuantityAmountLessThanOneThrowsException(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        UnitPrice unitPrice = new UnitPrice(pricePerPiece);
+        try {
+            Quantity quantity = new Quantity (0, Unit.PIECE);
+            unitPrice.calculatePrice(quantity);
+            assert(false);
+        } catch (IllegalArgumentException e) {
+            assert(true);
+        }
+    }
+
+    @Test
+    @DisplayName("Calculate price for one unit correctly")
+    void calculatesCorrectPriceForOneUnit(){
         Money pricePerPiece = new Money(100); // 1.00 kr per piece
         UnitPrice unitPrice = new UnitPrice(pricePerPiece);
         Quantity quantity = new Quantity (1, Unit.PIECE);
@@ -33,11 +56,11 @@ public class UnitPriceTest {
         Money actualPrice = unitPrice.calculatePrice(quantity);
 
         assert(expectedPrice.equals(actualPrice));
-     }
+    }
 
-     @Test
-     @DisplayName("Calculate price for multiple units correctly")
-     void calculatesCorrectPriceForMultipleUnit(){
+    @Test
+    @DisplayName("Calculate price for multiple units correctly")
+    void calculatesCorrectPriceForMultipleUnit(){
         Money pricePerPiece = new Money(1500); // 15.00 kr per piece
         UnitPrice unitPrice = new UnitPrice(pricePerPiece);
         Quantity quantity = new Quantity (3, Unit.PIECE);
@@ -45,11 +68,11 @@ public class UnitPriceTest {
         Money actualPrice = unitPrice.calculatePrice(quantity);
 
         assert(expectedPrice.equals(actualPrice));
-     }
+    }
 
-     @Test
-     @DisplayName("Rounds off correctly for decimal results")
-     void roundsOffCorrectlyForDecimalResults(){
+    @Test
+    @DisplayName("Rounds off correctly for decimal results")
+    void roundsOffCorrectlyForDecimalResults(){
         Money pricePerPiece = new Money(333); // 3.33 kr per piece
         UnitPrice unitPrice = new UnitPrice(pricePerPiece);
         Quantity quantity = new Quantity (3, Unit.PIECE);
@@ -57,11 +80,11 @@ public class UnitPriceTest {
         Money actualPrice = unitPrice.calculatePrice(quantity);
 
         assert(expectedPrice.equals(actualPrice));
-     }
+    }
 
-     @Test
-     @DisplayName("Throws exception for wrong unit")
-     void throwsExceptionForWrongUnit(){
+    @Test
+    @DisplayName("Throws exception for wrong unit")
+    void throwsExceptionForWrongUnit(){
         Money pricePerPiece = new Money(100); // 1.00 kr per piece
         UnitPrice unitPrice = new UnitPrice(pricePerPiece);
         Quantity quantity = new Quantity (1, Unit.KG);
@@ -72,7 +95,7 @@ public class UnitPriceTest {
         } catch (IllegalArgumentException e) {
             assert(true); // expected exception
         }
-     }
+    }
 
     @Test
     @DisplayName("Handles very large quantities correctly")

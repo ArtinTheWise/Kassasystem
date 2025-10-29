@@ -1,5 +1,7 @@
 package org.example;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.example.Product.Quantity;
 import org.example.Product.UnitPrice;
 import org.example.Product.UnitPriceWithPant;
@@ -18,6 +20,56 @@ public class UnitPriceWithPantTest {
      * kastar undantag med negativ pant
      * kastar undantag om fel enhet används
      */
+
+    @Test
+    @DisplayName("calculatePrice: quantity < 1 throws exception")
+    void calculatePriceWithQuantityAmountLessThanOneThrowsException(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        Money pantPerPiece = new Money(20); // 0.20 kr pant per piece
+        UnitPrice basePrice = new UnitPrice(pricePerPiece);
+        UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
+        try {
+            Quantity quantity = new Quantity (0, org.example.Product.Unit.PIECE);
+            unitPriceWithPant.calculatePrice(quantity);
+            assert(false);
+        } catch (IllegalArgumentException e) {
+            assert(true);
+        }
+    }
+
+    @Test
+    @DisplayName("getPantPerPiece returns correct pant per piece")
+    void getPantPerPieceReturnsCorrectPantPerPiece(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        Money pantPerPiece = new Money(20); // 0.20 kr pant per piece
+        UnitPrice basePrice = new UnitPrice(pricePerPiece);
+        UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
+
+        assert(unitPriceWithPant.getPantPerPiece().equals(pantPerPiece));
+    }
+
+    @Test
+    @DisplayName("getUnitPrice returns correct base price")
+    void getUnitPriceReturnsCorrectBasePrice(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        Money pantPerPiece = new Money(20); // 0.20 kr pant per piece
+        UnitPrice basePrice = new UnitPrice(pricePerPiece);
+        UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
+
+        assert(unitPriceWithPant.getUnitPrice().equals(basePrice));
+    }
+
+    @Test
+    @DisplayName("getUnit returns PIECE")
+    void getUnitReturnsPiece(){
+        Money pricePerPiece = new Money(100); // 1.00 kr per piece
+        Money pantPerPiece = new Money(20); // 0.20 kr pant per piece
+        UnitPrice basePrice = new UnitPrice(pricePerPiece);
+        UnitPriceWithPant unitPriceWithPant = new UnitPriceWithPant(basePrice, pantPerPiece);
+
+        assert(unitPriceWithPant.getUnit() == org.example.Product.Unit.PIECE);
+    }
+
 
     @Test
     @DisplayName("Calculate total price with pant for one unit")

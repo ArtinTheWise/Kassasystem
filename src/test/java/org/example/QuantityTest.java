@@ -1,5 +1,7 @@
 package org.example;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.example.Product.Quantity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,11 @@ public class QuantityTest {
      * hanterar liten vikt för HG korrekt
      */
 
+    @Test
+    @DisplayName("Constructor: null Unit throws exception")
+    void createQuantityNullUnitThrowsException(){
+        assertThrows(Exception.class, () -> new Quantity(5, null));
+    }
 
     @Test
     @DisplayName("Create quantity with whole number for PIECE")
