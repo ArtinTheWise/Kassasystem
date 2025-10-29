@@ -1,6 +1,6 @@
-package org.example;
+package org.example.Product;
 
-import org.example.Product.*;
+import org.example.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ public class ProductTest {
     }
 
     @Test
-    void constructorsThrowExceptionForNullName() {
+    void constructorsThrowExceptionForNullOrBlankName() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Product(null, new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false)
         );
@@ -58,6 +58,15 @@ public class ProductTest {
         );
         assertThrows(IllegalArgumentException.class, () ->
                 new Product(null, new UnitPrice(new Money(1500)), FOOD)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("", new UnitPrice(new Money(1500)), new ProductGroup("Godis"), FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("", new UnitPrice(new Money(1500)), FOOD, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                new Product("", new UnitPrice(new Money(1500)), FOOD)
         );
     }
 

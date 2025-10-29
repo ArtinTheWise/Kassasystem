@@ -56,8 +56,8 @@ public class Customer {
         if (localPart.isEmpty() || localPart.length() > 64) {
             throw new IllegalArgumentException("Invalid local part length");
         }
-        if (localPart.startsWith(".") || localPart.endsWith(".")) {
-            throw new IllegalArgumentException("Local part cannot start or end with dot");
+        if (localPart.startsWith(".")) {
+            throw new IllegalArgumentException("Local part cannot start with dot");
         }
         if (localPart.contains("..")) {
             throw new IllegalArgumentException("Local part cannot have consecutive dots");
@@ -186,7 +186,7 @@ public class Customer {
     public Membership getMembership() {
         if (membership == null || membership.getExpirationDate().isBefore(LocalDate.now())) {
             membership = null;                              // tas den bort om du glömt att renew:a den, tappar då alla poäng
-            throw new IllegalStateException("Non-member");
+            return null;
         }
         return membership;
     }

@@ -39,7 +39,7 @@ class CustomerTest {
     @Test
     void isMemberTest() {
         Customer customer = new Customer(validSSN, validEmailAddress);
-        assertThrows(IllegalStateException.class, customer::getMembership); // kollar att man inte är det från början
+        assertNull(customer.getMembership());// kollar att man inte är det från början
         customer.becomeMember();
         assertNotNull(customer.getMembership());
     }
@@ -49,7 +49,7 @@ class CustomerTest {
         Customer customer = new Customer("158204301234", validEmailAddress);
         customer.becomeMember();
         customer.getMembership().changeExpirationDate(LocalDate.of(1600, 4, 30));//test metod bara
-        assertThrows(IllegalStateException.class, customer::getMembership);
+        assertNull(customer.getMembership());
     }
 
     @Test
@@ -70,7 +70,7 @@ class CustomerTest {
         Customer customer = new Customer(validSSN, validEmailAddress);
         customer.becomeMember();
         customer.cancelMembership();
-        assertThrows(IllegalStateException.class, customer::getMembership);
+        assertNull(customer.getMembership());
     }
 
     @Test
@@ -78,8 +78,7 @@ class CustomerTest {
         String[] invalidEmails = {
                 "", "Å@test.se", "A @test.se", "A..@test.se",
                 "A.se", "@test.se", ".A@Test.se", "a@.com",
-                "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c.",
-                "A..A@test.se"
+                "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c."
         };
 
         for (String email : invalidEmails) {
@@ -114,7 +113,7 @@ class CustomerTest {
     void constructorAcceptsValidEmails() {
         String[] validEmails = {
                 "A.HEIDARI0554@GMAIL.COM",
-                "Aa\" \"1!@gmail.com",
+                "Aa\" \"1!.@gmail.com",
                 "\"test\\\"user\"@gmail.com"
         };
 
@@ -122,4 +121,27 @@ class CustomerTest {
             assertDoesNotThrow(() -> new Customer(validSSN, email));
         }
     }
+    @Test
+    void constructorSetsAgeAndStudentCorrectly() {
+        Customer c = new Customer(validSSN, validEmailAddress, 25, true);
+        assertEquals(25, c.getAge());
+        assertTrue(c.isStudent());
+    }
+    @Test
+    void defaultConstructorSetsAgeAndStudentCorrectly() {
+        Customer c = new Customer(validSSN, validEmailAddress);
+        assertEquals(18, c.getAge());
+        assertFalse(c.isStudent());
+    }
+    @Test
+    void cancelMembershipCallsCustomerCancelMembership() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+        Membership membership = customer.getMembership();
+
+        membership.cancelMembership();
+
+        assertNull(customer.getMembership());
+    }
+
 }

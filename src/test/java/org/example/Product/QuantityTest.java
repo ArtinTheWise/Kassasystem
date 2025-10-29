@@ -1,8 +1,7 @@
-package org.example;
+package org.example.Product;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.example.Product.Quantity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
