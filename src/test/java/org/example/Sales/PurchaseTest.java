@@ -8,12 +8,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.example.Money;
 import org.example.Discount.DiscountManager;
 import org.example.Discount.PercentageDiscount;
+import org.example.Discount.ProductDecorator;
 import org.example.Discount.NormalDiscount;
 import org.example.Discount.ThreeForTwoDiscount;
 import org.example.Product.PriceModel;
@@ -56,6 +56,138 @@ public class PurchaseTest {
      *      Hämta en rabatt
      *      Välja den bästa rabatt om flera är tillgängliga
      */
+
+
+    private DiscountManager mockDiscountManager(ProductDecorator... discounts) {
+        DiscountManager dm = mock(DiscountManager.class);
+
+        lenient().when(dm.getBestDiscount(any(Product.class), any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Product p = inv.getArgument(0);
+                Quantity q = inv.getArgument(1);
+
+            // original gross
+                Money orig = p.calculatePriceWithVat(q);
+                long bestVal = (orig != null) ? orig.getAmountInMinorUnits() : Long.MAX_VALUE;
+                Product best = p;
+
+                for (ProductDecorator d : discounts) {
+                    if (d.getProduct() == p && (d.isActive())) {
+                        Money cand = d.calculatePriceWithVat(q);
+                        if (cand == null) cand = d.calculatePrice(q);
+                        if (cand != null && cand.getAmountInMinorUnits() < bestVal) {
+                            bestVal = cand.getAmountInMinorUnits();
+                            best = d; // return the decorator itself (works with your Purchase logic)
+                        }
+                    }
+                }
+                return best;
+            });
+
+        return dm;
+    }
+
+    private ThreeForTwoDiscount mockThreeForTwoDiscount(Product product) {
+        ThreeForTwoDiscount d = mock(ThreeForTwoDiscount.class);
+
+        lenient().when(d.getProduct()).thenReturn(product);
+        lenient().when(d.isActive()).thenReturn(true);
+
+        // Net
+        lenient().when(d.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+
+                // Enforce PIECE like the real constructor does
+                if (q.getUnit() != Unit.PIECE) {
+                    throw new IllegalArgumentException("ThreeForTwoDiscount requires PIECE unit");
+                }
+
+                long free = (long) Math.floor(q.getAmount() / 3.0);
+                double chargedAmount = Math.max(0d, q.getAmount() - free);
+                Quantity charged = new Quantity(chargedAmount, q.getUnit());
+
+                return product.calculatePrice(charged);
+            });
+
+    // Gross
+        lenient().when(d.calculatePriceWithVat(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+
+                if (q.getUnit() != Unit.PIECE) {
+                    throw new IllegalArgumentException("ThreeForTwoDiscount requires PIECE unit");
+                }
+
+                long free = (long) Math.floor(q.getAmount() / 3.0);
+                double chargedAmount = Math.max(0d, q.getAmount() - free);
+                Quantity charged = new Quantity(chargedAmount, q.getUnit());
+
+                return product.calculatePriceWithVat(charged);
+            });
+
+        return d;
+    }
+
+    private NormalDiscount mockNormalDiscount(Product product, int discountMinor) {
+        NormalDiscount d = mock(NormalDiscount.class);
+
+        lenient().when(d.getProduct()).thenReturn(product);
+        lenient().when(d.isActive()).thenReturn(true);
+
+        // Net: amount - discount * qty
+        lenient().when(d.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                Money net = product.calculatePrice(q);
+                if (net == null) return null;
+                long qty = Math.round(q.getAmount());
+                long discounted = Math.max(0L, net.getAmountInMinorUnits() - discountMinor * qty);
+                return new Money(discounted);
+            });
+
+        // Gross: amount - discount (once)
+        lenient().when(d.calculatePriceWithVat(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                Money gross = product.calculatePriceWithVat(q);
+                if (gross == null) return null;
+                long discounted = Math.max(0L, gross.getAmountInMinorUnits() - discountMinor);
+                return new Money(discounted);
+            });
+
+        return d;
+    }
+
+    private PercentageDiscount mockPercentageDiscount(Product product, int percent) {
+        PercentageDiscount d = mock(PercentageDiscount.class);
+
+        lenient().when(d.getProduct()).thenReturn(product);
+        lenient().when(d.isActive()).thenReturn(true);
+
+        // Net
+        lenient().when(d.calculatePrice(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                Money net = product.calculatePrice(q);
+                if (net == null) return null;
+                long discounted = Math.round(net.getAmountInMinorUnits() * (1 - (percent / 100.0)));
+                return new Money(discounted);
+            });
+
+        // Gross (used by your tests)
+        lenient().when(d.calculatePriceWithVat(any(Quantity.class)))
+            .thenAnswer(inv -> {
+                Quantity q = inv.getArgument(0);
+                Money gross = product.calculatePriceWithVat(q);
+                if (gross == null) return null;
+                long discounted = Math.round(gross.getAmountInMinorUnits() * (1 - (percent / 100.0)));
+                return new Money(discounted);
+            });
+
+        return d;
+    }
+
 
 
     private Cashier mockCashier(){
@@ -163,6 +295,8 @@ public class PurchaseTest {
         Product p = mock(Product.class, name);
         UnitPrice pm = mock(UnitPrice.class);
         lenient().when(p.getPriceModel()).thenReturn(pm);
+
+        lenient().when(p.getName()).thenReturn(name);
 
         lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
@@ -509,11 +643,10 @@ public class PurchaseTest {
     void applyDiscounts_PercentageDiscount(){
 
         Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends);
-        DiscountManager discountManager = new DiscountManager(percentageDiscount);
+        PercentageDiscount percentageDiscount = mockPercentageDiscount(banana, 25);
+        DiscountManager mockDiscountManager = mockDiscountManager(percentageDiscount);
 
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -528,12 +661,11 @@ public class PurchaseTest {
     void applyDiscounts_BestPercentageDiscount(){
 
         Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 12, ends); // 12 %
-        PercentageDiscount percentageDiscountTwo = new PercentageDiscount(banana, 25, ends); // 25 %
-        DiscountManager discountManager = new DiscountManager(percentageDiscount, percentageDiscountTwo);
+        PercentageDiscount mockPercentageDiscount = mockPercentageDiscount(banana, 12); // 12 %
+        PercentageDiscount mockPercentageDiscountTwo = mockPercentageDiscount(banana, 25); // 25 %
+        DiscountManager mockDiscountManager = mockDiscountManager(mockPercentageDiscount, mockPercentageDiscountTwo);
         
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -548,13 +680,13 @@ public class PurchaseTest {
     void applyDiscounts_BestDiscountNormalAndPercentage(){
         
         Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        LocalDateTime starts = LocalDateTime.now();
-        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends); // 25 % - ^ 1600 --> 1200
-        NormalDiscount normalDiscount = new NormalDiscount(banana, 600, starts, ends); // 600kr - ^ 1600 --> 1000
-        DiscountManager discountManager = new DiscountManager(percentageDiscount, normalDiscount);
+
+        PercentageDiscount mockPercentageDiscount = mockPercentageDiscount(banana, 25); // 25 %
+        NormalDiscount mockNormalDiscount = mockNormalDiscount(banana, 600); // 600 kr
+
+        DiscountManager mockDiscountManager = mockDiscountManager(mockPercentageDiscount, mockNormalDiscount);
         
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManager);
 
         purchase.addPiece(banana);
         purchase.applyDiscounts();
@@ -569,11 +701,11 @@ public class PurchaseTest {
     void applyDiscounts_ThreeForTwoDiscount(){
 
         Product banana = mockUnitProductGrossOnly("Banana", new Money(1600));
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        ThreeForTwoDiscount threeForTwoDiscount = new ThreeForTwoDiscount(banana, ends); // 3 for 2 = 1600 x 3 - 1 unit = 3200kr
-        DiscountManager discountManager = new DiscountManager(threeForTwoDiscount);
+
+        ThreeForTwoDiscount mockThreeForTwoDiscount = mockThreeForTwoDiscount(banana); // 3 for 2 = 1600 x 3 - 1 unit = 3200kr
+        DiscountManager mockDiscountManager = mockDiscountManager(mockThreeForTwoDiscount);
         
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManager);
 
         purchase.addPiece(banana);
         purchase.addPiece(banana);
@@ -590,12 +722,11 @@ public class PurchaseTest {
     // Correct flow is net price + vat - discount + pant
     void applyDiscountOnPant(){
         Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1300)); //1kr pant
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        LocalDateTime starts = LocalDateTime.now();
         
-        NormalDiscount normalDiscount = new NormalDiscount(cola, 200, starts, ends); // cola 1300 --> 1100
-        DiscountManager discountManager = new DiscountManager(normalDiscount);
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        NormalDiscount normalDiscount = mockNormalDiscount(cola, 200);
+        DiscountManager mockDiscountManager = mockDiscountManager(normalDiscount);
+
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManager);
 
         purchase.addPiece(cola); // 1300
         purchase.applyDiscounts(); // 1100
@@ -617,16 +748,15 @@ public class PurchaseTest {
         Product cola = mockUnitProductWithPantGrossOnly("Coca Cola 33cl", new Money(1300)); //1kr pant
 
         //Discounts
-        LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
-        LocalDateTime starts = LocalDateTime.now();
-        ThreeForTwoDiscount threeForTwoDiscount = new ThreeForTwoDiscount(banana, ends); // 3 for 2 = 1000 istället för 1500
-        PercentageDiscount percentageDiscount = new PercentageDiscount(banana, 25, ends); // banana 25% 500 --> 375
-        NormalDiscount normalDiscount = new NormalDiscount(apple, 100, starts, ends); // apple 400 --> 300
-        NormalDiscount normalDiscountTwo = new NormalDiscount(cola, 200, starts, ends); // cola 1300 --> 1100
-
-        DiscountManager discountManager = new DiscountManager(threeForTwoDiscount, percentageDiscount, normalDiscount, normalDiscountTwo);
-
-        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), discountManager);
+        ThreeForTwoDiscount mockThreeForTwoDiscount = mockThreeForTwoDiscount(banana); // 3 for 2 = 1000 istället för 1500
+        PercentageDiscount mockPercentageDiscount = mockPercentageDiscount(banana, 25);
+        NormalDiscount mockNormalDiscount = mockNormalDiscount(apple, 100);
+        NormalDiscount mockNormalDiscountTwo = mockNormalDiscount(cola, 200);
+        DiscountManager mockDiscountManger = mockDiscountManager(mockThreeForTwoDiscount, 
+            mockPercentageDiscount, 
+            mockNormalDiscount, 
+            mockNormalDiscountTwo);
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier(), mockDiscountManger);
 
         purchase.addPiece(banana);
         purchase.addPiece(banana);
@@ -657,10 +787,7 @@ public class PurchaseTest {
 
         assertThrows(Exception.class, () -> purchase.applyDiscounts());
 
-
-
     }
-
 
 
 
