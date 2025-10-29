@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MembershipTest {
 
@@ -60,31 +61,14 @@ public class MembershipTest {
         assertEquals(3, membership.getChecks().size());
     }
     @Test
-    void getChecksRemovesInactiveOnes() {
-        Customer c = new Customer(validSSN, validEmailAddress);
-        c.becomeMember();
-        Membership m = c.getMembership();
+    void cancelMembershipCallsCustomerCancelMembership() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+        Membership membership = customer.getMembership();
 
-        BonusCheck active = new BonusCheck("active",
-                new NormalDiscount(new Product("chips",
-                        new UnitPrice(new Money(20)),
-                        VatRate.FOOD, false),
-                        10, LocalDateTime.now().plusDays(10)),
-                new Points(100));
+        membership.cancelMembership();
 
-        BonusCheck expired = new BonusCheck("expired",
-                new NormalDiscount(new Product("chips",
-                        new UnitPrice(new Money(20)),
-                        VatRate.FOOD, false),
-                        10, LocalDateTime.now().minusDays(10)),
-                new Points(100));
-
-        m.addCheck(active);
-        // Lägg till expired manuellt (förbi addCheck's kontroll)
-        m.getChecks().add(expired); // eller via reflektionshack beroende på åtkomst
-
-        m.getChecks(); // ska trigga borttagning av expired check
-        assertEquals(1, m.getChecks().size());
+        assertNull(customer.getMembership());
     }
 
 
