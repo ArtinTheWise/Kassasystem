@@ -198,7 +198,7 @@ public class Customer {
                     Integer.parseInt(socialSecurityNumber.substring(4,6)),
                     Integer.parseInt(socialSecurityNumber.substring(6,8))
             );
-            if (age.isEqual(LocalDate.now())||age.isBefore(LocalDate.now())) {
+            if (age.isBefore(LocalDate.now())) {
                 membership = new Membership(this);
             }
         }

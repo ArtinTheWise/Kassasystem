@@ -45,6 +45,22 @@ class CustomerTest {
     }
 
     @Test
+    void tooYoungToBecomeMember() {
+        Customer c = new Customer("201001010002", validEmailAddress);
+        c.becomeMember();
+        assertNull(c.getMembership());
+    }
+
+    @Test
+    void MemberBecomesMember() {
+        Customer c = new Customer(validSSN, validEmailAddress);
+        c.becomeMember();
+        assertNotNull(c.getMembership());
+        c.becomeMember();
+        assertNotNull(c.getMembership());
+    }
+
+    @Test
     void isExpiredMemberTest() {
         Customer customer = new Customer("158204301234", validEmailAddress);
         customer.becomeMember();
