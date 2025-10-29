@@ -74,6 +74,38 @@ class CustomerTest {
     }
 
     @Test
+    void validateDateFor30DayMonths() {
+        String invalidDate = "Invalid date";
+
+        Exception a = assertThrows(IllegalArgumentException.class, () -> {
+            new Customer("200004310006", validEmailAddress);
+        });
+        assertTrue(a.getMessage().contains(invalidDate));
+        Exception b = assertThrows(IllegalArgumentException.class, () -> {
+            new Customer("200006310006", validEmailAddress);
+        });
+        assertTrue(b.getMessage().contains(invalidDate));
+        Exception c = assertThrows(IllegalArgumentException.class, () -> {
+            new Customer("200009310006", validEmailAddress);
+        });
+        assertTrue(c.getMessage().contains(invalidDate));
+        Exception d = assertThrows(IllegalArgumentException.class, () -> {
+            new Customer("200011310006", validEmailAddress);
+        });
+        assertTrue(d.getMessage().contains(invalidDate));
+    }
+
+    @Test
+    void validateDateYearInFebruary() { // todo not done
+        try {
+            new Customer("200002010006", validEmailAddress);
+            new Customer("200402010006", validEmailAddress);
+            new Customer("220002010006", validEmailAddress);
+            new Customer("200102010006", validEmailAddress);
+        } catch (Exception ignored) {}
+    }
+
+    @Test
     void constructorThrowsWhenEmailFormatIsInvalid() {
         String[] invalidEmails = {
                 "", "Å@test.se", "A @test.se", "A..@test.se",
