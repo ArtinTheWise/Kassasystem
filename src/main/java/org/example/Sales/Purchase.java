@@ -124,9 +124,7 @@ public class Purchase {
             total += pricedFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
 
             if (p.getPriceModel() instanceof UnitPriceWithPant upm) {
-                if (q.getUnit() != Unit.PIECE) {
-                    throw new IllegalArgumentException("Pant product must be counted by PIECE");
-                }
+            
                 long pieces = Math.round(q.getAmount());
                 total += upm.getPantPerPiece().getAmountInMinorUnits() * pieces;
             }
@@ -135,28 +133,26 @@ public class Purchase {
 
     }
 
-    public void applyDiscounts(){
-        if (discountManager == null){
-            throw new IllegalStateException("DiscountManager is required for discounts");
-        }
-        Map<Product, Quantity> updated = new LinkedHashMap<>();
-        Map<Product, Product> chosen = new LinkedHashMap<>();
-
-        for (Map.Entry<Product, Quantity> e : items.entrySet()) {
-            Product base = e.getKey();
-            Quantity qty = e.getValue();
-
-            Product priced = discountManager.getBestDiscount(base, qty);
-
-            updated.merge(base, qty, (q1, q2) -> {
-                return new Quantity (q1.getAmount() + q2.getAmount(), q1.getUnit());
-            });
-
-            chosen.put(base, priced);
-        }
-        items = updated;
-        pricedByBase = chosen;
+public void applyDiscounts() {
+    if (discountManager == null) {
+        throw new IllegalStateException("DiscountManager is required for discounts");
     }
+
+    Map<Product, Quantity> updated = new LinkedHashMap<>();
+    Map<Product, Product> chosen  = new LinkedHashMap<>();
+
+    for (var e : items.entrySet()) {
+        Product base = e.getKey();
+        Quantity qty = e.getValue();
+        Product priced = discountManager.getBestDiscount(base, qty);
+
+        updated.put(base, qty);        // simple copy
+        chosen.put(base, priced);      // record mapping base -> priced
+    }
+
+    items = updated;
+    pricedByBase = chosen;
+}
 
     public Cashier getCashier(){ return cashier; }
 
