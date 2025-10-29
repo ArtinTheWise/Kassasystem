@@ -59,11 +59,18 @@ class CashRegisterTest {
     }
 
     @Test
-    void shouldStartNewPurchaseWhenLoggedIn_nonMemberCustomer() {
+    void nonMemberCustomerStartsAndEndsPurchase () {
         cashRegister.login(cashier);
+        Customer nonMember = new Customer(validSSN, validEmailAddress);
 
-        cashRegister.startPurchase(new Customer(validSSN, validEmailAddress));
-        assertNotNull(cashRegister.getPurchase());
+        assertNull(nonMember.getMembership());
+
+        assertDoesNotThrow( () -> {
+            cashRegister.startPurchase(nonMember);
+            Product coffee = new Product("Coffee", new UnitPrice(new Money(50)), VatRate.FOOD, false);
+            cashRegister.scanProduct(coffee, 1);
+            cashRegister.endPurchase();
+        });
     }
 
     @Test
@@ -339,7 +346,25 @@ class CashRegisterTest {
         // Kontrollera att bonuschecken finns kvar eftersom den inte användes
         assertFalse(customer.getMembership().getChecks().isEmpty(),
                 "BonusCheck should remain if it was not applied to any product");
+
+        // bonuscheck ska INTE användas (bättre rabatt finns)
+        // lägg till bättre rabatt
+        discountManager.addDiscount(
+                new PercentageDiscount(coffee, 70, LocalDateTime.now(), LocalDateTime.now().plusDays(1)));
+
+        cashRegister.startPurchase(customer);
+        cashRegister.scanProduct(coffee, 1);
+        cashRegister.getPurchase().applyDiscounts();
+        cashRegister.endPurchase();
+
+        // Kontrollera att bonuschecken finns kvar eftersom den inte användes
+        assertFalse(customer.getMembership().getChecks().isEmpty(),
+                "BonusCheck should remain if it was not applied to any product");
+
+
     }
+
+
 
 }
 
