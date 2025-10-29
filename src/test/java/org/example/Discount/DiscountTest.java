@@ -41,7 +41,10 @@ public class DiscountTest {
             Quantity q = inv.getArgument(0);
             return new Money(Math.round(q.getAmount() * price));
         });
-
+        lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
+            Quantity q = inv.getArgument(0);
+            return new Money(Math.round(q.getAmount() * price));
+        });
         return p;
     }
 
@@ -103,7 +106,7 @@ public class DiscountTest {
     @Test
     @DisplayName("ProductDecorator/constructor - null product throws exception")
     void constructorDoesNotAllowNullProduct() {
-        assertThrows(NullPointerException.class, () -> new PercentageDiscount(null, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_PAST, FIXED_DATE));
+        assertThrows(NullPointerException.class, () -> new PercentageDiscount(null, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE));
     }
 
     @ParameterizedTest
@@ -161,9 +164,11 @@ public class DiscountTest {
         Product productTwo = getMockProduct("Green Milk", 140);
         Product productThree = getMockProduct("Red Milk", 160);
         NormalDiscount activeDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        DiscountManager manager = new DiscountManager();
 
         ProductGroup productGroup = new ProductGroup("Dairy", product, productTwo, productThree);
-        ProductGroup discountedProductGroup = activeDiscount.discountGroup(productGroup, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductGroup discountedProductGroup = manager.discountGroup(productGroup, activeDiscount);
+
         assertEquals(i1, discountedProductGroup.getProductGroup().get(i2).calculatePrice(quantity(1)).getAmountInMinorUnits());
     }
 
@@ -377,54 +382,57 @@ public class DiscountTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"-1", "101"})
-    @DisplayName("SpecialDiscount/constructor - 0 > age > 100 throws exception")
-    void specialDiscountDoesNotAllowUnreasonableAges(int i1){
+    @CsvSource({"-1", "121"})
+    @DisplayName("SeniorDiscount/constructor - 0 > age > 100 throws exception")
+    void seniorDiscountDoesNotAllowUnreasonableAges(int i1){
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        assertThrows(IllegalArgumentException.class, () -> new SpecialDiscount(activeDiscount, i1, false));
+        assertThrows(IllegalArgumentException.class, () -> new SeniorDiscount(activeDiscount, i1));
     }
 
     @Test
-    @DisplayName("SpecialDiscount/calculatePrice - returns correct discounts when inactive")
-    void specialDiscountOnlyWorksIfActive(){
-        Customer student = getMockCustomer("Artin", 21, true);
+    @DisplayName("SeniorDiscount/calculatePrice - returns correct discounts when inactive")
+    void seniorDiscountOnlyWorksIfActive(){
+        Customer oldCustomer = getMockCustomer("Artin", 80, false);
         ProductDecorator inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
-        ProductDecorator studentDiscount = new SpecialDiscount(inactiveDiscount, true);
-        assertEquals(120, studentDiscount.calculatePrice(quantity(1), student).getAmountInMinorUnits());
+        ProductDecorator SeniorDiscount = new SeniorDiscount(inactiveDiscount, 80);
+        assertEquals(120, SeniorDiscount.calculatePrice(quantity(1), oldCustomer).getAmountInMinorUnits());
     }
 
     @Test
-    @DisplayName("SpecialDiscount/calculatePrice - returns correct discounts")
-    void specialDiscountGivesCorrectDiscountForStudentsAndElderly(){
-        Customer student = getMockCustomer("Artin", 21, true);
+    @DisplayName("SeniorDiscount/calculatePrice - returns correct discounts")
+    void seniorDiscountGivesCorrectDiscountForSeniors(){
         Customer normalCustomer = getMockCustomer("Martin", 18, false);
-        Customer elderly = getMockCustomer("Artina", 65, false);
-        Customer elderlyAndStudent = getMockCustomer("Martina", 65, true);
+        Customer elderly = getMockCustomer("Artina", 70, false);
 
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        ProductDecorator studentDiscount = new SpecialDiscount(activeDiscount, true);
-        ProductDecorator elderlyDiscount = new SpecialDiscount(activeDiscount, 65);
+        ProductDecorator seniorDiscount = new SeniorDiscount(activeDiscount, 65);
 
-        assertEquals(96, studentDiscount.calculatePrice(quantity(1), student).getAmountInMinorUnits());
-        assertEquals(120, studentDiscount.calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
-        assertEquals(120, studentDiscount.calculatePrice(quantity(1), elderly).getAmountInMinorUnits());
-        assertEquals(96, studentDiscount.calculatePrice(quantity(1), elderlyAndStudent).getAmountInMinorUnits());
-
-        assertEquals(120, elderlyDiscount.calculatePrice(quantity(1), student).getAmountInMinorUnits());
-        assertEquals(120, elderlyDiscount.calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
-        assertEquals(96, elderlyDiscount.calculatePrice(quantity(1), elderly).getAmountInMinorUnits());
-        assertEquals(96, elderlyDiscount.calculatePrice(quantity(1), elderlyAndStudent).getAmountInMinorUnits());
+        assertEquals(96, seniorDiscount.calculatePrice(quantity(1), elderly).getAmountInMinorUnits());
+        assertEquals(120, seniorDiscount.calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
     }
 
     @Test
-    @DisplayName("DiscountManager/getBestDiscount - returns cheapest discount when SpecialDiscount")
-    void specialDiscountGetsReturnedIfBestDiscount(){
+    @DisplayName("StudentDiscount/calculatePrice - returns correct discounts")
+    void studentDiscountGivesCorrectDiscountForStudents(){
+        Customer normalCustomer = getMockCustomer("Martin", 18, false);
+        Customer student = getMockCustomer("Artina", 21, true);
+
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator seniorDiscount = new StudentDiscount(activeDiscount);
+
+        assertEquals(96, seniorDiscount.calculatePrice(quantity(1), student).getAmountInMinorUnits());
+        assertEquals(120, seniorDiscount.calculatePrice(quantity(1), normalCustomer).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("DiscountManager/getBestDiscount - returns cheapest discount when StudentDiscount")
+    void studentDiscountGetsReturnedIfBestDiscount(){
         Customer student = getMockCustomer("Artin", 21, true);
         Customer normalCustomer = getMockCustomer("Martin", 18, false);
 
         ProductDecorator bestActiveDiscountNotInManager = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         ProductDecorator discountForNonStudents = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        ProductDecorator studentDiscount = new SpecialDiscount(bestActiveDiscountNotInManager, true);
+        ProductDecorator studentDiscount = new StudentDiscount(bestActiveDiscountNotInManager);
 
         DiscountManager manager = new DiscountManager(discountForNonStudents, studentDiscount);
 
@@ -522,7 +530,6 @@ public class DiscountTest {
         amount = 0;
         for (Map.Entry<Product, Quantity> entry : discountedItems.entrySet()) {
             Product p = entry.getKey();
-            Quantity q = entry.getValue();
             if(p instanceof OverXTotalDiscount){
                 amount = ((OverXTotalDiscount) p).calculatePrice(items).getAmountInMinorUnits();
             }

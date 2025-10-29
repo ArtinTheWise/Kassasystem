@@ -1,6 +1,5 @@
 package org.example.Discount;
 
-import org.example.Membership.Customer;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
@@ -8,27 +7,28 @@ import org.example.Product.Quantity;
 import java.util.Map;
 
 public class OverXTotalDiscount extends ProductDecorator {
-    private final ProductDecorator discount;
-    private final Money money;
+    private final ProductDecorator discountType;
+    private final Money priceThreshold;
 
-    public OverXTotalDiscount(ProductDecorator discount, Money money){
-        super(discount.getProduct(), discount.getStartTime(), discount.getEndTime(), discount.clock);
-        this.discount = discount;
-        this.money = money;
+    public OverXTotalDiscount(ProductDecorator discountType, Money priceThreshold){
+        super(discountType.getProduct(), discountType.getStartTime(), discountType.getEndTime(), discountType.clock);
+        if(!(discountType instanceof NormalDiscount) && !(discountType instanceof PercentageDiscount)) throw new IllegalArgumentException();
+        this.discountType = discountType;
+        this.priceThreshold = priceThreshold;
     }
 
     @Override
     public Money calculatePrice(Quantity q) {
-        if(!isActive() || !discount.isActive()) return discount.getProduct().calculatePrice(q);
-        if(discount.getProduct().calculatePrice(q).compareTo(money) > 0) return discount.calculatePrice(q);
-        return discount.getProduct().calculatePrice(q);
+        if(!isActive()) return discountType.getProduct().calculatePrice(q);
+        if(discountType.getProduct().calculatePriceWithVat(q).compareTo(priceThreshold) > 0) return discountType.calculatePrice(q);
+        return discountType.getProduct().calculatePrice(q);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity q) {
-        if(!isActive() || !discount.isActive()) return discount.getProduct().calculatePriceWithVat(q);
-        if(discount.getProduct().calculatePriceWithVat(q).compareTo(money) > 0) return discount.calculatePriceWithVat(q);
-        return discount.getProduct().calculatePriceWithVat(q);
+        if(!isActive()) return discountType.getProduct().calculatePriceWithVat(q);
+        if(discountType.getProduct().calculatePriceWithVat(q).compareTo(priceThreshold) > 0) return discountType.calculatePriceWithVat(q);
+        return discountType.getProduct().calculatePriceWithVat(q);
     }
 
     public Money calculatePrice(Map<Product, Quantity> items) {
@@ -38,12 +38,12 @@ public class OverXTotalDiscount extends ProductDecorator {
             Quantity q = entry.getValue();
             amount += p.calculatePrice(q).getAmountInMinorUnits();
         }
-        if(amount > money.getAmountInMinorUnits() && items.containsKey(discount.getProduct())){
+        if(amount > priceThreshold.getAmountInMinorUnits() && items.containsKey(discountType.getProduct())){
             long newAmount = 0;
             for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
                 Product p = entry.getKey();
                 Quantity q = entry.getValue();
-                newAmount += discount.createFor(p).calculatePrice(q).getAmountInMinorUnits();
+                newAmount += discountType.createFor(p).calculatePrice(q).getAmountInMinorUnits();
             }
             return new Money(newAmount);
         }
@@ -57,15 +57,20 @@ public class OverXTotalDiscount extends ProductDecorator {
             Quantity q = entry.getValue();
             amount += p.calculatePriceWithVat(q).getAmountInMinorUnits();
         }
-        if(amount > money.getAmountInMinorUnits() && items.containsKey(discount.getProduct())){
+        if(amount > priceThreshold.getAmountInMinorUnits() && items.containsKey(discountType.getProduct())){
             long newAmount = 0;
             for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
                 Product p = entry.getKey();
                 Quantity q = entry.getValue();
-                newAmount += discount.createFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
+                newAmount += discountType.createFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
             }
             return new Money(newAmount);
         }
         return new Money(amount);
+    }
+
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new OverXTotalDiscount(discountType.createFor(product), priceThreshold);
     }
 }

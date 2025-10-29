@@ -13,10 +13,9 @@ public abstract class ProductDecorator extends Product {
     private final Product product;
     protected final Clock clock;
 
-    public ProductDecorator(Product product, LocalDateTime startTime, LocalDateTime endTime, Clock clock){
+    public ProductDecorator(Product product, LocalDateTime startTime, LocalDateTime endTime, Clock clock){ //Clock is used for testing
         super(product.getName(), product.getPriceModel(), product.getProductGroup(), product.getVatRate(), product.getAgeRestriction());
 
-        if(product == null) throw new NullPointerException();
         if (startTime == null || endTime == null) {throw new IllegalArgumentException("Start time and end time can't be null.");}
         if (endTime.isBefore(startTime)) {throw new IllegalArgumentException("Start time must be before end time.");}
 
@@ -60,14 +59,15 @@ public abstract class ProductDecorator extends Product {
     }
 
     public Money calculatePriceWithVat(Quantity quantity, Customer customer) {
-        return calculatePrice(quantity); //Needed for specialDiscount
+        return calculatePriceWithVat(quantity); //Needed for specialDiscount
     }
 
     public Money getDiscountedAmount(Quantity quantity){
-        return new Money(getProduct().calculatePrice(quantity).getAmountInMinorUnits() - calculatePrice(quantity).getAmountInMinorUnits());
+        long originalPrice = getProduct().calculatePrice(quantity).getAmountInMinorUnits();
+        long discountedPrice = calculatePrice(quantity).getAmountInMinorUnits();
+
+        return new Money(originalPrice - discountedPrice);
     }
 
-    public ProductDecorator createFor(Product product) {
-        throw new UnsupportedOperationException("This decorator must implement createFor(Product)"); //Needed for OverXTotalDiscount
-    }
+    public abstract ProductDecorator createFor(Product product);
 }

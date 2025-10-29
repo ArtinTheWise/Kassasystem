@@ -2,7 +2,6 @@ package org.example.Discount;
 
 import org.example.Money;
 import org.example.Product.Product;
-import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -38,25 +37,11 @@ public class ThreeForTwoDiscount extends ProductDecorator {
 
     private Money calculatePriceForQuantity(Quantity q, boolean withVat) {
         double amount = q.getAmount();
-        long free = (long) Math.floor(amount / 3);
-        double chargedAmount = Math.max(0d, amount - free);
+        long freeQuantity = (long) Math.floor(amount / 3);
+        double chargedAmount = Math.max(0d, amount - freeQuantity);
         Quantity charged = new Quantity(chargedAmount, q.getUnit());
 
         return withVat ? getProduct().calculatePriceWithVat(charged) : getProduct().calculatePrice(charged);
-    }
-
-    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
-        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
-
-        for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(new ThreeForTwoDiscount(p, startTime, endTime, clock));
-        }
-
-        return discountedProductGroup;
-    }
-
-    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
-        return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 
     @Override

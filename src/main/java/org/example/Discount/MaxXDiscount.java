@@ -5,46 +5,47 @@ import org.example.Product.Product;
 import org.example.Product.Quantity;
 
 public class MaxXDiscount extends ProductDecorator {
-    private final int max;
-    private final ProductDecorator discount;
+    private final int max; //Max amount discount can be applied
+    private final ProductDecorator discountType;
 
-    public MaxXDiscount(ProductDecorator discount, int max){
-        super(discount.getProduct(), discount.getStartTime(), discount.getEndTime(), discount.clock);
+    public MaxXDiscount(ProductDecorator discountType, int max){
+        super(discountType.getProduct(), discountType.getStartTime(), discountType.getEndTime(), discountType.clock);
         if(max < 1) throw new IllegalArgumentException();
+        if (max == Integer.MAX_VALUE) throw new IllegalArgumentException("max must be less than Integer.MAX_VALUE");
         this.max = max;
-        this.discount = discount;
+        this.discountType = discountType;
     }
 
     @Override
     public Money calculatePrice(Quantity quantity) {
-        if (isActive() && discount.isActive()) {
+        if (isActive()) {
             if((int) quantity.getAmount() > max){
                 int notDiscountedAmount = (int) quantity.getAmount() - max;
-                long discounted = discount.calculatePrice(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
-                long notDiscounted = discount.getProduct().calculatePrice(new Quantity(notDiscountedAmount, quantity.getUnit())).getAmountInMinorUnits();
+                long discounted = discountType.calculatePrice(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
+                long notDiscounted = discountType.getProduct().calculatePrice(new Quantity(notDiscountedAmount, quantity.getUnit())).getAmountInMinorUnits();
                 return new Money(discounted+notDiscounted);
             }
-            return discount.calculatePrice(quantity);
+            return discountType.calculatePrice(quantity);
         }
-        return discount.getProduct().calculatePrice(quantity);
+        return discountType.getProduct().calculatePrice(quantity);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity quantity) {
-        if (isActive() && discount.isActive()) {
+        if (isActive()) {
             if((int) quantity.getAmount() > max){
                 int notDiscountedAmount = (int) quantity.getAmount() - max;
-                long discounted = discount.calculatePriceWithVat(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
-                long notDiscounted = discount.getProduct().calculatePriceWithVat(new Quantity(notDiscountedAmount, quantity.getUnit())).getAmountInMinorUnits();
+                long discounted = discountType.calculatePriceWithVat(new Quantity(max, quantity.getUnit())).getAmountInMinorUnits();
+                long notDiscounted = discountType.getProduct().calculatePriceWithVat(new Quantity(notDiscountedAmount, quantity.getUnit())).getAmountInMinorUnits();
                 return new Money(discounted+notDiscounted);
             }
-            return discount.calculatePriceWithVat(quantity);
+            return discountType.calculatePriceWithVat(quantity);
         }
-        return discount.getProduct().calculatePriceWithVat(quantity);
+        return discountType.getProduct().calculatePriceWithVat(quantity);
     }
 
     @Override
     public ProductDecorator createFor(Product product) {
-        return new MaxXDiscount(discount.createFor(product), max);
+        return new MaxXDiscount(discountType.createFor(product), max);
     }
 }

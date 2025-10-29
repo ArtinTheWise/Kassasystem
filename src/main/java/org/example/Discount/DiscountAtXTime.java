@@ -9,13 +9,13 @@ import java.time.LocalTime;
 public class DiscountAtXTime extends ProductDecorator {
     private final LocalTime startTimeInDay;
     private final LocalTime endTimeInDay;
-    private final ProductDecorator discount;
+    private final ProductDecorator discountType;
 
-    public DiscountAtXTime(ProductDecorator discount, LocalTime startTimeInDay, LocalTime endTimeInDay){
-        super(discount.getProduct(), discount.getStartTime(), discount.getEndTime(), discount.clock);
+    public DiscountAtXTime(ProductDecorator discountType, LocalTime startTimeInDay, LocalTime endTimeInDay){
+        super(discountType.getProduct(), discountType.getStartTime(), discountType.getEndTime(), discountType.clock);
         if(startTimeInDay.isAfter(endTimeInDay) || startTimeInDay.equals(endTimeInDay)) throw new IllegalArgumentException();
 
-        this.discount = discount;
+        this.discountType = discountType;
         this.startTimeInDay = startTimeInDay;
         this.endTimeInDay = endTimeInDay;
     }
@@ -25,24 +25,24 @@ public class DiscountAtXTime extends ProductDecorator {
         LocalDateTime now = LocalDateTime.now(clock);
         LocalTime currentTime = now.toLocalTime();
 
-        if(discount.isActive() && !currentTime.isBefore(startTimeInDay) && !currentTime.isAfter(endTimeInDay)) return true;
+        if(discountType.isActive() && !currentTime.isBefore(startTimeInDay) && !currentTime.isAfter(endTimeInDay)) return true;
         return false;
     }
 
     @Override
     public Money calculatePrice(Quantity quantity) {
-        if (isActive()) return discount.calculatePrice(quantity);
-        return discount.getProduct().calculatePrice(quantity);
+        if (isActive()) return discountType.calculatePrice(quantity);
+        return discountType.getProduct().calculatePrice(quantity);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity quantity) {
-        if (isActive()) return discount.calculatePriceWithVat(quantity);
-        return discount.getProduct().calculatePriceWithVat(quantity);
+        if (isActive()) return discountType.calculatePriceWithVat(quantity);
+        return discountType.getProduct().calculatePriceWithVat(quantity);
     }
 
     @Override
     public ProductDecorator createFor(Product product) {
-        return new DiscountAtXTime(discount.createFor(product), startTimeInDay, endTimeInDay);
+        return new DiscountAtXTime(discountType.createFor(product), startTimeInDay, endTimeInDay);
     }
 }

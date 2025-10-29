@@ -2,7 +2,6 @@ package org.example.Discount;
 
 import org.example.Money;
 import org.example.Product.Product;
-import org.example.Product.ProductGroup;
 import org.example.Product.Quantity;
 
 import java.time.Clock;
@@ -27,42 +26,18 @@ public class NormalDiscount extends ProductDecorator {
 
     @Override
     public Money calculatePrice(Quantity q) {
-        Money net = getProduct().calculatePrice(q);
+        if (!isActive()) return getProduct().calculatePrice(q);
 
-        if (!isActive()) return net;
-        if (net == null) return null; // undvik NPE
-
-        long amount = net.getAmountInMinorUnits();
-        long discounted = Math.max(0L, amount - discount * (long) q.getAmount());
-
+        long discounted = Math.max(0L, getProduct().calculatePrice(q).getAmountInMinorUnits() - discount * (long) q.getAmount());
         return new Money(discounted);
     }
 
     @Override
     public Money calculatePriceWithVat(Quantity q) {
-        Money gross = getProduct().calculatePriceWithVat(q);
+        if (!isActive()) return getProduct().calculatePriceWithVat(q);
 
-        if (!isActive()) return gross;
-        if (gross == null) return null; // undvik NPE
-
-        long amount = gross.getAmountInMinorUnits();
-        long discounted = Math.max(0L, amount - (long) discount);
-
+        long discounted = Math.max(0L, getProduct().calculatePriceWithVat(q).getAmountInMinorUnits() - discount * (long) q.getAmount());
         return new Money(discounted);
-    }
-
-    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime startTime, LocalDateTime endTime) {
-        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
-
-        for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(new NormalDiscount(p, discount, startTime, endTime, clock));
-        }
-
-        return discountedProductGroup;
-    }
-
-    public ProductGroup discountGroup(ProductGroup productGroup, LocalDateTime endTime){
-        return discountGroup(productGroup, LocalDateTime.now(), endTime);
     }
 
     @Override
