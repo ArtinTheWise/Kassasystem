@@ -121,4 +121,16 @@ class CustomerTest {
             assertDoesNotThrow(() -> new Customer(validSSN, email));
         }
     }
+    @Test
+    void constructorSetsAgeAndStudentCorrectly() {
+        Customer c = new Customer(validSSN, validEmailAddress, 25, true);
+        assertEquals(25, c.getAge());
+        assertTrue(c.isStudent());
+    }
+    @Test
+    void defaultConstructorSetsAgeAndStudentCorrectly() {
+        Customer c = new Customer(validSSN, validEmailAddress);
+        assertEquals(18, c.getAge());
+        assertFalse(c.isStudent());
+    }
 }
