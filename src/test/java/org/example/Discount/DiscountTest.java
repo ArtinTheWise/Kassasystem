@@ -43,7 +43,7 @@ public class DiscountTest {
         });
         lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
-            return new Money(Math.round(q.getAmount() * price * 1.1));
+            return new Money(Math.round(q.getAmount() * price));
         });
         return p;
     }
@@ -101,6 +101,8 @@ public class DiscountTest {
     void constructorDoesNotAllowImpossibleDates(){
         assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_PAST, FIXED_DATE));
         assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(product, DISCOUNT_AMOUNT, null, null, FIXED_DATE));
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, null, FIXED_DATE));
+        assertThrows(IllegalArgumentException.class, () -> new PercentageDiscount(product, DISCOUNT_AMOUNT, null, DATE_IN_FUTURE, FIXED_DATE));
     }
 
     @Test
@@ -174,10 +176,18 @@ public class DiscountTest {
 
     @ParameterizedTest
     @CsvSource({"120, 1", "240, 3", "360, 4"})
-    @DisplayName("ThreeForTwoDiscount/calculatePrice - returns correct price")
+    @DisplayName("ThreeForTwoDiscount/calculatePriceWithVat - returns correct price")
     void ThreeForTwoDiscountCalculatesDiscountCorrectly(int i1, int i2){
         Product discountedProduct = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         assertEquals(i1, discountedProduct.calculatePrice(quantity(i2)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("ThreeForTwoDiscount/calculatePriceWithVat - returns correct price")
+    void ThreeForTwoDiscountCalculatesDiscountCorrectlyForInactive(){
+        Product inactiveDiscount = new ThreeForTwoDiscount(product, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        assertEquals(120, inactiveDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
+        assertEquals(120, inactiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
     }
 
     @ParameterizedTest
@@ -347,7 +357,7 @@ public class DiscountTest {
     }
 
     @Test
-    @DisplayName("DiscountAtXTime/calculatePrice - returns correct price")
+    @DisplayName("DiscountAtXTime/calculatePrice, calculatePriceWithVat - returns correct price")
     void discountAtXTimeGivesCorrectDiscount(){
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         LocalTime start = LocalTime.now(FIXED_DATE);
@@ -358,6 +368,9 @@ public class DiscountTest {
 
         assertEquals(96, specificActiveDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
         assertEquals(120, specificInactiveDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        assertEquals(96, specificActiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        assertEquals(120, specificInactiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
     }
 
     @Test
@@ -452,6 +465,10 @@ public class DiscountTest {
         assertEquals(120, overXTotalDiscountOne.calculatePrice(quantity(1)).getAmountInMinorUnits());
         assertEquals(192, overXTotalDiscountOne.calculatePrice(quantity(2)).getAmountInMinorUnits());
         assertEquals(240, overXTotalDiscountTwo.calculatePrice(quantity(2)).getAmountInMinorUnits());
+
+        assertEquals(120, overXTotalDiscountOne.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        assertEquals(192, overXTotalDiscountOne.calculatePriceWithVat(quantity(2)).getAmountInMinorUnits());
+        assertEquals(240, overXTotalDiscountTwo.calculatePriceWithVat(quantity(2)).getAmountInMinorUnits());
     }
 
     @Test
@@ -544,7 +561,112 @@ public class DiscountTest {
     void maxXDiscountReturnsCorrectAmount(){
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         ProductDecorator maxActiveDiscount = new MaxXDiscount(activeDiscount, 2);
-        assertEquals(106, maxActiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        assertEquals(96, maxActiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        assertEquals(312, maxActiveDiscount.calculatePriceWithVat(quantity(3)).getAmountInMinorUnits());
+
+        ProductDecorator inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator maxInactiveDiscount = new MaxXDiscount(inactiveDiscount, 2);
+        assertEquals(120, maxInactiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
     }
+
+    @Test
+    @DisplayName("MaxXDiscount/constructor - max integer throws exception")
+    void maxXDiscountDoesNotAllowMaxEqualsToMAXINTEGER(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        assertThrows(IllegalArgumentException.class, () -> new MaxXDiscount(activeDiscount, Integer.MAX_VALUE));
+    }
+
+    @Test
+    @DisplayName("ProductDecorator/createFor - returns correct discountType")
+    void productDecoratorCreateForReturnsCorrectDiscountType(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator maxActiveDiscount = new MaxXDiscount(activeDiscount, 2);
+        ProductDecorator maxActiveDiscountTwo = maxActiveDiscount.createFor(product);
+
+        assertEquals(maxActiveDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits(), maxActiveDiscountTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        ProductDecorator studentDiscount = new StudentDiscount(activeDiscount);
+        ProductDecorator studentDiscountTwo = studentDiscount.createFor(product);
+
+        assertEquals(studentDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits(), studentDiscountTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        ProductDecorator seniorDiscount = new SeniorDiscount(activeDiscount, 65);
+        ProductDecorator seniorDiscountTwo = seniorDiscount.createFor(product);
+
+        assertEquals(seniorDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits(), seniorDiscountTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        ProductDecorator twd = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE);
+        ProductDecorator twdTwo = twd.createFor(product);
+
+        assertEquals(twd.calculatePrice(quantity(1)).getAmountInMinorUnits(), twdTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        ProductDecorator oX = new OverXTotalDiscount(activeDiscount, new Money(100));
+        ProductDecorator oXTwo = oX.createFor(product);
+
+        assertEquals(oX.calculatePrice(quantity(1)).getAmountInMinorUnits(), oXTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+
+        ProductDecorator atX = new DiscountAtXTime(activeDiscount, LocalTime.of(8, 0), LocalTime.of(17, 0));
+        ProductDecorator atXTwo = atX.createFor(product);
+
+        assertEquals(atX.calculatePrice(quantity(1)).getAmountInMinorUnits(), atXTwo.calculatePrice(quantity(1)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("PercentageDiscount/calculatePriceWithVat - returns correct discount")
+    void percentageDiscountReturnsCorrectCalculation(){
+        ProductDecorator inactiveDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        assertEquals(120, inactiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("PercentageDiscount/constructor - allows endTime only")
+    void percentageDiscountDoesNotThrowIfEndTimeOnly(){
+        assertDoesNotThrow(() -> new PercentageDiscount(product, DISCOUNT_AMOUNT, LocalDateTime.now().plusDays(1)));
+    }
+
+    @Test
+    @DisplayName("NormalDiscount/calculatePriceWithVat - returns correct discount")
+    void normalDiscountReturnsCorrectCalculation(){
+        ProductDecorator inactiveDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        assertEquals(120, inactiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("NormalDiscount/constructor - does not throw exception")
+    void normalDiscountDoesNotThrowIfEndTimeAndStartTime(){
+        assertDoesNotThrow(() -> new NormalDiscount(product, DISCOUNT_AMOUNT, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1)));
+    }
+
+    @Test
+    @DisplayName("StudentDiscount/calculatePriceWithVat, calculatePriceWith - returns correct discount")
+    void studentDiscountReturnsCorrectPriceWhenInactive(){
+        ProductDecorator inactiveDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator studentDiscount = new StudentDiscount(inactiveDiscount);
+        Customer c = getMockCustomer("Artin", 21,true);
+
+        assertEquals(120, studentDiscount.calculatePriceWithVat(quantity(1), c).getAmountInMinorUnits());
+        assertEquals(120, studentDiscount.calculatePrice(quantity(1), c).getAmountInMinorUnits());
+    }
+
+    @Test
+    @DisplayName("SeniorDiscount/calculatePriceWithVat, calculatePriceWith - returns correct discount")
+    void seniorDiscountReturnsCorrectPrice(){
+        ProductDecorator inactiveDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_FUTURE, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+
+        ProductDecorator seniorDiscount = new SeniorDiscount(activeDiscount, 65);
+        Customer c = getMockCustomer("Artin", 21,true);
+        Customer cOld = getMockCustomer("Artin", 65,true);
+
+        assertEquals(120, seniorDiscount.calculatePriceWithVat(quantity(1), c).getAmountInMinorUnits());
+        assertEquals(120, seniorDiscount.calculatePrice(quantity(1), c).getAmountInMinorUnits());
+        assertEquals(120, seniorDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        assertEquals(120, seniorDiscount.calculatePrice(quantity(1)).getAmountInMinorUnits());
+        assertEquals(100, seniorDiscount.calculatePriceWithVat(quantity(1), cOld).getAmountInMinorUnits());
+
+        ProductDecorator seniorDiscountTwo = new SeniorDiscount(inactiveDiscount, 65);
+        assertEquals(120, seniorDiscountTwo.calculatePriceWithVat(quantity(1), cOld).getAmountInMinorUnits());
+    }
+
 
 }
