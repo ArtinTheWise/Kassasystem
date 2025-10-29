@@ -143,6 +143,5 @@ class CustomerTest {
 
         assertNull(customer.getMembership());
     }
-    
 
 }
