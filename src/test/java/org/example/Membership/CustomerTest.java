@@ -79,7 +79,7 @@ class CustomerTest {
                 "", "Å@test.se", "A @test.se", "A..@test.se",
                 "A.se", "@test.se", ".A@Test.se", "a@.com",
                 "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c.",
-                "A@@test.se"
+                "A@@test.se", "A@"
         };
 
         for (String email : invalidEmails) {
