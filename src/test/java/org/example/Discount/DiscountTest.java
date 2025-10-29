@@ -668,5 +668,32 @@ public class DiscountTest {
         assertEquals(120, seniorDiscountTwo.calculatePriceWithVat(quantity(1), cOld).getAmountInMinorUnits());
     }
 
+    @Test
+    @DisplayName("DiscountManager/addDiscount, discountCheck - adds correct discounts")
+    void discountProductGroupDiscountsEveryProductInGroup(){
+        NormalDiscount expiredDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_PAST, FIXED_DATE);
+        DiscountManager manager = new DiscountManager();
+        manager.addDiscount(expiredDiscount);
+        assertFalse(manager.discountCheck(product));
 
+        DiscountManager managerTwo = new DiscountManager(new ProductGroup("Dairy", product));
+        assertFalse(managerTwo.discountCheck(product));
+    }
+
+    @Test
+    @DisplayName("DiscountAtXTime/isActive - returns correct boolean")
+    void discountAtXTimeReturnsCorrectBoolean(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeMaxDiscount = new DiscountAtXTime(activeDiscount, LocalTime.of(8, 0), LocalTime.of(10, 0));
+        assertFalse(activeMaxDiscount.isActive());
+    }
+
+    @Test
+    @DisplayName("OverXTotalDiscount/constructor - throws exception for non normal or percentage discount")
+    void overXTotalDiscountThrowsException(){
+        ProductDecorator activeDiscount = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        //ProductDecorator overXDiscount = new OverXTotalDiscount(activeDiscount, new Money(100));
+        assertThrows(IllegalArgumentException.class, () -> new OverXTotalDiscount(activeDiscount, new Money(100)));
+        assertThrows(IllegalArgumentException.class, () -> new OverXTotalDiscount(activeDiscount, new Money(100)));
+    }
 }

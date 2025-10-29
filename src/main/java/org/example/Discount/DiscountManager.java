@@ -18,9 +18,8 @@ public class DiscountManager {
         }
 
         for(Product p : product){
-            if(p instanceof ProductDecorator d){
-                discounts.add(d);
-            }
+            ProductDecorator d = (ProductDecorator) p;
+            discounts.add(d);
         }
     }
 
@@ -35,7 +34,7 @@ public class DiscountManager {
     public boolean discountCheck(Product product){
         removeOldDiscounts();
         for (ProductDecorator d : getActiveDiscounts()){
-            if (d.isActive() && Objects.equals(d.getProduct(), product)) {
+            if (Objects.equals(d.getProduct(), product)) {
                 return true;
             }
         }
@@ -50,15 +49,12 @@ public class DiscountManager {
         long cheapestValue = Long.MAX_VALUE;
 
         for (ProductDecorator d : discounts){
-            if (d.isActive() && Objects.equals(d.getProduct(), product)){
+            if (Objects.equals(d.getProduct(), product)){
                 Money m = d.calculatePriceWithVat(quantity);
-                if (m == null) m = d.calculatePrice(quantity);
-                if (m != null) {
-                    long val = m.getAmountInMinorUnits();
-                    if (val < cheapestValue) {
-                        cheapestValue = val;
-                        cheapest = d;
-                    }
+                long val = m.getAmountInMinorUnits();
+                if (val < cheapestValue) {
+                    cheapestValue = val;
+                    cheapest = d;
                 }
             }
         }
@@ -73,15 +69,12 @@ public class DiscountManager {
         long cheapestValue = Long.MAX_VALUE;
 
         for (ProductDecorator d : discounts){
-            if (d.isActive() && Objects.equals(d.getProduct(), product)){
+            if (Objects.equals(d.getProduct(), product)){
                 Money m = d.calculatePriceWithVat(quantity, customer);
-                if (m == null) m = d.calculatePrice(quantity, customer);
-                if (m != null) {
-                    long val = m.getAmountInMinorUnits();
-                    if (val < cheapestValue) {
-                        cheapestValue = val;
-                        cheapest = d;
-                    }
+                long val = m.getAmountInMinorUnits();
+                if (val < cheapestValue) {
+                    cheapestValue = val;
+                    cheapest = d;
                 }
             }
         }
@@ -129,15 +122,12 @@ public class DiscountManager {
             long cheapestValue = Long.MAX_VALUE;
             for (ProductDecorator d : discounts){
                 if(!(d instanceof OverXTotalDiscount)) {
-                    if (d.isActive() && Objects.equals(d.getProduct(), p)){
+                    if (Objects.equals(d.getProduct(), p)){
                         Money m = d.calculatePriceWithVat(q, customer);
-                        if (m == null) m = d.calculatePrice(q, customer);
-                        if (m != null) {
-                            long val = m.getAmountInMinorUnits();
-                            if (val < cheapestValue) {
-                                cheapestValue = val;
-                                cheapest = d;
-                            }
+                        long val = m.getAmountInMinorUnits();
+                        if (val < cheapestValue) {
+                            cheapestValue = val;
+                            cheapest = d;
                         }
                     }
                 }
@@ -157,16 +147,11 @@ public class DiscountManager {
 
         for (ProductDecorator d : discounts) {
             if (d instanceof OverXTotalDiscount dT) {
-                if (d.isActive()) {
-                    Money m = dT.calculatePriceWithVat(items);
-                    if (m == null) m = dT.calculatePrice(items);
-                    if (m != null) {
-                        long val = m.getAmountInMinorUnits();
-                        if (val < cheapestValue) {
-                            cheapestValue = val;
-                            bestOverX = dT;
-                        }
-                    }
+                Money m = dT.calculatePriceWithVat(items);
+                long val = m.getAmountInMinorUnits();
+                if (val < cheapestValue) {
+                    cheapestValue = val;
+                    bestOverX = dT;
                 }
             }
         }
