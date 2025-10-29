@@ -449,9 +449,9 @@ public class DiscountTest {
     @Test
     @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts with no discounted product")
     void overXTotalDiscountDoesNotApplyDiscountIfNoDiscountedProduct(){
-        Product productOne = getRealProduct("Milk", 120);
-        Product productTwo = getRealProduct("Egg", 50);
-        Product productThree = getRealProduct("Apple", 200);
+        Product productOne = getMockProduct("Milk", 120);
+        Product productTwo = getMockProduct("Egg", 50);
+        Product productThree = getMockProduct("Apple", 200);
 
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         OverXTotalDiscount overXTotalDiscountOne = new OverXTotalDiscount(activeDiscount, new Money(400));
@@ -467,9 +467,9 @@ public class DiscountTest {
     @Test
     @DisplayName("OverXTotalDiscount/calculatePrice - returns correct discounts with discounted product and other products")
     void overXTotalDiscountAppliesDiscountWithMultipleProductsAndDiscountedProduct(){
-        Product productOne = getRealProduct("Milk", 120);
-        Product productTwo = getRealProduct("Egg", 50);
-        Product productThree = getRealProduct("Apple", 200);
+        Product productOne = getMockProduct("Milk", 120);
+        Product productTwo = getMockProduct("Egg", 50);
+        Product productThree = getMockProduct("Apple", 200);
 
         ProductDecorator activeDiscount = new PercentageDiscount(productOne, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         OverXTotalDiscount overXTotalDiscountOne = new OverXTotalDiscount(activeDiscount, new Money(400));
@@ -484,4 +484,50 @@ public class DiscountTest {
         items.remove(productThree);
         assertEquals(220, overXTotalDiscountOne.calculatePrice(items).getAmountInMinorUnits());
     }
+
+    @Test
+    @DisplayName("DiscountManager/getBestDiscount - returns correct discounts")
+    void discountManagerWithOverXTotalDiscount(){
+        Product productOne = getRealProduct("Milk", 120);
+        Product productTwo = getRealProduct("Egg", 50);
+        Product productThree = getRealProduct("Apple", 200);
+        Product productFour = getRealProduct("Gold Apple", 400);
+
+        ProductDecorator activeDiscountOne = new PercentageDiscount(productOne, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeDiscountTwo = new NormalDiscount(productTwo, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeDiscountThree = new PercentageDiscount(productFour, 50, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        OverXTotalDiscount overXTotalDiscount = new OverXTotalDiscount(activeDiscountThree, new Money(400));
+
+        DiscountManager manager = new DiscountManager(activeDiscountOne, activeDiscountTwo, overXTotalDiscount);
+
+        Map<Product, Quantity> items = new HashMap<>();
+        items.put(productOne, quantity(1));
+        items.put(productTwo, quantity(2));
+        items.put(productThree, quantity(1));
+
+        Map<Product, Quantity> discountedItems = manager.getBestDiscount(items, getMockCustomer("Artin", 21, true));
+
+        long amount = 0;
+        for (Map.Entry<Product, Quantity> entry : discountedItems.entrySet()) {
+            Product p = entry.getKey();
+            Quantity q = entry.getValue();
+            amount += p.calculatePrice(q).getAmountInMinorUnits();
+        }
+
+        assertEquals(356, amount);
+
+        items.put(productFour, quantity(1));
+        discountedItems = manager.getBestDiscount(items, getMockCustomer("Artin", 21, true));
+
+        amount = 0;
+        for (Map.Entry<Product, Quantity> entry : discountedItems.entrySet()) {
+            Product p = entry.getKey();
+            Quantity q = entry.getValue();
+            if(p instanceof OverXTotalDiscount){
+                amount = ((OverXTotalDiscount) p).calculatePrice(items).getAmountInMinorUnits();
+            }
+        }
+        assertEquals(410, amount);
+    }
+
 }
