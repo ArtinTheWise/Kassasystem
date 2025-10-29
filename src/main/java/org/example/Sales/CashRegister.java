@@ -32,7 +32,7 @@ public class CashRegister {
         if (this.cashier == null) {
             this.cashier = cashier;
         } else {
-            throw new IllegalArgumentException("Someone else logged in");
+            throw new IllegalStateException("Someone else logged in");
         }
     }
 
@@ -71,7 +71,7 @@ public class CashRegister {
 
             for (BonusCheck check : customer.getMembership().getChecks()) {
 
-                Product product= check.getDiscount().getProduct();
+                Product product = check.getDiscount().getProduct(); // vad händer med productGroup
 
                 if (purchase.getItemsView().containsKey(product)) {
                     if (dm.getBestDiscount(product, purchase.getItemsView().get(product)) == check.getDiscount()) {
