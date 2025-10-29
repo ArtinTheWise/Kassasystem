@@ -788,6 +788,26 @@ public class PurchaseTest {
         assertThrows(Exception.class, () -> purchase.applyDiscounts());
 
     }
+    @Test
+    @DisplayName("LocalDateTime getter returns correct value")
+    void getLocalDateTime_returnsCorrectValue(){
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
+        assertNotNull(purchase.getLocalDateTimeObject());
+    }
+
+    @Test
+    @DisplayName("merge with different units throw exception")
+    void mergeWithDifferentUnits_throwsException(){
+        Purchase purchase = new Purchase(mockCashRegister(), mockCashier());
+        Product potato = mockWeightProduct("Potato");
+
+        purchase.addWeight(potato, 0.350, Unit.G);
+
+        assertThrows(IllegalArgumentException.class, 
+            () -> purchase.addWeight(potato, 0.200, Unit.HG));
+    }
+
+
 
 
 

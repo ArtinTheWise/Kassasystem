@@ -85,9 +85,7 @@ public class Purchase {
 
     private static void requireNonNullProduct(Product product) {
         Objects.requireNonNull(product, "product cannot be null");
-        if (product.getPriceModel() == null){
-            throw new IllegalArgumentException("Product has no PriceModel");
-        }
+        
     }
 
     public Map<Product, Quantity> getItemsView() {
