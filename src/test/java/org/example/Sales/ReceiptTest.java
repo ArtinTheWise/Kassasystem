@@ -1,5 +1,7 @@
 package org.example.Sales;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -250,13 +253,13 @@ public class ReceiptTest {
 
     @Test
     @DisplayName("large receipt works correctly") // just for reading purposes
-    void receiptManyArticles(){
+    void receiptManyArticles() {
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
 
-        Product banana = mockUnitProductWithGross("Banana", new Money(1000),new Money(1250));
-        Product twix = mockUnitProductWithGross("Twix", new Money(700),new Money(875));
-        Product snickers = mockUnitProductWithGross("Snickers", new Money(760),new Money(950));
-        Product olwDill = mockUnitProductWithGross("OLW Dill & Gräslök", new Money(2000),new Money(2500));
+        Product banana = mockUnitProductWithGross("Banana", new Money(1000), new Money(1250));
+        Product twix = mockUnitProductWithGross("Twix", new Money(700), new Money(875));
+        Product snickers = mockUnitProductWithGross("Snickers", new Money(760), new Money(950));
+        Product olwDill = mockUnitProductWithGross("OLW Dill & Gräslök", new Money(2000), new Money(2500));
         Product potato = mockWeightProductGrossOnly("Potato", new Money(2000), new Money(2500));
         Product cocaCola33Cl = mockUnitProductWithPantGrossOnly("Coca Cola 33Cl", new Money(800));
 
@@ -264,10 +267,13 @@ public class ReceiptTest {
         CashRegister cashRegister = new CashRegister(discountManager);
         Cashier cashier = new Cashier("TestCashier");
         Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
+
+        // discounts: 500 off OLW and 3-for-2 on bananas
         NormalDiscount nd = new NormalDiscount(olwDill, 500, ends);
         ThreeForTwoDiscount tf2 = new ThreeForTwoDiscount(banana, ends);
         discountManager.addDiscount(nd, tf2);
 
+        // scan items
         purchase.addPiece(banana);
         purchase.addPiece(twix);
         purchase.addPiece(snickers);
@@ -277,15 +283,57 @@ public class ReceiptTest {
         purchase.addPiece(banana);
         purchase.addPiece(banana);
 
+        // apply discounts and build receipt
         purchase.applyDiscounts();
-
-        @SuppressWarnings("unused")
         Receipt receipt = new Receipt(purchase);
 
-        // System.out.println(receipt.toString());
+        String out = receipt.toString();
 
+        // --- structural/header assertions ---
+        assertTrue(out.contains("StoreName"), "Store name missing");
+        assertTrue(out.contains("StoreLocation"), "Store location missing");
 
+        assertTrue(out.contains("cashier: " + cashier.getId()), "Cashier id missing");
+        assertTrue(out.contains("cashRegister: " + cashRegister.getId()), "Cash register id missing");
+        assertTrue(out.contains("Nr: " + receipt.getId()), "Receipt id missing");
 
+        assertTrue(out.contains("Date:"), "Date missing");
+        assertTrue(out.contains("Time:"), "Time missing");
+
+        // separators
+        assertTrue(out.contains("\n---------------------------"), "Missing line separator");
+        assertEquals(2, out.split("\n---------------------------", -1).length - 1, "Should have two separators");
+
+        // --- line-items present (don’t assert exact numeric formatting) ---
+        assertTrue(out.contains("Banana"), "Banana line missing (1st)");
+        assertTrue(out.contains("Twix"), "Twix line missing");
+        assertTrue(out.contains("Snickers"), "Snickers line missing");
+        assertTrue(out.contains("OLW"), "OLW line missing");
+        assertTrue(out.contains("Potato"), "Potato (weighted) line missing");
+        assertTrue(out.contains("Coca Cola"), "Coca Cola line missing");
+        // bananas added two more times (to trigger 3-for-2)
+        // we only assert that at least one banana line exists; quantity is printed per entry by design
+        // If your purchase collapses identical products, update this to match that behavior:
+        assertTrue(out.contains("Banana"), "Banana line(s) missing (additional)");
+
+        // --- totals must match purchase figures exactly as rendered by Receipt ---
+        BigDecimal expectedGross = BigDecimal.valueOf(purchase.getTotalGross().getAmountInMinorUnits(), 2);
+        BigDecimal expectedNet   = BigDecimal.valueOf(purchase.getTotalNet().getAmountInMinorUnits(), 2);
+        BigDecimal expectedVat   = BigDecimal.valueOf(purchase.getTotalVat().getAmountInMinorUnits(), 2);
+
+        assertTrue(out.contains("\nTotal\t" + expectedGross), "Total gross does not match purchase");
+
+        String summaryRow = "\n25,00\t" + expectedVat + "\t" + expectedNet + "\t" + expectedGross;
+        assertTrue(out.contains("Moms% \tMoms \tNetto \tBrutto"), "VAT header missing");
+        assertTrue(out.contains(summaryRow), "VAT/Net/Gross summary row mismatch");
+
+        // --- sanity: no accidental 'null' text anywhere ---
+        assertFalse(out.contains("null"), "Receipt contains 'null' text");
+
+        // --- optional: ensure discounts had some effect ---
+        // We can at least assert that discounted totals are <= the sum without discounts.
+        // (This doesn’t rely on specific discount math.)
+        // If you have an API to compute totals before discounts, compare explicitly here.
     }
 
     @Test
