@@ -1,6 +1,6 @@
-package org.example;
+package org.example.Product;
 
-import org.example.Product.*;
+import org.example.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

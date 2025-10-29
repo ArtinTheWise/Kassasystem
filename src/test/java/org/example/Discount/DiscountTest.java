@@ -1,11 +1,11 @@
-package org.example;
+package org.example.Discount;
 
 import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.example.Discount.*;
 import org.example.Membership.Customer;
+import org.example.Money;
 import org.example.Product.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

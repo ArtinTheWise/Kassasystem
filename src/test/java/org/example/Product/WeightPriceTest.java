@@ -1,3 +1,5 @@
+package org.example.Product;
+
 import org.example.Money;
 import org.example.Product.Unit;
 import org.example.Product.WeightPrice;
