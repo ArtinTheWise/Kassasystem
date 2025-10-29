@@ -43,7 +43,7 @@ public class DiscountTest {
         });
         lenient().when(p.calculatePriceWithVat(any(Quantity.class))).thenAnswer(inv -> {
             Quantity q = inv.getArgument(0);
-            return new Money(Math.round(q.getAmount() * price));
+            return new Money(Math.round(q.getAmount() * price * 1.1));
         });
         return p;
     }
@@ -535,6 +535,15 @@ public class DiscountTest {
             }
         }
         assertEquals(410, amount);
+    }
+
+    //Öka täckningsgraden
+
+    @Test
+    @DisplayName("MaxXDiscount/calculatePriceWithVat - returns correct price")
+    void maxXDiscountReturnsCorrectAmount(){
+        ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        assertEquals(106, activeDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
     }
 
 }
