@@ -56,8 +56,8 @@ public class Customer {
         if (localPart.isEmpty() || localPart.length() > 64) {
             throw new IllegalArgumentException("Invalid local part length");
         }
-        if (localPart.startsWith(".") || localPart.endsWith(".")) {
-            throw new IllegalArgumentException("Local part cannot start or end with dot");
+        if (localPart.startsWith(".")) {
+            throw new IllegalArgumentException("Local part cannot start with dot");
         }
         if (localPart.contains("..")) {
             throw new IllegalArgumentException("Local part cannot have consecutive dots");

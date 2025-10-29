@@ -114,7 +114,7 @@ class CustomerTest {
     void constructorAcceptsValidEmails() {
         String[] validEmails = {
                 "A.HEIDARI0554@GMAIL.COM",
-                "Aa\" \"1!@gmail.com",
+                "Aa\" \"1!.@gmail.com",
                 "\"test\\\"user\"@gmail.com"
         };
 
