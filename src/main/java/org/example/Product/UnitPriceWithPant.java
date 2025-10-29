@@ -14,9 +14,6 @@ public class UnitPriceWithPant implements PriceModel{
         if (pantPerPiece == null){
             throw new IllegalArgumentException("Pant per piece cannot be null.");
         }
-        if (pantPerPiece.getAmountInMinorUnits() < 0){
-            throw new IllegalArgumentException("Pant per piece cannot be negative.");
-        }
 
         this.basePrice = basePrice;
         this.pantPerPiece = pantPerPiece;
