@@ -543,7 +543,8 @@ public class DiscountTest {
     @DisplayName("MaxXDiscount/calculatePriceWithVat - returns correct price")
     void maxXDiscountReturnsCorrectAmount(){
         ProductDecorator activeDiscount = new PercentageDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        assertEquals(106, activeDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
+        ProductDecorator maxActiveDiscount = new MaxXDiscount(activeDiscount, 2);
+        assertEquals(106, maxActiveDiscount.calculatePriceWithVat(quantity(1)).getAmountInMinorUnits());
     }
 
 }
