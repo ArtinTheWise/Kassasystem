@@ -133,4 +133,16 @@ class CustomerTest {
         assertEquals(18, c.getAge());
         assertFalse(c.isStudent());
     }
+    @Test
+    void cancelMembershipCallsCustomerCancelMembership() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+        Membership membership = customer.getMembership();
+
+        membership.cancelMembership();
+
+        assertNull(customer.getMembership());
+    }
+    
+
 }

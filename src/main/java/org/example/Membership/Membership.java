@@ -37,10 +37,10 @@ public class Membership {
         this.expirationDate = LocalDate.now().plusYears(5); //flyttal
     }
 
-    //nytt
-    public void cancelMembership() {
-        customer.cancelMembership();
-    }
+        //nytt
+        public void cancelMembership() {
+            customer.cancelMembership();
+        }
 
 
     //bonuscheckar
@@ -71,6 +71,7 @@ public class Membership {
             throw new IllegalArgumentException("Check does not exist.");
         }
     }
+
 
 
     // bara för tester
