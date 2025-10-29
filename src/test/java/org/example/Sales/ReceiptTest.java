@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 
 import org.example.Money;
 import org.example.Discount.DiscountManager;
@@ -287,6 +286,17 @@ public class ReceiptTest {
 
     }
 
+    @Test
+    @DisplayName("GetPurchase: returns correct purchase")
+    void getPurchaseReturnsCorrectPurchase(){
+        Purchase purchase = mockPurchase();
+        Product banana = mockUnitProductWithGross("banana", new Money(1000),new Money(1250));
+        purchase.addPiece(banana);
+
+        Receipt receipt = new Receipt(purchase);
+
+        assert(receipt.getPurchase().equals(purchase));
+    }
 
 }
 

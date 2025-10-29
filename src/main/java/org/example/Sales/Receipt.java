@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.example.Money;
 import org.example.Product.Product;
 import org.example.Product.Quantity;
-import org.example.Product.Unit;
 import org.example.Product.UnitPriceWithPant;
 
 public class Receipt {
@@ -56,11 +55,8 @@ public class Receipt {
 
             long lineGrossMinor = priced.calculatePriceWithVat(q).getAmountInMinorUnits();
 
-                // include pant on the BASE product (the physical bottle/can)
+                
             if (base.getPriceModel() instanceof UnitPriceWithPant upm) {
-                if (q.getUnit() != Unit.PIECE) {
-                    throw new IllegalArgumentException("Pant product must be counted by PIECE");
-                }
                 long pieces = Math.round(q.getAmount());
                 lineGrossMinor += upm.getPantPerPiece().getAmountInMinorUnits() * pieces;
             }
