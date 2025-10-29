@@ -63,7 +63,7 @@ public class CashRegister {
 
         Receipt receipt = new Receipt(purchase);
 
-        if (customer != null && customer.getMembership() != null){
+        if (customer != null){
             long pointsGained = purchase.getTotalGross().getAmountInMajorUnits() / 100;
             customer.getMembership().getPoints().add(pointsGained);
 
