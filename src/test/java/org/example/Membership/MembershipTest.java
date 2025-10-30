@@ -106,8 +106,27 @@ public class MembershipTest {
 
 
         );
+    }
 
+    @Test
+    void getChecks_removesExpiredCheck() {
+        Customer customer = new Customer(validSSN, validEmailAddress);
+        customer.becomeMember();
+        Membership membership = customer.getMembership();
 
+        LocalDateTime discountStart = LocalDateTime.now().minusDays(10);
+        LocalDateTime discountEnd = LocalDateTime.now().minusDays(5);
+
+        Product product = new Product("OldProduct", new UnitPrice(new Money(100)), null, VatRate.FOOD, false) {};
+        NormalDiscount expiredDiscount = new NormalDiscount(product, 20, discountStart, discountEnd);
+
+        BonusCheck expiredCheck = new BonusCheck("expiredCheck", expiredDiscount, new Points(50));
+
+        membership.forceAddExpiredCheck(expiredCheck); // metoden används bara för tester
+
+        var checks = membership.getChecks();
+
+        assertTrue(checks.isEmpty());
     }
 
 

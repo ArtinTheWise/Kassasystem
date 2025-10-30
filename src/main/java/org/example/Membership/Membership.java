@@ -79,5 +79,9 @@ public class Membership {
         this.expirationDate = newExpirationDate;
     }
 
+    public void forceAddExpiredCheck(BonusCheck check) {
+        checks.add(check);
+    }
+
 
 }
