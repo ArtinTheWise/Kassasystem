@@ -105,7 +105,7 @@ public class Customer {
         String[] labels = domainPart.split("\\.");
 
         for (String label : labels) {
-            if (label.isEmpty() || label.length() > 63) {
+            if (label.length() > 63) {
                 throw new IllegalArgumentException("Invalid domain label length");
             }
             if (label == labels[labels.length - 1] && label.length() < 2) {
