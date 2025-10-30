@@ -110,7 +110,7 @@ public class Customer {
             if (label.length() > 63) {
                 throw new IllegalArgumentException("Invalid domain label length");
             }
-            if (label == labels[labels.length - 1] && label.length() < 2) {
+            if (label.equals(labels[labels.length - 1]) && label.length() < 2) {
                 throw new IllegalArgumentException("Domain label must be at least 2 characters");
             }
             for (char c : label.toCharArray()) {
