@@ -115,7 +115,7 @@ public class Customer {
             }
             for (char c : label.toCharArray()) {
                 if (!isValidDomainPartChar(c)) {
-                    throw new IllegalArgumentException("Invalid character in local part: " + c);
+                    throw new IllegalArgumentException("Invalid character in domain part: " + c);
                 }
             }
         }
