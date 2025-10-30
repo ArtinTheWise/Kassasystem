@@ -3,9 +3,6 @@ package org.example.Product;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.example.Money;
-import org.example.Product.Quantity;
-import org.example.Product.Unit;
-import org.example.Product.UnitPrice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

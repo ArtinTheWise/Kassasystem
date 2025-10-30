@@ -1,8 +1,6 @@
 package org.example.Product;
 
 import org.example.Money;
-import org.example.Product.Unit;
-import org.example.Product.WeightPrice;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
