@@ -71,7 +71,7 @@ public class Customer {
                 insideQuotes = !insideQuotes;
                 continue;
             }
-            if (c == '\\' && i + 1 < localPart.length()) {
+            if (c == '\\') {
                 i++;
                 continue;
             }
@@ -88,7 +88,9 @@ public class Customer {
         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
             return true;
         }
-        if ("!#$%&'*+-/=?^_`{|}~.".indexOf(c) >= 0) {return true;}
+        if ("!#$%&'*+-/=?^_`{|}~.".contains(String.valueOf(c))) {
+            return true;
+        }
         return false;
     }
 
@@ -112,11 +114,21 @@ public class Customer {
                 throw new IllegalArgumentException("Domain label must be at least 2 characters");
             }
             for (char c : label.toCharArray()) {
-                if (!Character.isLetterOrDigit(c) && c != '-') {
-                    throw new IllegalArgumentException("Invalid character in domain: " + c);
+                if (!isValidDomainPartChar(c)) {
+                    throw new IllegalArgumentException("Invalid character in local part: " + c);
                 }
             }
         }
+    }
+
+    private boolean isValidDomainPartChar(char c) {
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+            return true;
+        }
+        if ("!#$%&'*+-/=?^`{|}~.".contains(String.valueOf(c))) {
+            return true;
+        }
+        return false;
     }
 
     private void validateSSN(String ssn) {

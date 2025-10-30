@@ -127,7 +127,7 @@ class CustomerTest {
                 "", "Å@test.se", "A @test.se", "A..@test.se",
                 "A.se", "@test.se", ".A@Test.se", "a@.com",
                 "a@-a.com", "a@a_a.com", "a@com", "a@y.c", "a@y.c.",
-                "A@@test.se", "A@"
+                "A@@test.se", "A@", "a@åtest.se"
         };
 
         for (String email : invalidEmails) {
@@ -162,7 +162,7 @@ class CustomerTest {
     void constructorAcceptsValidEmails() {
         String[] validEmails = {
                 "A.HEIDARI0554@GMAIL.COM",
-                "Aa\" \"1!.@gmail.com",
+                "Aa\" \"1!.@Gma1!il.com",
                 "\"test\\\"user\"@gmail.com"
         };
 
