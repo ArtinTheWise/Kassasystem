@@ -692,8 +692,66 @@ public class DiscountTest {
     @DisplayName("OverXTotalDiscount/constructor - throws exception for non normal or percentage discount")
     void overXTotalDiscountThrowsException(){
         ProductDecorator activeDiscount = new ThreeForTwoDiscount(product, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
-        //ProductDecorator overXDiscount = new OverXTotalDiscount(activeDiscount, new Money(100));
+        ProductDecorator normalDiscount = new NormalDiscount(product, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
         assertThrows(IllegalArgumentException.class, () -> new OverXTotalDiscount(activeDiscount, new Money(100)));
         assertThrows(IllegalArgumentException.class, () -> new OverXTotalDiscount(activeDiscount, new Money(100)));
+        assertDoesNotThrow(() -> new OverXTotalDiscount(normalDiscount, new Money(100)));
+    }
+
+    @Test
+    @DisplayName("DiscountManager/getBestDiscount - returns correct discounts with no OverXTotalDiscount")
+    void discountManagerWithNoOverXTotalDiscountAndProductMap(){
+        Product productOne = getRealProduct("Milk", 120);
+        Product productTwo = getRealProduct("Egg", 50);
+
+        ProductDecorator activeDiscountOne = new PercentageDiscount(productOne, 0, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeDiscountTwo = new NormalDiscount(productTwo, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+
+        DiscountManager manager = new DiscountManager(activeDiscountOne, activeDiscountTwo);
+
+        Map<Product, Quantity> items = new HashMap<>();
+        items.put(productOne, quantity(1));
+        items.put(productTwo, quantity(2));
+
+        Map<Product, Quantity> discountedItems = manager.getBestDiscount(items, getMockCustomer("Artin", 21, true));
+
+        long amount = 0;
+        for (Map.Entry<Product, Quantity> entry : discountedItems.entrySet()) {
+            Product p = entry.getKey();
+            Quantity q = entry.getValue();
+            amount += p.calculatePrice(q).getAmountInMinorUnits();
+        }
+
+        assertEquals(180, amount);
+    }
+
+    @Test
+    @DisplayName("DiscountManager/getBestDiscount - returns correct OverXTotalDiscount")
+    void discountManagerWithTwoOverXTotalDiscount(){
+        Product productOne = getRealProduct("Milk", 120);
+        Product productTwo = getRealProduct("Egg", 50);
+
+        ProductDecorator activeDiscountOne = new PercentageDiscount(productOne, 25, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator activeDiscountTwo = new PercentageDiscount(productTwo, DISCOUNT_AMOUNT, DATE_IN_PAST, DATE_IN_FUTURE, FIXED_DATE);
+        ProductDecorator OverXOne = new OverXTotalDiscount(activeDiscountOne, new Money(0));
+        ProductDecorator OverXTwo = new OverXTotalDiscount(activeDiscountTwo, new Money(0));
+
+        DiscountManager manager = new DiscountManager(OverXOne, OverXTwo);
+
+        Map<Product, Quantity> items = new HashMap<>();
+        items.put(productOne, quantity(1));
+        items.put(productTwo, quantity(2));
+
+        Map<Product, Quantity> discountedItems = manager.getBestDiscount(items, getMockCustomer("Artin", 21, true));
+
+        long amount = 0;
+        for (Map.Entry<Product, Quantity> entry : discountedItems.entrySet()) {
+            Product p = entry.getKey();
+            System.out.println(p);
+            if(p instanceof OverXTotalDiscount){
+                amount = ((OverXTotalDiscount) p).calculatePrice(items).getAmountInMinorUnits();
+            }
+        }
+        assertEquals(165, amount);
     }
 }

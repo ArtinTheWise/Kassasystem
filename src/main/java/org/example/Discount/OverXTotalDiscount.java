@@ -32,37 +32,34 @@ public class OverXTotalDiscount extends ProductDecorator {
     }
 
     public Money calculatePrice(Map<Product, Quantity> items) {
-        long amount = 0;
-        for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
-            Product p = entry.getKey();
-            Quantity q = entry.getValue();
-            amount += p.calculatePrice(q).getAmountInMinorUnits();
-        }
-        if(amount > priceThreshold.getAmountInMinorUnits() && items.containsKey(discountType.getProduct())){
-            long newAmount = 0;
-            for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
-                Product p = entry.getKey();
-                Quantity q = entry.getValue();
-                newAmount += discountType.createFor(p).calculatePrice(q).getAmountInMinorUnits();
-            }
-            return new Money(newAmount);
-        }
-        return new Money(amount);
+        return calculatePriceHelper(items, false);
     }
 
     public Money calculatePriceWithVat(Map<Product, Quantity> items) {
+        return calculatePriceHelper(items, true);
+    }
+
+    private Money calculatePriceHelper(Map<Product, Quantity> items, boolean withVat){
         long amount = 0;
         for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
             Product p = entry.getKey();
             Quantity q = entry.getValue();
-            amount += p.calculatePriceWithVat(q).getAmountInMinorUnits();
+            if(withVat) {
+                amount += p.calculatePriceWithVat(q).getAmountInMinorUnits();
+            } else {
+                amount += p.calculatePrice(q).getAmountInMinorUnits();
+            }
         }
         if(amount > priceThreshold.getAmountInMinorUnits() && items.containsKey(discountType.getProduct())){
             long newAmount = 0;
             for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
                 Product p = entry.getKey();
                 Quantity q = entry.getValue();
-                newAmount += discountType.createFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
+                if(withVat) {
+                    newAmount += discountType.createFor(p).calculatePriceWithVat(q).getAmountInMinorUnits();
+                } else {
+                    newAmount += discountType.createFor(p).calculatePrice(q).getAmountInMinorUnits();
+                }
             }
             return new Money(newAmount);
         }

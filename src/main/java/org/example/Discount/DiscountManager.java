@@ -42,35 +42,28 @@ public class DiscountManager {
     }
 
     public Product getBestDiscount(Product product, Quantity quantity){
-        removeOldDiscounts();
-        if (!discountCheck(product)) return product;
-
-        Product cheapest = null;
-        long cheapestValue = Long.MAX_VALUE;
-
-        for (ProductDecorator d : discounts){
-            if (Objects.equals(d.getProduct(), product)){
-                Money m = d.calculatePriceWithVat(quantity);
-                long val = m.getAmountInMinorUnits();
-                if (val < cheapestValue) {
-                    cheapestValue = val;
-                    cheapest = d;
-                }
-            }
-        }
-        return (cheapest != null) ? cheapest : product;
+        return getBestDiscountHelper(product, quantity, null);
     }
 
     public Product getBestDiscount(Product product, Quantity quantity, Customer customer){ //includes SpecialDiscount
+        return getBestDiscountHelper(product, quantity, customer);
+    }
+
+    private Product getBestDiscountHelper(Product product, Quantity quantity, Customer customer){
         removeOldDiscounts();
         if (!discountCheck(product)) return product;
 
-        Product cheapest = null;
-        long cheapestValue = Long.MAX_VALUE;
+        Product cheapest = product;
+        long cheapestValue = product.calculatePrice(quantity).getAmountInMinorUnits();
 
         for (ProductDecorator d : discounts){
             if (Objects.equals(d.getProduct(), product)){
-                Money m = d.calculatePriceWithVat(quantity, customer);
+                Money m;
+                if(customer != null) {
+                    m = d.calculatePriceWithVat(quantity, customer);
+                } else {
+                    m = d.calculatePriceWithVat(quantity);
+                }
                 long val = m.getAmountInMinorUnits();
                 if (val < cheapestValue) {
                     cheapestValue = val;
@@ -78,7 +71,7 @@ public class DiscountManager {
                 }
             }
         }
-        return (cheapest != null) ? cheapest : product;
+        return cheapest;
     }
 
     public Map<Product, Quantity> getBestDiscount(Map<Product, Quantity> items, Customer customer){ //best
@@ -118,8 +111,8 @@ public class DiscountManager {
         for (Map.Entry<Product, Quantity> entry : items.entrySet()) {
             Product p = entry.getKey();
             Quantity q = entry.getValue();
-            Product cheapest = null;
-            long cheapestValue = Long.MAX_VALUE;
+            Product cheapest = p;
+            long cheapestValue = p.calculatePrice(q).getAmountInMinorUnits();
             for (ProductDecorator d : discounts){
                 if(!(d instanceof OverXTotalDiscount)) {
                     if (Objects.equals(d.getProduct(), p)){
@@ -132,7 +125,7 @@ public class DiscountManager {
                     }
                 }
             }
-            if(cheapest != null){
+            if(cheapest != p){
                 discountedItems.put(cheapest, q);
             } else {
                 discountedItems.put(p, q);
