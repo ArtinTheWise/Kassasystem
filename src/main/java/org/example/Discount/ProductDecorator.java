@@ -30,14 +30,6 @@ public abstract class ProductDecorator extends Product {
         return now.isBefore(endTime) && (now.isAfter(startTime) || now.isEqual(startTime));
     }
 
-    @Override
-    public String getName(){
-        if(isActive()){
-            return product.getName() + " got a discount.";
-        }
-        return product.getName();
-    }
-
     public LocalDateTime getStartTime(){
         return startTime;
     }
@@ -49,10 +41,6 @@ public abstract class ProductDecorator extends Product {
     public Product getProduct(){
         return product;
     }
-
-    public abstract Money calculatePrice(Quantity quantity);
-
-    public abstract Money calculatePriceWithVat(Quantity quantity);
 
     public Money calculatePrice(Quantity quantity, Customer customer) {
         return calculatePrice(quantity); //Needed for specialDiscount
@@ -69,5 +57,17 @@ public abstract class ProductDecorator extends Product {
         return new Money(originalPrice - discountedPrice);
     }
 
+    @Override
+    public String getName(){
+        if(isActive()){
+            return product.getName() + " got a discount.";
+        }
+        return product.getName();
+    }
+
     public abstract ProductDecorator createFor(Product product);
+
+    public abstract Money calculatePrice(Quantity quantity);
+
+    public abstract Money calculatePriceWithVat(Quantity quantity);
 }

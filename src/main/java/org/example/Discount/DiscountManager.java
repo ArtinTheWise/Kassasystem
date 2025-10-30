@@ -41,37 +41,36 @@ public class DiscountManager {
         return false;
     }
 
+    public void addDiscount(Product... product){
+        for(Product p : product) {
+            if (p instanceof ProductDecorator d) {
+                if (!d.getEndTime().isBefore(LocalDateTime.now(d.clock))) {
+                    discounts.add(d);
+                }
+            }
+        }
+    }
+
+    public void addDiscount(ProductGroup group){
+        addDiscount(group.getProductGroup().toArray(new Product[0]));
+    }
+
+    public ProductGroup discountGroup(ProductGroup productGroup, ProductDecorator discount) {
+        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
+
+        for(Product p : productGroup.getProductGroup()){
+            discountedProductGroup.addProduct(discount.createFor(p));
+        }
+
+        return discountedProductGroup;
+    }
+
     public Product getBestDiscount(Product product, Quantity quantity){
         return getBestDiscountHelper(product, quantity, null);
     }
 
     public Product getBestDiscount(Product product, Quantity quantity, Customer customer){ //includes SpecialDiscount
         return getBestDiscountHelper(product, quantity, customer);
-    }
-
-    private Product getBestDiscountHelper(Product product, Quantity quantity, Customer customer){
-        removeOldDiscounts();
-        if (!discountCheck(product)) return product;
-
-        Product cheapest = product;
-        long cheapestValue = product.calculatePrice(quantity).getAmountInMinorUnits();
-
-        for (ProductDecorator d : discounts){
-            if (Objects.equals(d.getProduct(), product)){
-                Money m;
-                if(customer != null) {
-                    m = d.calculatePriceWithVat(quantity, customer);
-                } else {
-                    m = d.calculatePriceWithVat(quantity);
-                }
-                long val = m.getAmountInMinorUnits();
-                if (val < cheapestValue) {
-                    cheapestValue = val;
-                    cheapest = d;
-                }
-            }
-        }
-        return cheapest;
     }
 
     public Map<Product, Quantity> getBestDiscount(Map<Product, Quantity> items, Customer customer){ //best
@@ -125,11 +124,7 @@ public class DiscountManager {
                     }
                 }
             }
-            if(cheapest != p){
-                discountedItems.put(cheapest, q);
-            } else {
-                discountedItems.put(p, q);
-            }
+            discountedItems.put(cheapest, q);
         }
         return discountedItems;
     }
@@ -151,34 +146,33 @@ public class DiscountManager {
         return bestOverX;
     }
 
-    public void addDiscount(Product... product){
-        for(Product p : product) {
-            if (p instanceof ProductDecorator d) {
-                if (!d.getEndTime().isBefore(LocalDateTime.now(d.clock))) {
-                    discounts.add(d);
+    private Product getBestDiscountHelper(Product product, Quantity quantity, Customer customer){
+        removeOldDiscounts();
+        if (!discountCheck(product)) return product;
+
+        Product cheapest = product;
+        long cheapestValue = product.calculatePrice(quantity).getAmountInMinorUnits();
+
+        for (ProductDecorator d : discounts){
+            if (Objects.equals(d.getProduct(), product)){
+                Money m;
+                if(customer != null) {
+                    m = d.calculatePriceWithVat(quantity, customer);
+                } else {
+                    m = d.calculatePriceWithVat(quantity);
+                }
+                long val = m.getAmountInMinorUnits();
+                if (val < cheapestValue) {
+                    cheapestValue = val;
+                    cheapest = d;
                 }
             }
         }
-    }
-
-    public void addDiscount(ProductGroup group){
-        addDiscount(group.getProductGroup().toArray(new Product[0]));
-    }
-
-    public ProductGroup discountGroup(ProductGroup productGroup, ProductDecorator discount) {
-        ProductGroup discountedProductGroup = new ProductGroup(productGroup.getName());
-
-        for(Product p : productGroup.getProductGroup()){
-            discountedProductGroup.addProduct(discount.createFor(p));
-        }
-
-        return discountedProductGroup;
+        return cheapest;
     }
 
     private void removeOldDiscounts(){
-        discounts.removeIf(d -> {
-            return LocalDateTime.now(d.clock).isAfter(d.getEndTime());
-        });
+        discounts.removeIf(d -> LocalDateTime.now(d.clock).isAfter(d.getEndTime()));
     }
 
     private ArrayList<ProductDecorator> getActiveDiscounts(){

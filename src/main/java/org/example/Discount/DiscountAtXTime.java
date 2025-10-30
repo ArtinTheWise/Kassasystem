@@ -25,8 +25,7 @@ public class DiscountAtXTime extends ProductDecorator {
         LocalDateTime now = LocalDateTime.now(clock);
         LocalTime currentTime = now.toLocalTime();
 
-        if(discountType.isActive() && !currentTime.isBefore(startTimeInDay) && !currentTime.isAfter(endTimeInDay)) return true;
-        return false;
+        return discountType.isActive() && !currentTime.isBefore(startTimeInDay) && !currentTime.isAfter(endTimeInDay);
     }
 
     @Override

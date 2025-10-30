@@ -35,6 +35,11 @@ public class ThreeForTwoDiscount extends ProductDecorator {
         return calculatePriceForQuantity(q, true);
     }
 
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new ThreeForTwoDiscount(product, getStartTime(), getEndTime(), clock);
+    }
+
     private Money calculatePriceForQuantity(Quantity q, boolean withVat) {
         double amount = q.getAmount();
         long freeQuantity = (long) Math.floor(amount / 3);
@@ -42,10 +47,5 @@ public class ThreeForTwoDiscount extends ProductDecorator {
         Quantity charged = new Quantity(chargedAmount, q.getUnit());
 
         return withVat ? getProduct().calculatePriceWithVat(charged) : getProduct().calculatePrice(charged);
-    }
-
-    @Override
-    public ProductDecorator createFor(Product product) {
-        return new ThreeForTwoDiscount(product, getStartTime(), getEndTime(), clock);
     }
 }

@@ -17,6 +17,14 @@ public class OverXTotalDiscount extends ProductDecorator {
         this.priceThreshold = priceThreshold;
     }
 
+    public Money calculatePrice(Map<Product, Quantity> items) {
+        return calculatePriceHelper(items, false);
+    }
+
+    public Money calculatePriceWithVat(Map<Product, Quantity> items) {
+        return calculatePriceHelper(items, true);
+    }
+
     @Override
     public Money calculatePrice(Quantity q) {
         if(!isActive()) return discountType.getProduct().calculatePrice(q);
@@ -31,12 +39,9 @@ public class OverXTotalDiscount extends ProductDecorator {
         return discountType.getProduct().calculatePriceWithVat(q);
     }
 
-    public Money calculatePrice(Map<Product, Quantity> items) {
-        return calculatePriceHelper(items, false);
-    }
-
-    public Money calculatePriceWithVat(Map<Product, Quantity> items) {
-        return calculatePriceHelper(items, true);
+    @Override
+    public ProductDecorator createFor(Product product) {
+        return new OverXTotalDiscount(discountType.createFor(product), priceThreshold);
     }
 
     private Money calculatePriceHelper(Map<Product, Quantity> items, boolean withVat){
@@ -64,10 +69,5 @@ public class OverXTotalDiscount extends ProductDecorator {
             return new Money(newAmount);
         }
         return new Money(amount);
-    }
-
-    @Override
-    public ProductDecorator createFor(Product product) {
-        return new OverXTotalDiscount(discountType.createFor(product), priceThreshold);
     }
 }
