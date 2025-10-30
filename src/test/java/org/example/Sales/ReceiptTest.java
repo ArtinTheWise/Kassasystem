@@ -252,7 +252,7 @@ public class ReceiptTest {
     }
 
     @Test
-    @DisplayName("large receipt works correctly") // just for reading purposes
+    @DisplayName("large receipt works correctly") 
     void receiptManyArticles() {
         LocalDateTime ends = LocalDateTime.of(2099, 1, 1, 0, 0);
 
@@ -268,12 +268,10 @@ public class ReceiptTest {
         Cashier cashier = new Cashier("TestCashier");
         Purchase purchase = new Purchase(cashRegister, cashier, discountManager);
 
-        // discounts: 500 off OLW and 3-for-2 on bananas
         NormalDiscount nd = new NormalDiscount(olwDill, 500, ends);
         ThreeForTwoDiscount tf2 = new ThreeForTwoDiscount(banana, ends);
         discountManager.addDiscount(nd, tf2);
 
-        // scan items
         purchase.addPiece(banana);
         purchase.addPiece(twix);
         purchase.addPiece(snickers);
@@ -283,13 +281,11 @@ public class ReceiptTest {
         purchase.addPiece(banana);
         purchase.addPiece(banana);
 
-        // apply discounts and build receipt
         purchase.applyDiscounts();
         Receipt receipt = new Receipt(purchase);
 
         String out = receipt.toString();
 
-        // --- structural/header assertions ---
         assertTrue(out.contains("StoreName"), "Store name missing");
         assertTrue(out.contains("StoreLocation"), "Store location missing");
 
@@ -300,23 +296,18 @@ public class ReceiptTest {
         assertTrue(out.contains("Date:"), "Date missing");
         assertTrue(out.contains("Time:"), "Time missing");
 
-        // separators
         assertTrue(out.contains("\n---------------------------"), "Missing line separator");
         assertEquals(2, out.split("\n---------------------------", -1).length - 1, "Should have two separators");
 
-        // --- line-items present (don’t assert exact numeric formatting) ---
         assertTrue(out.contains("Banana"), "Banana line missing (1st)");
         assertTrue(out.contains("Twix"), "Twix line missing");
         assertTrue(out.contains("Snickers"), "Snickers line missing");
         assertTrue(out.contains("OLW"), "OLW line missing");
         assertTrue(out.contains("Potato"), "Potato (weighted) line missing");
         assertTrue(out.contains("Coca Cola"), "Coca Cola line missing");
-        // bananas added two more times (to trigger 3-for-2)
-        // we only assert that at least one banana line exists; quantity is printed per entry by design
-        // If your purchase collapses identical products, update this to match that behavior:
+
         assertTrue(out.contains("Banana"), "Banana line(s) missing (additional)");
 
-        // --- totals must match purchase figures exactly as rendered by Receipt ---
         BigDecimal expectedGross = BigDecimal.valueOf(purchase.getTotalGross().getAmountInMinorUnits(), 2);
         BigDecimal expectedNet   = BigDecimal.valueOf(purchase.getTotalNet().getAmountInMinorUnits(), 2);
         BigDecimal expectedVat   = BigDecimal.valueOf(purchase.getTotalVat().getAmountInMinorUnits(), 2);
@@ -327,13 +318,8 @@ public class ReceiptTest {
         assertTrue(out.contains("Moms% \tMoms \tNetto \tBrutto"), "VAT header missing");
         assertTrue(out.contains(summaryRow), "VAT/Net/Gross summary row mismatch");
 
-        // --- sanity: no accidental 'null' text anywhere ---
         assertFalse(out.contains("null"), "Receipt contains 'null' text");
 
-        // --- optional: ensure discounts had some effect ---
-        // We can at least assert that discounted totals are <= the sum without discounts.
-        // (This doesn’t rely on specific discount math.)
-        // If you have an API to compute totals before discounts, compare explicitly here.
     }
 
     @Test
