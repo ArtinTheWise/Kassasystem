@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 class BonusCheckTest {
 
     @Test
-    void constructor_ShouldSetAllFieldsCorrectly() {
+    void    constructor_ShouldSetAllFieldsCorrectly() {
 
         String expectedName = "10% Off Coffee";
         ProductDecorator mockDiscount = mock(ProductDecorator.class);
